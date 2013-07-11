@@ -18,6 +18,20 @@ package org.jclouds.vcloud.director.v1_5.features.admin;
 
 import java.net.URI;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
+import org.jclouds.rest.annotations.BinderParam;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.binders.BindToXMLPayload;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
 import org.jclouds.vcloud.director.v1_5.domain.org.AdminOrg;
 import org.jclouds.vcloud.director.v1_5.domain.org.Org;
 import org.jclouds.vcloud.director.v1_5.domain.org.OrgEmailSettings;
@@ -28,13 +42,14 @@ import org.jclouds.vcloud.director.v1_5.domain.org.OrgPasswordPolicySettings;
 import org.jclouds.vcloud.director.v1_5.domain.org.OrgSettings;
 import org.jclouds.vcloud.director.v1_5.domain.org.OrgVAppTemplateLeaseSettings;
 import org.jclouds.vcloud.director.v1_5.features.OrgApi;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
 
 /**
- * Provides synchronous access to {@link Org} objects.
- * 
- * @see AdminOrgAsyncApi
+ * Provides access to {@link Org} objects.
  * @author danikov, Adrian Cole
  */
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface AdminOrgApi extends OrgApi {
 
    /**
@@ -50,10 +65,21 @@ public interface AdminOrgApi extends OrgApi {
     * @return the admin org
     */
    @Override
-   AdminOrg get(String orgUrn);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   AdminOrg get(@EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
+   /**
+    * @see AdminOrgApi#get(URI)
+    */
    @Override
-   AdminOrg get(URI orgAdminHref);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   AdminOrg get(@EndpointParam URI adminOrgHref);
 
    /**
     * Gets organizational settings for this organization.
@@ -66,9 +92,22 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the settings
     */
-   OrgSettings getSettings(String orgUrn);
+   @GET
+   @Path("/settings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgSettings getSettings(@EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgSettings getSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getSettings(URI)
+    */
+   @GET
+   @Path("/settings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgSettings getSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates organizational settings for this organization.
@@ -83,9 +122,24 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgSettings editSettings(String orgUrn, OrgSettings newSettings);
+   @PUT
+   @Path("/settings")
+   @Consumes(VCloudDirectorMediaType.ORG_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_SETTINGS)
+   @JAXBResponseParser
+   OrgSettings editSettings(@EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgSettings settings);
 
-   OrgSettings editSettings(URI orgAdminHref, OrgSettings newSettings);
+   /**
+    * @see AdminOrgApi#editSettings(URI, OrgSettings)
+    */
+   @PUT
+   @Path("/settings")
+   @Consumes(VCloudDirectorMediaType.ORG_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_SETTINGS)
+   @JAXBResponseParser
+   OrgSettings editSettings(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgSettings settings);
 
    /**
     * Retrieves email settings for an organization.
@@ -98,9 +152,22 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the email settings
     */
-   OrgEmailSettings getEmailSettings(String orgUrn);
+   @GET
+   @Path("/settings/email")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgEmailSettings getEmailSettings(@EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgEmailSettings getEmailSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getEmailSettings(URI)
+    */
+   @GET
+   @Path("/settings/email")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgEmailSettings getEmailSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates email policy settings for organization.
@@ -115,9 +182,25 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgEmailSettings editEmailSettings(String orgUrn, OrgEmailSettings newSettings);
+   @PUT
+   @Path("/settings/email")
+   @Consumes(VCloudDirectorMediaType.ORG_EMAIL_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_EMAIL_SETTINGS)
+   @JAXBResponseParser
+   OrgEmailSettings editEmailSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgEmailSettings settings);
 
-   OrgEmailSettings editEmailSettings(URI orgAdminHref, OrgEmailSettings newSettings);
+   /**
+    * @see AdminOrgApi#editEmailSettings(URI, OrgEmailSettings)
+    */
+   @PUT
+   @Path("/settings/email")
+   @Consumes(VCloudDirectorMediaType.ORG_EMAIL_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_EMAIL_SETTINGS)
+   @JAXBResponseParser
+   OrgEmailSettings editEmailSettings(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgEmailSettings settings);
 
    /**
     * Gets general organization settings.
@@ -130,9 +213,23 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the lease settings
     */
-   OrgGeneralSettings getGeneralSettings(String orgUrn);
+   @GET
+   @Path("/settings/general")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgGeneralSettings getGeneralSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgGeneralSettings getGeneralSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getGeneralSettings(URI)
+    */
+   @GET
+   @Path("/settings/general")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgGeneralSettings getGeneralSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates general organization settings.
@@ -147,9 +244,25 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgGeneralSettings editGeneralSettings(String orgUrn, OrgGeneralSettings newSettings);
+   @PUT
+   @Path("/settings/general")
+   @Consumes(VCloudDirectorMediaType.ORG_GENERAL_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_GENERAL_SETTINGS)
+   @JAXBResponseParser
+   OrgGeneralSettings editGeneralSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgGeneralSettings settings);
 
-   OrgGeneralSettings editGeneralSettings(URI orgAdminHref, OrgGeneralSettings newSettings);
+   /**
+    * @see AdminOrgApi#editGeneralSettings(URI, OrgGeneralSettings)
+    */
+   @PUT
+   @Path("/settings/general")
+   @Consumes(VCloudDirectorMediaType.ORG_GENERAL_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_GENERAL_SETTINGS)
+   @JAXBResponseParser
+   OrgGeneralSettings editGeneralSettings(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgGeneralSettings settings);
 
    /**
     * Retrieves LDAP settings for an organization.
@@ -162,9 +275,22 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the ldap settings
     */
-   OrgLdapSettings getLdapSettings(String orgUrn);
+   @GET
+   @Path("/settings/ldap")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgLdapSettings getLdapSettings(@EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgLdapSettings getLdapSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getPasswordPolicy(URI)
+    */
+   @GET
+   @Path("/settings/ldap")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgLdapSettings getLdapSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Retrieves password policy settings for an organization.
@@ -177,9 +303,23 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the lease settings
     */
-   OrgPasswordPolicySettings getPasswordPolicy(String orgUrn);
+   @GET
+   @Path("/settings/passwordPolicy")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgPasswordPolicySettings getPasswordPolicy(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgPasswordPolicySettings getPasswordPolicy(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getPasswordPolicy(URI)
+    */
+   @GET
+   @Path("/settings/passwordPolicy")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgPasswordPolicySettings getPasswordPolicy(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates password policy settings for organization.
@@ -194,9 +334,25 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgPasswordPolicySettings editPasswordPolicy(String orgUrn, OrgPasswordPolicySettings newSettings);
+   @PUT
+   @Path("/settings/passwordPolicy")
+   @Consumes(VCloudDirectorMediaType.ORG_PASSWORD_POLICY_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_PASSWORD_POLICY_SETTINGS)
+   @JAXBResponseParser
+   OrgPasswordPolicySettings editPasswordPolicy(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgPasswordPolicySettings settings);
 
-   OrgPasswordPolicySettings editPasswordPolicy(URI orgAdminHref, OrgPasswordPolicySettings newSettings);
+   /**
+    * @see AdminOrgApi#editPasswordPolicy(URI, OrgPasswordPolicySettings)
+    */
+   @PUT
+   @Path("/settings/passwordPolicy")
+   @Consumes(VCloudDirectorMediaType.ORG_PASSWORD_POLICY_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_PASSWORD_POLICY_SETTINGS)
+   @JAXBResponseParser
+   OrgPasswordPolicySettings editPasswordPolicy(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgPasswordPolicySettings settings);
 
    /**
     * Gets organization resource cleanup settings on the level of vApp.
@@ -209,9 +365,23 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the lease settings
     */
-   OrgLeaseSettings getVAppLeaseSettings(String orgUrn);
+   @GET
+   @Path("/settings/vAppLeaseSettings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgLeaseSettings getVAppLeaseSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgLeaseSettings getVAppLeaseSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getVAppLeaseSettings(URI)
+    */
+   @GET
+   @Path("/settings/vAppLeaseSettings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgLeaseSettings getVAppLeaseSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates organization resource cleanup settings on the level of vApp.
@@ -226,9 +396,25 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgLeaseSettings editVAppLeaseSettings(String orgUrn, OrgLeaseSettings newSettings);
+   @PUT
+   @Path("/settings/vAppLeaseSettings")
+   @Consumes(VCloudDirectorMediaType.ORG_LEASE_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_LEASE_SETTINGS)
+   @JAXBResponseParser
+   OrgLeaseSettings editVAppLeaseSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgLeaseSettings settings);
 
-   OrgLeaseSettings editVAppLeaseSettings(URI orgAdminHref, OrgLeaseSettings newSettings);
+   /**
+    * @see AdminOrgApi#editVAppLeaseSettings(URI, OrgVAppLeaseSettings)
+    */
+   @PUT
+   @Path("/settings/vAppLeaseSettings")
+   @Consumes(VCloudDirectorMediaType.ORG_LEASE_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_LEASE_SETTINGS)
+   @JAXBResponseParser
+   OrgLeaseSettings editVAppLeaseSettings(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgLeaseSettings settings);
 
    /**
     * Retrieves expiration and storage policy for vApp templates in an organization.
@@ -241,9 +427,23 @@ public interface AdminOrgApi extends OrgApi {
     *           the reference for the admin org
     * @return the lease settings
     */
-   OrgVAppTemplateLeaseSettings getVAppTemplateLeaseSettings(String orgUrn);
+   @GET
+   @Path("/settings/vAppTemplateLeaseSettings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgVAppTemplateLeaseSettings getVAppTemplateLeaseSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
-   OrgVAppTemplateLeaseSettings getVAppTemplateLeaseSettings(URI orgAdminHref);
+   /**
+    * @see AdminOrgApi#getVAppTemplateLeaseSettings(URI)
+    */
+   @GET
+   @Path("/settings/vAppTemplateLeaseSettings")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OrgVAppTemplateLeaseSettings getVAppTemplateLeaseSettings(@EndpointParam URI adminOrgHref);
 
    /**
     * Updates vApp template policy settings for organization.
@@ -258,7 +458,23 @@ public interface AdminOrgApi extends OrgApi {
     *           the requested edited settings
     * @return the resultant settings
     */
-   OrgVAppTemplateLeaseSettings editVAppTemplateLeaseSettings(String orgUrn, OrgVAppTemplateLeaseSettings newSettings);
+   @PUT
+   @Path("/settings/vAppTemplateLeaseSettings")
+   @Consumes(VCloudDirectorMediaType.ORG_VAPP_TEMPLATE_LEASE_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_VAPP_TEMPLATE_LEASE_SETTINGS)
+   @JAXBResponseParser
+   OrgVAppTemplateLeaseSettings editVAppTemplateLeaseSettings(
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn,
+            @BinderParam(BindToXMLPayload.class) OrgVAppTemplateLeaseSettings settings);
 
-   OrgVAppTemplateLeaseSettings editVAppTemplateLeaseSettings(URI orgAdminHref, OrgVAppTemplateLeaseSettings newSettings);
+   /**
+    * @see AdminOrgApi#editVAppTemplateLeaseSettings(URI, OrgVAppTemplateLeaseSettings)
+    */
+   @PUT
+   @Path("/settings/vAppTemplateLeaseSettings")
+   @Consumes(VCloudDirectorMediaType.ORG_VAPP_TEMPLATE_LEASE_SETTINGS)
+   @Produces(VCloudDirectorMediaType.ORG_VAPP_TEMPLATE_LEASE_SETTINGS)
+   @JAXBResponseParser
+   OrgVAppTemplateLeaseSettings editVAppTemplateLeaseSettings(@EndpointParam URI adminOrgHref,
+            @BinderParam(BindToXMLPayload.class) OrgVAppTemplateLeaseSettings settings);
 }

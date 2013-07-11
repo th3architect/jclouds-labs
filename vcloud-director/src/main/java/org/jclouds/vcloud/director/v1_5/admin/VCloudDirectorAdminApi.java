@@ -37,7 +37,6 @@ import org.jclouds.vcloud.director.v1_5.features.admin.GroupApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.UserApi;
 import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
 import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorAsyncApi;
 
 /**
  * Provides synchronous access to VCloudDirector Admin.

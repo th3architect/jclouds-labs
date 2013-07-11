@@ -16,10 +16,37 @@
  */
 package org.jclouds.vcloud.director.v1_5.features;
 
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.CONTROL_ACCESS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.DEPLOY_VAPP_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.LEASE_SETTINGS_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.NETWORK_CONFIG_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.OWNER;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.PRODUCT_SECTION_LIST;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.RECOMPOSE_VAPP_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.STARTUP_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.TASK;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.UNDEPLOY_VAPP_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VAPP;
+
 import java.net.URI;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.dmtf.ovf.StartupSection;
+import org.jclouds.rest.annotations.BinderParam;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.binders.BindToXMLPayload;
 import org.jclouds.vcloud.director.v1_5.domain.Owner;
 import org.jclouds.vcloud.director.v1_5.domain.ProductSectionList;
 import org.jclouds.vcloud.director.v1_5.domain.Task;
@@ -30,14 +57,17 @@ import org.jclouds.vcloud.director.v1_5.domain.params.RecomposeVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.UndeployVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.section.LeaseSettingsSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * Provides synchronous access to {@link VApp} objects.
  * 
- * @author grkvlt@apache.org, Adrian Cole
- * @see VAppAsyncApi
- * @version 1.5
+ * @author grkvlt@apache.org
  */
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface VAppApi {
 
    /**
@@ -85,9 +115,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   VApp get(String vAppUrn);
-
-   VApp get(URI vAppHref);
+   @GET
+   @Consumes(VAPP)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VApp get(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the name/description of a {@link VApp}.
@@ -98,9 +130,12 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task edit(String vAppUrn, VApp vApp);
-
-   Task edit(URI vAppHref, VApp vApp);
+   @PUT
+   @Produces(VAPP)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task edit(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) VApp vApp);
 
    /**
     * Deletes a {@link VApp}.
@@ -111,9 +146,10 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task remove(String vAppUrn);
-
-   Task remove(URI vAppHref);
+   @DELETE
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the control access of a {@link VApp}.
@@ -124,9 +160,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   ControlAccessParams editControlAccess(String vAppUrn, ControlAccessParams params);
-
-   ControlAccessParams editControlAccess(URI vAppHref, ControlAccessParams params);
+   @POST
+   @Path("/action/controlAccess")
+   @Produces(CONTROL_ACCESS)
+   @Consumes(CONTROL_ACCESS)
+   @JAXBResponseParser
+   ControlAccessParams editControlAccess(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
 
    /**
     * Deploys a {@link VApp}.
@@ -142,9 +182,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task deploy(String vAppUrn, DeployVAppParams params);
-
-   Task deploy(URI vAppHref, DeployVAppParams params);
+   @POST
+   @Path("/action/deploy")
+   @Produces(DEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task deploy(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
 
    /**
     * Discard suspended state of a {@link VApp}.
@@ -158,9 +202,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task discardSuspendedState(String vAppUrn);
-
-   Task discardSuspendedState(URI vAppHref);
+   @POST
+   @Path("/action/discardSuspendedState")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task discardSuspendedState(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Place the {@link VApp} into maintenance mode.
@@ -175,9 +221,11 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   void enterMaintenanceMode(String vAppUrn);
-
-   void enterMaintenanceMode(URI vAppHref);
+   @POST
+   @Path("/action/enterMaintenanceMode")
+   @Consumes
+   @JAXBResponseParser
+   Void enterMaintenanceMode(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Take the {@link VApp} out of maintenance mode.
@@ -188,9 +236,11 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   void exitMaintenanceMode(String vAppUrn);
-
-   void exitMaintenanceMode(URI vAppHref);
+   @POST
+   @Path("/action/exitMaintenanceMode")
+   @Consumes
+   @JAXBResponseParser
+   Void exitMaintenanceMode(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Recompose a {@link VApp} by removing its own VMs and/or adding new ones from other vApps or
@@ -209,9 +259,13 @@ public interface VAppApi {
     * 
     * @since 1.0
     */
-   Task recompose(String vAppUrn, RecomposeVAppParams params);
-
-   Task recompose(URI vAppHref, RecomposeVAppParams params);
+   @POST
+   @Path("/action/recomposeVApp")
+   @Produces(RECOMPOSE_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task recompose(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
 
    /**
     * Undeploy a {@link VApp}.
@@ -226,9 +280,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task undeploy(String vAppUrn, UndeployVAppParams params);
-
-   Task undeploy(URI vAppHref, UndeployVAppParams params);
+   @POST
+   @Path("/action/undeploy")
+   @Produces(UNDEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task undeploy(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
 
    /**
     * Retrieves the control access information for a {@link VApp}.
@@ -243,9 +301,12 @@ public interface VAppApi {
     * @since 0.9
     */
    // TODO: revise
-   ControlAccessParams getAccessControl(String vAppUrn);
-
-   ControlAccessParams getAccessControl(URI vAppHref);
+   @GET
+   @Path("/controlAccess")
+   @Consumes(CONTROL_ACCESS)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ControlAccessParams getAccessControl(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Powers off a {@link VApp}.
@@ -259,9 +320,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task powerOff(String vAppUrn);
-
-   Task powerOff(URI vAppHref);
+   @POST
+   @Path("/power/action/powerOff")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOff(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Powers on a {@link VApp}.
@@ -275,9 +338,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task powerOn(String vAppUrn);
-
-   Task powerOn(URI vAppHref);
+   @POST
+   @Path("/power/action/powerOn")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOn(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Reboots a {@link VApp}.
@@ -290,9 +355,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task reboot(String vAppUrn);
-
-   Task reboot(URI vAppHref);
+   @POST
+   @Path("/power/action/reboot")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reboot(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Resets a {@link VApp}.
@@ -306,9 +373,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task reset(String vAppUrn);
-
-   Task reset(URI vAppHref);
+   @POST
+   @Path("/power/action/reset")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reset(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Shuts down a {@link VApp}.
@@ -322,9 +391,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task shutdown(String vAppUrn);
-
-   Task shutdown(URI vAppHref);
+   @POST
+   @Path("/power/action/shutdown")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task shutdown(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Suspends a {@link VApp}.
@@ -338,9 +409,11 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task suspend(String vAppUrn);
-
-   Task suspend(URI vAppHref);
+   @POST
+   @Path("/power/action/suspend")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task suspend(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Retrieves the lease settings section of a {@link VApp}.
@@ -351,9 +424,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   LeaseSettingsSection getLeaseSettingsSection(String vAppUrn);
-
-   LeaseSettingsSection getLeaseSettingsSection(URI vAppHref);
+   @GET
+   @Path("/leaseSettingsSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   LeaseSettingsSection getLeaseSettingsSection(
+            @EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the lease settings section of a {@link VApp}.
@@ -364,9 +441,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task editLeaseSettingsSection(String vAppUrn, LeaseSettingsSection section);
-
-   Task editLeaseSettingsSection(URI vAppHref, LeaseSettingsSection section);
+   @PUT
+   @Path("/leaseSettingsSection")
+   @Produces(LEASE_SETTINGS_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editLeaseSettingsSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
 
    /**
     * Retrieves the network config section of a {@link VApp}.
@@ -377,9 +458,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   NetworkConfigSection getNetworkConfigSection(String vAppUrn);
-
-   NetworkConfigSection getNetworkConfigSection(URI vAppHref);
+   @GET
+   @Path("/networkConfigSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkConfigSection getNetworkConfigSection(
+            @EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the network config section of a {@link VApp}.
@@ -390,9 +475,13 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task editNetworkConfigSection(String vAppUrn, NetworkConfigSection section);
-
-   Task editNetworkConfigSection(URI vAppHref, NetworkConfigSection section);
+   @PUT
+   @Path("/networkConfigSection")
+   @Produces(NETWORK_CONFIG_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editNetworkConfigSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
 
    /**
     * Retrieves the network section of a {@link VApp}.
@@ -403,9 +492,12 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   NetworkSection getNetworkSection(String vAppUrn);
-
-   NetworkSection getNetworkSection(URI vAppHref);
+   @GET
+   @Path("/networkSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkSection getNetworkSection(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Retrieves the owner of a {@link VApp}.
@@ -416,9 +508,12 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   Owner getOwner(String vAppUrn);
-
-   Owner getOwner(URI vAppHref);
+   @GET
+   @Path("/owner")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Owner getOwner(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Changes {@link VApp} owner.
@@ -429,9 +524,13 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   void editOwner(String vAppUrn, Owner owner);
-
-   void editOwner(URI vAppHref, Owner owner);
+   @PUT
+   @Path("/owner")
+   @Produces(OWNER)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Void editOwner(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) Owner owner);
 
    /**
     * Retrieves {@link VApp} product sections.
@@ -442,9 +541,12 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   ProductSectionList getProductSections(String vAppUrn);
-
-   ProductSectionList getProductSections(URI vAppHref);
+   @GET
+   @Path("/productSections")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ProductSectionList getProductSections(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the product section information of a {@link VApp}.
@@ -455,9 +557,13 @@ public interface VAppApi {
     * 
     * @since 1.5
     */
-   Task editProductSections(String vAppUrn, ProductSectionList sectionList);
-
-   Task editProductSections(URI vAppHref, ProductSectionList sectionList);
+   @PUT
+   @Path("/productSections")
+   @Produces(PRODUCT_SECTION_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editProductSections(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
 
    /**
     * Retrieves the startup section of a {@link VApp}.
@@ -468,9 +574,12 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   StartupSection getStartupSection(String vAppUrn);
-
-   StartupSection getStartupSection(URI vAppHref);
+   @GET
+   @Path("/startupSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   StartupSection getStartupSection(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the startup section of a {@link VApp}.
@@ -481,7 +590,535 @@ public interface VAppApi {
     * 
     * @since 0.9
     */
-   Task editStartupSection(String vAppUrn, StartupSection section);
+   @PUT
+   @Path("/startupSection")
+   @Produces(STARTUP_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editStartupSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
+            @BinderParam(BindToXMLPayload.class) StartupSection section);
 
-   Task editStartupSection(URI vAppHref, StartupSection section);
+   /**
+    * Retrieves a {@link VApp}.
+    * 
+    * The {@link VApp} could be in one of these statuses:
+    * <ul>
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#FAILED_CREATION
+    * FAILED_CREATION(-1)} - Transient entity state, e.g., model object is addd but the
+    * corresponding VC backing does not exist yet. This is further sub-categorized in the respective
+    * entities.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRESOLVED
+    * UNRESOLVED(0)} - Entity is whole, e.g., VM creation is complete and all the required model
+    * objects and VC backings are created.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#RESOLVED
+    * RESOLVED(1)} - Entity is resolved.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#DEPLOYED
+    * DEPLOYED(2)} - Entity is deployed.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#SUSPENDED
+    * SUSPENDED(3)} - All VMs of the vApp are suspended.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_ON
+    * POWERED_ON(4)} - All VMs of the vApp are powered on.
+    * <li>
+    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#WAITING_FOR_INPUT
+    * WAITING_FOR_INPUT(5)} - VM is pending response on a question.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNKNOWN
+    * UNKNOWN(6)} - Entity state could not be retrieved from the inventory, e.g., VM power state is
+    * null.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRECOGNIZED
+    * UNRECOGNIZED(7)} - Entity state was retrieved from the inventory but could not be mapped to an
+    * internal state.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_OFF
+    * POWERED_OFF(8)} - All VMs of the vApp are powered off.
+    * <li>
+    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#INCONSISTENT_STATE
+    * INCONSISTENT_STATE(9)} - Apply to VM status, if a vm is {@code POWERED_ON}, or
+    * {@code WAITING_FOR_INPUT}, but is undeployed, it is in an inconsistent state.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#MIXED MIXED(10)}
+    * - vApp status is set to {@code MIXED} when the VMs in the vApp are in different power states
+    * </ul>
+    * 
+    * <pre>
+    * GET /vApp/{id}
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @GET
+   @Consumes(VAPP)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VApp get(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the name/description of a {@link VApp}.
+    * 
+    * <pre>
+    * PUT /vApp/{id}
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @PUT
+   @Produces(VAPP)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task edit(@EndpointParam URI vAppHref, @BinderParam(BindToXMLPayload.class) VApp vApp);
+
+   /**
+    * Deletes a {@link VApp}.
+    * 
+    * <pre>
+    * DELETE /vApp/{id}
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @DELETE
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the control access of a {@link VApp}.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/controlAccess
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/action/controlAccess")
+   @Produces(CONTROL_ACCESS)
+   @Consumes(CONTROL_ACCESS)
+   @JAXBResponseParser
+   ControlAccessParams editControlAccess(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
+
+   /**
+    * Deploys a {@link VApp}.
+    * 
+    * Deployment means allocation of all resource for a vApp/VM like CPU and memory from a vDC
+    * resource pool. Deploying a vApp automatically deploys all of the virtual machines it contains.
+    * As of version 1.5 the operation supports force customization passed with
+    * {@link DeployVAppParamsType#setForceCustomization(Boolean)} parameter.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/deploy
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/action/deploy")
+   @Produces(DEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task deploy(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
+
+   /**
+    * Discard suspended state of a {@link VApp}.
+    * 
+    * Discarding suspended state of a vApp automatically discarded suspended states of all of the
+    * virtual machines it contains.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/discardSuspendedState
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/action/discardSuspendedState")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task discardSuspendedState(@EndpointParam URI vAppHref);
+
+   /**
+    * Place the {@link VApp} into maintenance mode.
+    * 
+    * While in maintenance mode, a system admin can operate on the vApp as usual, but end users are
+    * restricted to read-only operations. Any user-initiated tasks running when the vApp enters
+    * maintenance mode will continue.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/enterMaintenanceMode
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @POST
+   @Path("/action/enterMaintenanceMode")
+   @Consumes
+   @JAXBResponseParser
+   Void enterMaintenanceMode(@EndpointParam URI vAppHref);
+
+   /**
+    * Take the {@link VApp} out of maintenance mode.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/exitMaintenanceMode
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @POST
+   @Path("/action/exitMaintenanceMode")
+   @Consumes
+   @JAXBResponseParser
+   Void exitMaintenanceMode(@EndpointParam URI vAppHref);
+
+   /**
+    * Recompose a {@link VApp} by removing its own VMs and/or adding new ones from other vApps or
+    * vApp templates.
+    * 
+    * To remove VMs you should put their references in elements. The way you add VMs is the same as
+    * described in compose vApp operation
+    * {@link VdcApi#composeVApp(String, org.jclouds.vcloud.director.v1_5.domain.ComposeVAppParams)}.
+    * The status of vApp will be in
+    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRESOLVED} until the
+    * recompose task is finished.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/recomposeVApp
+    * </pre>
+    * 
+    * @since 1.0
+    */
+   @POST
+   @Path("/action/recomposeVApp")
+   @Produces(RECOMPOSE_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task recompose(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
+
+   /**
+    * Undeploy a {@link VApp}.
+    * 
+    * Undeployment means deallocation of all resources for a vApp/VM like CPU and memory from a vDC
+    * resource pool. Undeploying a vApp automatically undeploys all of the virtual machines it
+    * contains.
+    * 
+    * <pre>
+    * POST /vApp/{id}/action/undeploy
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/action/undeploy")
+   @Produces(UNDEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task undeploy(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
+
+   /**
+    * Retrieves the control access information for a {@link VApp}.
+    * 
+    * The vApp could be shared to everyone or could be shared to specific user, by editing the
+    * control access values.
+    * 
+    * <pre>
+    * GET /vApp/{id}/controlAccess
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   // TODO: revise
+   @GET
+   @Path("/controlAccess")
+   @Consumes(CONTROL_ACCESS)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ControlAccessParams getAccessControl(@EndpointParam URI vAppHref);
+
+   /**
+    * Powers off a {@link VApp}.
+    * 
+    * If the operation is used over a vApp then all VMs are powered off. This operation is allowed
+    * only when the vApp/VM is powered on.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/powerOff
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/powerOff")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOff(@EndpointParam URI vAppHref);
+
+   /**
+    * Powers on a {@link VApp}.
+    * 
+    * If the operation is used over a vApp then all VMs are powered on. This operation is allowed
+    * only when the vApp/VM is powered off.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/powerOn
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/powerOn")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOn(@EndpointParam URI vAppHref);
+
+   /**
+    * Reboots a {@link VApp}.
+    * 
+    * The vApp/VM should be started in order to reboot it.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/reboot
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/reboot")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reboot(@EndpointParam URI vAppHref);
+
+   /**
+    * Resets a {@link VApp}.
+    * 
+    * If the operation is used over a vApp then all VMs are reset. This operation is allowed only
+    * when the vApp/VM is powered on.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/reset
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/reset")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reset(@EndpointParam URI vAppHref);
+
+   /**
+    * Shuts down a {@link VApp}.
+    * 
+    * If the operation is used over a vApp then all VMs are shutdown. This operation is allowed only
+    * when the vApp/VM is powered on.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/shutdown
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/shutdown")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task shutdown(@EndpointParam URI vAppHref);
+
+   /**
+    * Suspends a {@link VApp}.
+    * 
+    * If the operation is used over a vApp then all VMs are suspended. This operation is allowed
+    * only when the vApp/VM is powered on.
+    * 
+    * <pre>
+    * POST /vApp/{id}/power/action/suspend
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @POST
+   @Path("/power/action/suspend")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task suspend(@EndpointParam URI vAppHref);
+
+   /**
+    * Retrieves the lease settings section of a {@link VApp}.
+    * 
+    * <pre>
+    * GET /vApp/{id}/leaseSettingsSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @GET
+   @Path("/leaseSettingsSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   LeaseSettingsSection getLeaseSettingsSection(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the lease settings section of a {@link VApp}.
+    * 
+    * <pre>
+    * PUT /vApp/{id}/leaseSettingsSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @PUT
+   @Path("/leaseSettingsSection")
+   @Produces(LEASE_SETTINGS_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editLeaseSettingsSection(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
+
+   /**
+    * Retrieves the network config section of a {@link VApp}.
+    * 
+    * <pre>
+    * GET /vApp/{id}/networkConfigSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @GET
+   @Path("/networkConfigSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkConfigSection getNetworkConfigSection(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the network config section of a {@link VApp}.
+    * 
+    * <pre>
+    * PUT /vApp/{id}/networkConfigSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @PUT
+   @Path("/networkConfigSection")
+   @Produces(NETWORK_CONFIG_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editNetworkConfigSection(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
+
+   /**
+    * Retrieves the network section of a {@link VApp}.
+    * 
+    * <pre>
+    * GET /vApp/{id}/networkSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @GET
+   @Path("/networkSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkSection getNetworkSection(@EndpointParam URI vAppHref);
+
+   /**
+    * Retrieves the owner of a {@link VApp}.
+    * 
+    * <pre>
+    * GET /vApp/{id}/owner
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @GET
+   @Path("/owner")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Owner getOwner(@EndpointParam URI vAppHref);
+
+   /**
+    * Changes {@link VApp} owner.
+    * 
+    * <pre>
+    * PUT /vApp/{id}/owner
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @PUT
+   @Path("/owner")
+   @Produces(OWNER)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Void editOwner(@EndpointParam URI vAppHref, @BinderParam(BindToXMLPayload.class) Owner owner);
+
+   /**
+    * Retrieves {@link VApp} product sections.
+    * 
+    * <pre>
+    * GET /vApp/{id}/productSections
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @GET
+   @Path("/productSections")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ProductSectionList getProductSections(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the product section information of a {@link VApp}.
+    * 
+    * <pre>
+    * PUT /vApp/{id}/productSections
+    * </pre>
+    * 
+    * @since 1.5
+    */
+   @PUT
+   @Path("/productSections")
+   @Produces(PRODUCT_SECTION_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editProductSections(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
+
+   /**
+    * Retrieves the startup section of a {@link VApp}.
+    * 
+    * <pre>
+    * GET /vApp/{id}/startupSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @GET
+   @Path("/startupSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   StartupSection getStartupSection(@EndpointParam URI vAppHref);
+
+   /**
+    * Modifies the startup section of a {@link VApp}.
+    * 
+    * <pre>
+    * PUT /vApp/{id}/startupSection
+    * </pre>
+    * 
+    * @since 0.9
+    */
+   @PUT
+   @Path("/startupSection")
+   @Produces(STARTUP_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editStartupSection(@EndpointParam URI vAppHref,
+            @BinderParam(BindToXMLPayload.class) StartupSection section);
 }

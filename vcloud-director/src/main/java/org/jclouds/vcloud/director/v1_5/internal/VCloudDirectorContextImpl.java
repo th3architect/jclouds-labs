@@ -16,30 +16,11 @@
  */
 package org.jclouds.vcloud.director.v1_5.internal;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.jclouds.annotations.Name;
-import org.jclouds.domain.Credentials;
-import org.jclouds.lifecycle.Closer;
-import org.jclouds.location.Provider;
-import org.jclouds.providers.ProviderMetadata;
-import org.jclouds.rest.RestContext;
-import org.jclouds.rest.Utils;
-import org.jclouds.rest.internal.RestContextImpl;
-import org.jclouds.vcloud.director.v1_5.VCloudDirectorContext;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminAsyncApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorAsyncApi;
-
-import com.google.common.base.Supplier;
-import com.google.inject.Injector;
-import com.google.inject.TypeLiteral;
 
 /**
  * @author danikov
  */
+/*
 @Singleton
 public class VCloudDirectorContextImpl extends RestContextImpl<VCloudDirectorApi, VCloudDirectorAsyncApi> implements
       VCloudDirectorContext {
@@ -59,3 +40,4 @@ public class VCloudDirectorContextImpl extends RestContextImpl<VCloudDirectorApi
       return adminContext;
    }
 }
+*/

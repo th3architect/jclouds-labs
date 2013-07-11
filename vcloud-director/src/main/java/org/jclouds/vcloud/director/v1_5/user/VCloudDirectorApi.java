@@ -16,10 +16,12 @@
  */
 package org.jclouds.vcloud.director.v1_5.user;
 
+import java.io.Closeable;
 import java.net.URI;
 
 import org.jclouds.rest.annotations.Delegate;
 import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.vcloud.director.v1_5.domain.Catalog;
 import org.jclouds.vcloud.director.v1_5.domain.Entity;
 import org.jclouds.vcloud.director.v1_5.domain.Media;
@@ -44,17 +46,19 @@ import org.jclouds.vcloud.director.v1_5.features.VAppApi;
 import org.jclouds.vcloud.director.v1_5.features.VAppTemplateApi;
 import org.jclouds.vcloud.director.v1_5.features.VdcApi;
 import org.jclouds.vcloud.director.v1_5.features.VmApi;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
 import com.google.inject.Provides;
 
 /**
- * Provides synchronous access to VCloudDirector.
+ * Provides access to VCloudDirector 1.5
  * 
  * @see VCloudDirectorAsyncApi
- * @author danikov
+ * @author danikov, Andrea Turli
  */
-public interface VCloudDirectorApi {
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+public interface VCloudDirectorApi extends Closeable{
 
    /**
     * Redirects to the URL of an entity with the given VCD ID.

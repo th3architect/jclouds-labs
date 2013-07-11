@@ -17,7 +17,6 @@
 package org.jclouds.vcloud.director.v1_5;
 
 import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
-import static org.jclouds.reflect.Reflection2.typeToken;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_TIMEOUT_TASK_COMPLETED;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_VERSION_SCHEMA;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_XML_NAMESPACE;
@@ -27,21 +26,18 @@ import java.net.URI;
 import java.util.Properties;
 
 import org.jclouds.apis.ApiMetadata;
-import org.jclouds.rest.internal.BaseRestApiMetadata;
-import org.jclouds.vcloud.director.v1_5.config.VCloudDirectorRestClientModule;
+import org.jclouds.rest.internal.BaseHttpApiMetadata;
+import org.jclouds.vcloud.director.v1_5.config.VCloudDirectorHttpApiModule;
 import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorAsyncApi;
-
-import com.google.common.reflect.TypeToken;
 
 /**
  * Implementation of {@link ApiMetadata} for VCloudDirector 1.5 API
  * 
- * @author Adrian Cole
+ * @author Adrian Cole, Andrea Turli
  */
-public class VCloudDirectorApiMetadata extends BaseRestApiMetadata {
+public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata<VCloudDirectorApi> {
 
-   public static final TypeToken<VCloudDirectorContext> CONTEXT_TOKEN = typeToken(VCloudDirectorContext.class);
+   //public static final TypeToken<VCloudDirectorContext> CONTEXT_TOKEN = typeToken(VCloudDirectorContext.class);
    
    @Override
    public Builder toBuilder() {
@@ -57,7 +53,7 @@ public class VCloudDirectorApiMetadata extends BaseRestApiMetadata {
    }
 
    public static Properties defaultProperties() {
-      Properties properties = BaseRestApiMetadata.defaultProperties();
+       Properties properties = BaseHttpApiMetadata.defaultProperties();
       /** FIXME this should not be the default */
       properties.setProperty(PROPERTY_SESSION_INTERVAL, Integer.toString(30 * 60));
 
@@ -73,10 +69,9 @@ public class VCloudDirectorApiMetadata extends BaseRestApiMetadata {
       return properties;
    }
 
-   public static class Builder extends BaseRestApiMetadata.Builder<Builder> {
+   public static class Builder extends BaseHttpApiMetadata.Builder<VCloudDirectorApi, Builder> {
 
       protected Builder() {
-         super(VCloudDirectorApi.class, VCloudDirectorAsyncApi.class);
           id("vcloud-director")
          .name("vCloud Director 1.5 API")
          .identityName("User at Organization (user@org)")
@@ -84,8 +79,7 @@ public class VCloudDirectorApiMetadata extends BaseRestApiMetadata {
          .documentation(URI.create("http://www.vmware.com/support/pubs/vcd_pubs.html"))
          .version("1.5")
          .defaultProperties(VCloudDirectorApiMetadata.defaultProperties())
-         .context(typeToken(VCloudDirectorContext.class))
-         .defaultModule(VCloudDirectorRestClientModule.class);
+         .defaultModule(VCloudDirectorHttpApiModule.class);
       }
 
       @Override

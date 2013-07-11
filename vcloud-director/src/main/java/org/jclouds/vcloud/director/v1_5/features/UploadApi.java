@@ -17,19 +17,27 @@
 package org.jclouds.vcloud.director.v1_5.features;
 
 import java.net.URI;
+
+import javax.ws.rs.PUT;
+
 import org.jclouds.io.Payload;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
- * Provides synchronous access to upload.
+ * Provides access to upload.
  * 
- * @see UploadAsyncApi
- * @author danikov
+ * @author danikov, Andrea Turli
  */
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface UploadApi {
 
    /**
     * @return eTag
     */
-   void upload(URI location, Payload payload);
-   
+   @PUT
+   Void upload(@EndpointParam URI location, Payload payload);
 }

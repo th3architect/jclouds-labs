@@ -18,17 +18,36 @@ package org.jclouds.vcloud.director.v1_5.features;
 
 import java.net.URI;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
+import org.jclouds.rest.annotations.BinderParam;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.binders.BindToXMLPayload;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
 import org.jclouds.vcloud.director.v1_5.domain.Media;
 import org.jclouds.vcloud.director.v1_5.domain.Owner;
 import org.jclouds.vcloud.director.v1_5.domain.Task;
 import org.jclouds.vcloud.director.v1_5.domain.params.CloneMediaParams;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
- * Provides synchronous access to {@link Media}.
- * 
- * @see MediaAsyncApi
- * @author danikov, Adrian Cole
+ * @see MediaApi
+ * @author danikov, Adrian Cole, Andrea Turli
  */
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface MediaApi {
 
    /**
@@ -36,9 +55,11 @@ public interface MediaApi {
     * 
     * @return the media or null if not found
     */
-   Media get(String mediaUrn);
-
-   Media get(URI mediaHref);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Media get(@EndpointParam(parser = URNToHref.class) String mediaUrn);
 
    /**
     * Creates a media (and present upload link for the floppy/iso file).
@@ -46,7 +67,11 @@ public interface MediaApi {
     * @return The response will return a link to transfer site to be able to continue with uploading
     *         the media.
     */
-   Media add(URI uploadHref, Media media);
+   @POST
+   @Consumes(VCloudDirectorMediaType.MEDIA)
+   @Produces(VCloudDirectorMediaType.MEDIA)
+   @JAXBResponseParser
+   Media add(@EndpointParam URI updateHref, @BinderParam(BindToXMLPayload.class) Media media);
 
    /**
     * Clones a media into new one. The status of the returned media is UNRESOLVED(0) until the task
@@ -55,9 +80,13 @@ public interface MediaApi {
     * @return a Media resource which will contain a task. The user should monitor the contained task
     *         status in order to check when it is completed.
     */
-   Media clone(String mediaUrn, CloneMediaParams params);
-
-   Media clone(URI mediaHref, CloneMediaParams params);
+   @POST
+   @Path("/action/cloneMedia")
+   @Consumes(VCloudDirectorMediaType.MEDIA)
+   @Produces(VCloudDirectorMediaType.CLONE_MEDIA_PARAMS)
+   @JAXBResponseParser
+   Media clone(@EndpointParam(parser = URNToHref.class) String mediaUrn,
+            @BinderParam(BindToXMLPayload.class) CloneMediaParams params);
 
    /**
     * Updates the name/description of a media.
@@ -65,23 +94,84 @@ public interface MediaApi {
     * @return a task. This operation is asynchronous and the user should monitor the returned task
     *         status in order to check when it is completed.
     */
-   Task edit(String mediaUrn, Media media);
-
-   Task edit(URI mediaHref, Media media);
+   @PUT
+   @Consumes(VCloudDirectorMediaType.TASK)
+   @Produces(VCloudDirectorMediaType.MEDIA)
+   @JAXBResponseParser
+   Task edit(@EndpointParam(parser = URNToHref.class) String mediaUrn,
+            @BinderParam(BindToXMLPayload.class) Media media);
 
    /**
     * Deletes a media.
     */
-   Task remove(String mediaUrn);
+   @DELETE
+   @Consumes(VCloudDirectorMediaType.TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam(parser = URNToHref.class) String mediaUrn);
 
-   Task remove(URI mediaHref);
+   /**
+    * @see MediaApi#getOwner(String)
+    */
+   @GET
+   @Path("/owner")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Owner getOwner(@EndpointParam(parser = URNToHref.class) String mediaUrn);
+
+   /**
+    * @see MediaApi#get(URI)
+    */
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Media get(@EndpointParam URI mediaHref);
+
+   /**
+    * Clones a media into new one. The status of the returned media is UNRESOLVED(0) until the task
+    * for cloning finish.
+    * 
+    * @return a Media resource which will contain a task. The user should monitor the contained task
+    *         status in order to check when it is completed.
+    */
+   @POST
+   @Path("/action/cloneMedia")
+   @Consumes(VCloudDirectorMediaType.MEDIA)
+   @Produces(VCloudDirectorMediaType.CLONE_MEDIA_PARAMS)
+   @JAXBResponseParser
+   Media clone(@EndpointParam URI mediaHref,
+            @BinderParam(BindToXMLPayload.class) CloneMediaParams params);
+
+   /**
+    * Updates the name/description of a media.
+    * 
+    * @return a task. This operation is asynchronous and the user should monitor the returned task
+    *         status in order to check when it is completed.
+    */
+   @PUT
+   @Consumes(VCloudDirectorMediaType.TASK)
+   @Produces(VCloudDirectorMediaType.MEDIA)
+   @JAXBResponseParser
+   Task edit(@EndpointParam URI mediaHref, @BinderParam(BindToXMLPayload.class) Media media);
+
+   /**
+    * Deletes a media.
+    */
+   @DELETE
+   @Consumes(VCloudDirectorMediaType.TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam URI mediaHref);
 
    /**
     * Retrieves an owner.
     * 
     * @return the owner or null if not found
     */
-   Owner getOwner(String mediaUrn);
-
-   Owner getOwner(URI mediaHref);
+   @GET
+   @Path("/owner")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Owner getOwner(@EndpointParam URI mediaHref);
 }
