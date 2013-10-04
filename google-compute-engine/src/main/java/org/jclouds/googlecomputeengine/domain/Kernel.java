@@ -26,7 +26,7 @@ import com.google.common.annotations.Beta;
  * Represents a kernel.
  *
  * @author David Alves
- * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/kernels"/>
+ * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/kernels"/>
  */
 @Beta
 public final class Kernel extends Resource {

@@ -42,7 +42,7 @@ import com.google.common.annotations.Beta;
  * <p/>
  *
  * @author David Alves
- * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15">api doc</a>
+ * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16">api doc</a>
  */
 @Beta
 public interface GoogleComputeEngineApi extends Closeable {

@@ -83,7 +83,7 @@ public class GoogleComputeEngineParserModule extends AbstractModule {
    /**
     * Parser for operations that unwraps errors avoiding an extra intermediate object.
     *
-    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/operations"/>
+    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/operations"/>
     */
    @Singleton
    private static class OperationTypeAdapter implements JsonDeserializer<Operation> {

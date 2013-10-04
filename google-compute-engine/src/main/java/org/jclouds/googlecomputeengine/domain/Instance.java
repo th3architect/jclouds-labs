@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableSet;
  * Represents a virtual machine.
  *
  * @author David Alves
- * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/instances"/>
+ * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/instances"/>
  */
 @Beta
 public class Instance extends Resource {
@@ -476,7 +476,7 @@ public class Instance extends Resource {
    /**
     * A disk attached to an Instance.
     *
-    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/instances"/>
+    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/instances"/>
     */
    public static class AttachedDisk {
 
@@ -665,7 +665,7 @@ public class Instance extends Resource {
    /**
     * A network interface for an Instance.
     *
-    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/instances"/>
+    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/instances"/>
     */
    public static final class NetworkInterface {
 
@@ -959,7 +959,7 @@ public class Instance extends Resource {
     * The output of an instance's serial port;
     *
     * @author David Alves
-    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/instances/serialPort"/>
+    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/instances/serialPort"/>
     */
    public static final class SerialPortOutput {
 
@@ -1067,7 +1067,7 @@ public class Instance extends Resource {
     * A service account for which access tokens are to be made available to the instance through metadata queries.
     *
     * @author David Alves
-    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta15/instances"/>
+    * @see <a href="https://developers.google.com/compute/docs/reference/v1beta16/instances"/>
     */
    public static final class ServiceAccount {
 
