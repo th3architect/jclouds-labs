@@ -19,14 +19,14 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.apache.jclouds.labs</groupId>
+    <groupId>io.brooklyn.jclouds.labs</groupId>
     <artifactId>jclouds-represetations</artifactId>
-    <version>1.7.2-SNAPSHOT</version>
+    <version>1.7.2-alpha.1</version>
     <relativePath>..</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.jclouds.labs.representations</groupId>
+  <groupId>io.brooklyn.jclouds.labs.representations</groupId>
   <artifactId>representations-codec</artifactId>
   <packaging>bundle</packaging>
   <name>jclouds :: representations :: codec</name>
@@ -46,27 +46,27 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.jclouds.labs.representations</groupId>
+      <groupId>io.brooklyn.jclouds.labs.representations</groupId>
       <artifactId>representations-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
+      <groupId>io.brooklyn.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.2-alpha.1</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
+      <groupId>io.brooklyn.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.2-alpha.1</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
+      <groupId>io.brooklyn.jclouds</groupId>
       <artifactId>jclouds-blobstore</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.2-alpha.1</version>
     </dependency>
 
     <dependency>
@@ -76,9 +76,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
+      <groupId>io.brooklyn.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.2-alpha.1</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
