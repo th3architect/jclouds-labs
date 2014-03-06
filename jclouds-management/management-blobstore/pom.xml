@@ -20,12 +20,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>jclouds-management</artifactId>
-    <groupId>org.apache.jclouds.labs</groupId>
+    <groupId>io.cloudsoft.jclouds.labs</groupId>
     <version>1.7.2-ea-brooklyn.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.jclouds.labs.management</groupId>
+  <groupId>io.cloudsoft.jclouds.labs.management</groupId>
   <artifactId>management-blobstore</artifactId>
   <packaging>bundle</packaging>
   <name>jclouds :: management :: blobstore</name>
@@ -41,19 +41,19 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
+      <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-blobstore</artifactId>
       <version>1.7.2-ea-brooklyn.1</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds.labs.representations</groupId>
+      <groupId>io.cloudsoft.jclouds.labs.representations</groupId>
       <artifactId>representations-codec</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.jclouds.labs.management</groupId>
+      <groupId>io.cloudsoft.jclouds.labs.management</groupId>
       <artifactId>management-core</artifactId>
       <version>${project.version}</version>
     </dependency>
