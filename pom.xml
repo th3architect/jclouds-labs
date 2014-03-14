@@ -22,11 +22,11 @@
   <parent>
     <groupId>io.cloudsoft.jclouds</groupId>
     <artifactId>jclouds-project</artifactId>
-    <version>1.7.2-ea-brooklyn.1</version>
+    <version>1.7.2-ea-brooklyn.2</version>
   </parent>
   <groupId>io.cloudsoft.jclouds.labs</groupId>
   <artifactId>jclouds-labs</artifactId>
-  <version>1.7.2-ea-brooklyn.1</version>
+  <version>1.7.2-ea-brooklyn.2</version>
   <packaging>pom</packaging>
   <name>Apache jclouds labs</name>
 
@@ -38,7 +38,7 @@
   </scm>
 
   <properties>
-    <jclouds.version>1.7.2-ea-brooklyn.1</jclouds.version>
+    <jclouds.version>1.7.2-ea-brooklyn.2</jclouds.version>
   </properties>
 
   <repositories>
@@ -65,7 +65,6 @@
   </repositories>
 
   <modules>
-    <module>docker</module>
     <module>virtualbox</module>
     <module>vcloud-director</module>
     <module>dmtf</module>
@@ -75,6 +74,7 @@
     <module>cloudsigma2-wdc</module>
     <module>cloudsigma2-zrh</module>
     <module>digitalocean</module>
+    <module>docker</module>
     <module>joyent-cloudapi</module>
     <module>joyentcloud</module>
     <module>fgcp</module>

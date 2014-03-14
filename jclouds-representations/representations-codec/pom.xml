@@ -21,7 +21,7 @@
   <parent>
     <groupId>io.cloudsoft.jclouds.labs</groupId>
     <artifactId>jclouds-represetations</artifactId>
-    <version>1.7.2-ea-brooklyn.1</version>
+    <version>1.7.2-ea-brooklyn.2</version>
     <relativePath>..</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -54,19 +54,19 @@
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.7.2-ea-brooklyn.1</version>
+      <version>1.7.2-ea-brooklyn.2</version>
     </dependency>
 
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.7.2-ea-brooklyn.1</version>
+      <version>1.7.2-ea-brooklyn.2</version>
     </dependency>
 
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-blobstore</artifactId>
-      <version>1.7.2-ea-brooklyn.1</version>
+      <version>1.7.2-ea-brooklyn.2</version>
     </dependency>
 
     <dependency>
@@ -78,7 +78,7 @@
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.7.2-ea-brooklyn.1</version>
+      <version>1.7.2-ea-brooklyn.2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
