@@ -27,14 +27,12 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.extensions.ImageExtension;
 import org.jclouds.docker.compute.extensions.DockerImageExtension;
 import org.jclouds.docker.compute.functions.ContainerToNodeMetadata;
-import org.jclouds.docker.compute.functions.ContainerToSshClient;
 import org.jclouds.docker.compute.functions.ImageToImage;
 import org.jclouds.docker.compute.strategy.DockerComputeServiceAdapter;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
-import org.jclouds.ssh.SshClient;
 
 /**
  * @author Adrian Cole
@@ -55,10 +53,6 @@ public class DockerComputeServiceContextModule extends
       }).to(Class.class.cast(IdentityFunction.class));
       bind(new TypeLiteral<Function<Location, Location>>() {
       }).to(Class.class.cast(IdentityFunction.class));
-
-      bind(new TypeLiteral<Function<Container, SshClient>>() {
-      }).to(ContainerToSshClient.class);
-
       bind(new TypeLiteral<ImageExtension>() {
       }).to(DockerImageExtension.class);
    }

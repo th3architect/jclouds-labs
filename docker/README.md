@@ -22,17 +22,15 @@ If you are on OS X, please consider [dvm](https://github.com/fnichol/dvm) as sim
 
 ##Components
 
-- jclouds \- acts as a java client to access to docker functionalities
+- jclouds \- acts as a java client to access to docker features
 - DOCKER_HOST \- hosts Docker API, NB: jclouds-docker assumes that the latest Docker is installed
 - Image \- it is a docker image that can be started.
 - Node \- is a docker container
 
 ## Assumptions
 
-- jclouds-docker will create 2 ssh'able images starting from `centos:6.4` and `ubuntu:12.04` base images named
-'jclouds/centos' and 'jclouds/ubuntu'. Those images will be initially accessible using `root/password` credentials.
-
-- ContainerToNodeMetadata supports only an hardcoded group name `jclouds`
+- jclouds-docker assumes that the images specified using the template are ssh'able.
+- jclouds-docker will mount ${user.home} to /root of the container
 
 --------------
 

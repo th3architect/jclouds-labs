@@ -81,7 +81,7 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
               .osDescriptionMatches("jclouds/centos:latest")
               .build();
       Statement bootInstructions = AdminAccess.standard();
-      template.getOptions()//.runScript(bootInstructions)
+      template.getOptions().runScript(bootInstructions)
               .inboundPorts(22, 80, 8080);
 
       Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(TEST_LAUNCH_CLUSTER, numNodes, template);
@@ -103,7 +103,7 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
    }
 
    public void testLaunchUbuntuCluster() throws RunNodesException {
-      int numNodes = 3;
+      int numNodes = 1;
       ComputeService compute = context.getComputeService();
       Template template = compute.templateBuilder()
               .smallest().osFamily(OsFamily.UBUNTU)
@@ -111,7 +111,7 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
               .osDescriptionMatches("jclouds/ubuntu:latest")
               .build();
       Statement bootInstructions = AdminAccess.standard();
-      template.getOptions()//.runScript(bootInstructions)
+      template.getOptions().runScript(bootInstructions)
               .inboundPorts(22);
 
       Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(TEST_LAUNCH_CLUSTER, numNodes, template);

@@ -17,12 +17,10 @@
 package org.jclouds.docker.compute.strategy;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.Resources;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.HardwareBuilder;
@@ -42,8 +40,6 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,7 +116,6 @@ public class DockerComputeServiceAdapter implements
             hostConfigBuilder.binds(ImmutableList.of(v.getDevice() + ":/root"));
          }
       } else {
-         // default static binding
          hostConfigBuilder.binds(ImmutableList.of("/var/lib/docker:/root"));
       }
       HostConfig hostConfig = hostConfigBuilder.build();
@@ -144,35 +139,7 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Set<Image> listImages() {
-      Set<Image> images = api.getRemoteApi().listImages(true);
-
-      buildImageIfNotAvailable(images, "jclouds/centos", "centos");
-      buildImageIfNotAvailable(images, "jclouds/ubuntu", "ubuntu");
-
-      List<Container> containers = api.getRemoteApi().listContainers(true);
-      // removing the left over containers created during build image command
-      for (Container container : containers) {
-         if (container.getStatus().equals("Exit 0")) {
-            api.getRemoteApi().removeContainer(container.getId(), true);
-         }
-      }
       return api.getRemoteApi().listImages(true);
-   }
-
-   private void buildImageIfNotAvailable(Set<Image> images, final String imageName, String folderName) {
-      boolean available = false;
-      for (Image image : images) {
-         if (image.getRepoTags().get(0).startsWith(imageName)) {
-            available = true;
-         }
-      }
-      if (!available) {
-         try {
-            api.getRemoteApi().build(imageName, false, false, new File(Resources.getResource(folderName + "/Dockerfile").toURI()));
-         } catch (URISyntaxException e) {
-            throw Throwables.propagate(e);
-         }
-      }
    }
 
    @Override

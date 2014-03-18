@@ -67,9 +67,9 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
          super(DockerApi.class);
          id("docker")
                  .name("Docker API")
-                 .defaultIdentity("email")
-                 .identityName("Email")
-                 .defaultCredential("Password")
+                 .defaultIdentity("root")
+                 .identityName("user")
+                 .defaultCredential("password")
                  .credentialName("Password")
                  .documentation(URI.create("http://docs.docker.io/en/latest/api/docker_remote_api/"))
                  .version("1.8")
