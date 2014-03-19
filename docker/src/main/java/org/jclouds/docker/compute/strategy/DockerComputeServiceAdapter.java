@@ -35,6 +35,7 @@ import org.jclouds.docker.domain.Image;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
+import org.jclouds.rest.ApiContext;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -62,10 +63,12 @@ public class DockerComputeServiceAdapter implements
    protected Logger logger = Logger.NULL;
 
    private final DockerApi api;
+   private final ApiContext<DockerApi> context;
 
    @Inject
-   public DockerComputeServiceAdapter(DockerApi api) {
+   public DockerComputeServiceAdapter(DockerApi api, ApiContext<DockerApi> context) {
       this.api = checkNotNull(api, "api");
+      this.context = context;
    }
 
    @Override
@@ -75,9 +78,12 @@ public class DockerComputeServiceAdapter implements
       checkNotNull(template.getOptions(), "template options was null");
 
       String imageId = checkNotNull(template.getImage().getId(), "template image id must not be null");
-      String loginUser = template.getOptions().getLoginUser() == null ? "root" : template.getOptions().getLoginUser();
-      String loginUserPassword = template.getOptions().getLoginPassword() == null ? "password" : template.getOptions()
-              .getLoginUser();
+      String defaultIdentity = context.getProviderMetadata().getApiMetadata().getDefaultIdentity().get();
+      String defaultCredential = context.getProviderMetadata().getApiMetadata().getDefaultCredential().get();
+      String loginUser = template.getOptions().getLoginUser() == null ? defaultIdentity :
+              template.getOptions().getLoginUser();
+      String loginUserPassword = template.getOptions().getLoginPassword() == null ? defaultCredential :
+              template.getOptions().getLoginUser();
       boolean volumeBindings = !template.getHardware().getVolumes().isEmpty();
 
       Map<String, Object> exposedPorts = Maps.newHashMap();
@@ -122,6 +128,9 @@ public class DockerComputeServiceAdapter implements
 
       api.getRemoteApi().startContainer(container.getId(), hostConfig);
       container = api.getRemoteApi().inspectContainer(container.getId());
+      if (!container.getState().isRunning()) {
+          throw new IllegalStateException(String.format("Container %s has not started correctly", container.getId()));
+      }
       return new NodeAndInitialCredentials<Container>(container, container.getId() + "",
               LoginCredentials.builder().user(loginUser).password(loginUserPassword).build());
    }

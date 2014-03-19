@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 
@@ -99,7 +100,10 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
 
    private int getLoginPort(Container container) {
       if (container.getNetworkSettings() != null) {
-         return Integer.parseInt(getOnlyElement(container.getNetworkSettings().getPorts().get("22/tcp")).get("HostPort"));
+          Map<String, List<Map<String,String>>> ports = container.getNetworkSettings().getPorts();
+          if(ports != null) {
+            return Integer.parseInt(getOnlyElement(ports.get("22/tcp")).get("HostPort"));
+          }
       } else if (container.getPorts() != null) {
          for (Port port : container.getPorts()) {
             if (port.getPrivatePort() == 22) {
