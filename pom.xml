@@ -22,11 +22,11 @@
   <parent>
     <groupId>io.cloudsoft.jclouds</groupId>
     <artifactId>jclouds-project</artifactId>
-    <version>1.7.2-ea-brooklyn.2</version>
+    <version>1.7.2-ea-brooklyn.3</version>
   </parent>
   <groupId>io.cloudsoft.jclouds.labs</groupId>
   <artifactId>jclouds-labs</artifactId>
-  <version>1.7.2-ea-brooklyn.2</version>
+  <version>1.7.2-ea-brooklyn.3</version>
   <packaging>pom</packaging>
   <name>Apache jclouds labs</name>
 
