@@ -18,12 +18,15 @@ package org.jclouds.docker.domain;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 import org.jclouds.javax.annotation.Nullable;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Andrea Turli
@@ -31,68 +34,93 @@ import java.util.Map;
 public class Config {
 
    @SerializedName("Hostname")
-   private String hostname;
+   final private String hostname;
+   @SerializedName("Domainname")
+   final private String domainName;
    @SerializedName("User")
-   private String user;
+   final private String user;
    @SerializedName("Memory")
-   private int memory;
+   final private int memory;
    @SerializedName("MemorySwap")
-   private int memorySwap;
+   final private int memorySwap;
+   @SerializedName("CpuShares")
+   final private int cpuShares;
    @SerializedName("AttachStdin")
-   private boolean attachStdin;
+   final private boolean attachStdin;
    @SerializedName("AttachStdout")
-   private boolean attachStdout;
+   final private boolean attachStdout;
    @SerializedName("AttachStderr")
-   private boolean attachStderr;
+   final private boolean attachStderr;
    @SerializedName("ExposedPorts")
-   private Map<String, ?> exposedPorts;
+   final private Map<String, ?> exposedPorts;
    @SerializedName("Tty")
-   private boolean tty;
+   final private boolean tty;
    @SerializedName("OpenStdin")
-   private boolean openStdin;
+   final private boolean openStdin;
    @SerializedName("StdinOnce")
-   private boolean stdinOnce;
+   final private boolean stdinOnce;
    @SerializedName("Env")
-   private List<String> env;
+   final private List<String> env;
    @SerializedName("Cmd")
-   private List<String> cmd;
+   final private List<String> cmd;
    @SerializedName("Dns")
-   private List<String> dns;
+   final private List<String> dns;
    @SerializedName("Image")
-   private String image;
+   final private String imageId;
    @SerializedName("Volumes")
-   private Map<String, ?> volumes;
+   final private Map<String, ?> volumes;
    @SerializedName("VolumesFrom")
-   private String volumesFrom;
+   final private String volumesFrom;
    @SerializedName("WorkingDir")
-   private String workingDir;
+   final private String workingDir;
+   @SerializedName("Entrypoint")
+   final private String entrypoint;
+   @SerializedName("NetworkDisabled")
+   final private boolean networkDisabled;
+   @SerializedName("OnBuild")
+   final private String onBuild;
 
-   Config(String hostname, String user, int memory, int memorySwap, boolean attachStdin, boolean attachStdout,
-          boolean attachStderr, Map<String, ?> exposedPorts, boolean tty, boolean openStdin, boolean stdinOnce, List<String> env,
-          @Nullable List<String> cmd, List<String> dns, String image, @Nullable Map<String, ?> volumes,
-          String volumesFrom, String workingDir) {
+
+   @ConstructorProperties({ "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",
+           "AttachStdout", "AttachStderr", "PortSpecs", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd",
+           "Dns", "Image", "Volumes", "VolumesFrom", "WorkingDir", "Entrypoint", "NetworkDisabled", "OnBuild" })
+   Config(@Nullable String hostname, @Nullable String domainName, @Nullable String user, int memory, int memorySwap,
+          int cpuShares, boolean attachStdin, boolean attachStdout, boolean attachStderr,
+          Map<String, ?> exposedPorts, boolean tty, boolean openStdin, boolean stdinOnce,
+          @Nullable List<String> env, @Nullable List<String> cmd, @Nullable List<String> dns, String imageId,
+          Map<String, ?> volumes, @Nullable String volumesFrom, @Nullable String workingDir,
+          @Nullable String entrypoint, @Nullable boolean networkDisabled, @Nullable String onBuild) {
       this.hostname = hostname;
+      this.domainName = domainName;
       this.user = user;
-      this.memory = memory;
-      this.memorySwap = memorySwap;
-      this.attachStdin = attachStdin;
-      this.attachStdout = attachStdout;
-      this.attachStderr = attachStderr;
-      this.exposedPorts = exposedPorts;
-      this.tty = tty;
-      this.openStdin = openStdin;
-      this.stdinOnce = stdinOnce;
-      this.env = env;
-      this.cmd = cmd == null ? Lists.<String>newArrayList() : cmd;
-      this.dns = dns;
-      this.image = image;
-      this.volumes = volumes;
+      this.memory = checkNotNull(memory, "memory");
+      this.memorySwap = checkNotNull(memorySwap, "memorySwap");
+      this.cpuShares = checkNotNull(cpuShares, "cpuShares");
+      this.attachStdin = checkNotNull(attachStdin, "attachStdin");
+      this.attachStdout = checkNotNull(attachStdout, "attachStdout");
+      this.attachStderr = checkNotNull(attachStderr, "attachStderr");
+      this.exposedPorts = exposedPorts != null ? ImmutableMap.copyOf(exposedPorts) : ImmutableMap.<String, Object> of();
+      this.tty = checkNotNull(tty, "tty");
+      this.openStdin = checkNotNull(openStdin, "openStdin");
+      this.stdinOnce = checkNotNull(stdinOnce, "stdinOnce");
+      this.env = env != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String> of();
+      this.cmd = cmd != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String> of();
+      this.dns = dns != null ? ImmutableList.copyOf(dns) : ImmutableList.<String> of();
+      this.imageId = checkNotNull(imageId, "imageId");
+      this.volumes = volumes != null ? ImmutableMap.copyOf(volumes) : ImmutableMap.<String, Object> of();
       this.volumesFrom = volumesFrom;
       this.workingDir = workingDir;
+      this.entrypoint = entrypoint;
+      this.networkDisabled = networkDisabled;
+      this.onBuild = onBuild;
    }
 
    public String getHostname() {
       return hostname;
+   }
+
+   public String getDomainName() {
+      return domainName;
    }
 
    public String getUser() {
@@ -105,6 +133,10 @@ public class Config {
 
    public int getMemorySwap() {
       return memorySwap;
+   }
+
+   public int getCpuShares() {
+      return cpuShares;
    }
 
    public boolean isAttachStdin() {
@@ -147,8 +179,8 @@ public class Config {
       return dns;
    }
 
-   public String getImage() {
-      return image;
+   public String getImageId() {
+      return imageId;
    }
 
    public Map<String, ?> getVolumes() {
@@ -163,13 +195,65 @@ public class Config {
       return workingDir;
    }
 
+   public String getEntrypoint() {
+      return entrypoint;
+   }
+
+   public boolean isNetworkDisabled() {
+      return networkDisabled;
+   }
+
+   public String getOnBuild() {
+      return onBuild;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Config that = (Config) o;
+
+      return Objects.equal(this.hostname, that.hostname) &&
+              Objects.equal(this.domainName, that.domainName) &&
+              Objects.equal(this.user, that.user) &&
+              Objects.equal(this.memory, that.memory) &&
+              Objects.equal(this.memorySwap, that.memorySwap) &&
+              Objects.equal(this.cpuShares, that.cpuShares) &&
+              Objects.equal(this.attachStdin, that.attachStdin) &&
+              Objects.equal(this.attachStdout, that.attachStdout) &&
+              Objects.equal(this.attachStderr, that.attachStderr) &&
+              Objects.equal(this.exposedPorts, that.exposedPorts) &&
+              Objects.equal(this.tty, that.tty) &&
+              Objects.equal(this.openStdin, that.openStdin) &&
+              Objects.equal(this.stdinOnce, that.stdinOnce) &&
+              Objects.equal(this.env, that.env) &&
+              Objects.equal(this.cmd, that.cmd) &&
+              Objects.equal(this.dns, that.dns) &&
+              Objects.equal(this.imageId, that.imageId) &&
+              Objects.equal(this.volumes, that.volumes) &&
+              Objects.equal(this.volumesFrom, that.volumesFrom) &&
+              Objects.equal(this.workingDir, that.workingDir) &&
+              Objects.equal(this.entrypoint, that.entrypoint) &&
+              Objects.equal(this.onBuild, that.onBuild);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
+              attachStderr, exposedPorts, tty, openStdin, stdinOnce, env, cmd, dns, imageId, volumes,
+              volumesFrom, workingDir, entrypoint, networkDisabled, onBuild);
+   }
+
    @Override
    public String toString() {
       return Objects.toStringHelper(this)
               .add("hostname", hostname)
+              .add("domainName", domainName)
               .add("user", user)
               .add("memory", memory)
               .add("memorySwap", memorySwap)
+              .add("cpuShares", cpuShares)
               .add("attachStdin", attachStdin)
               .add("attachStdout", attachStdout)
               .add("attachStderr", attachStderr)
@@ -180,10 +264,13 @@ public class Config {
               .add("env", env)
               .add("cmd", cmd)
               .add("dns", dns)
-              .add("image", image)
+              .add("imageId", imageId)
               .add("volumes", volumes)
               .add("volumesFrom", volumesFrom)
               .add("workingDir", workingDir)
+              .add("entrypoint", entrypoint)
+              .add("networkDisabled", networkDisabled)
+              .add("onBuild", onBuild)
               .toString();
    }
 
@@ -197,26 +284,37 @@ public class Config {
 
    public static final class Builder {
       private String hostname;
+      private String domainName;
       private String user;
       private int memory;
       private int memorySwap;
+      private int cpuShares;
       private boolean attachStdin;
       private boolean attachStdout;
       private boolean attachStderr;
-      private Map<String, ?> exposedPorts;
+      private Map<String, ?> portSpecs = ImmutableMap.of();
+      private Map<String, ?> exposedPorts = ImmutableMap.of();
       private boolean tty;
       private boolean openStdin;
       private boolean stdinOnce;
-      private List<String> env;
-      private ImmutableList.Builder<String> cmd = ImmutableList.builder();
-      private List<String> dns;
-      private String image;
-      private Map<String, ?> volumes;
+      private List<String> env = ImmutableList.of();
+      private List<String> cmd = ImmutableList.of();
+      private List<String> dns = ImmutableList.of();
+      private String imageId;
+      private Map<String, ?> volumes = ImmutableMap.of();
       private String volumesFrom;
       private String workingDir;
+      private String entrypoint;
+      private boolean networkDisabled;
+      private String onBuild;
 
       public Builder hostname(String hostname) {
          this.hostname = hostname;
+         return this;
+      }
+
+      public Builder domainName(String domainName) {
+         this.domainName = domainName;
          return this;
       }
 
@@ -232,6 +330,11 @@ public class Config {
 
       public Builder memorySwap(int memorySwap) {
          this.memorySwap = memorySwap;
+         return this;
+      }
+
+      public Builder cpuShares(int cpuShares) {
+         this.cpuShares = cpuShares;
          return this;
       }
 
@@ -251,7 +354,7 @@ public class Config {
       }
 
       public Builder exposedPorts(Map<String, ?> exposedPorts) {
-         this.exposedPorts = exposedPorts;
+         this.exposedPorts = ImmutableMap.copyOf(checkNotNull(exposedPorts, "exposedPorts"));
          return this;
       }
 
@@ -276,23 +379,22 @@ public class Config {
       }
 
       public Builder cmd(List<String> cmd) {
-         this.cmd = ImmutableList.builder();
-         this.cmd.addAll(cmd);
+         this.cmd = ImmutableList.copyOf(checkNotNull(cmd, "cmd"));
          return this;
       }
 
       public Builder dns(List<String> dns) {
-         this.dns = dns;
+         this.dns = ImmutableList.copyOf(checkNotNull(dns, "dns"));
          return this;
       }
 
-      public Builder image(String image) {
-         this.image = image;
+      public Builder imageId(String imageId) {
+         this.imageId = imageId;
          return this;
       }
 
       public Builder volumes(Map<String, ?> volumes) {
-         this.volumes = volumes;
+         this.volumes = ImmutableMap.copyOf(checkNotNull(volumes, "volumes"));
          return this;
       }
 
@@ -306,17 +408,35 @@ public class Config {
          return this;
       }
 
+      public Builder entrypoint(String entrypoint) {
+         this.entrypoint = entrypoint;
+         return this;
+      }
+
+      public Builder networkDisabled(boolean networkDisabled) {
+         this.networkDisabled = networkDisabled;
+         return this;
+      }
+
+      public Builder onBuild(String onBuild) {
+         this.onBuild = onBuild;
+         return this;
+      }
+
       public Config build() {
-         return new Config(hostname, user, memory, memorySwap, attachStdin, attachStdout, attachStderr, exposedPorts,
-                 tty, openStdin, stdinOnce, env, cmd.build(), dns, image, volumes, volumesFrom, workingDir);
+         return new Config(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
+                 attachStderr, exposedPorts, tty, openStdin, stdinOnce, env, cmd, dns, imageId, volumes,
+                 volumesFrom, workingDir, entrypoint, networkDisabled, onBuild);
       }
 
       public Builder fromConfig(Config in) {
          return this
                  .hostname(in.getHostname())
+                 .domainName(in.getDomainName())
                  .user(in.getUser())
                  .memory(in.getMemory())
                  .memorySwap(in.getMemorySwap())
+                 .cpuShares(in.getCpuShares())
                  .attachStdin(in.isAttachStdin())
                  .attachStdout(in.isAttachStdout())
                  .attachStderr(in.isAttachStderr())
@@ -327,10 +447,14 @@ public class Config {
                  .env(in.getEnv())
                  .cmd(in.getCmd())
                  .dns(in.getDns())
-                 .image(in.getImage())
+                 .imageId(in.getImageId())
                  .volumes(in.getVolumes())
                  .volumesFrom(in.getVolumesFrom())
-                 .workingDir(in.getWorkingDir());
+                 .workingDir(in.getWorkingDir())
+                 .entrypoint(in.getEntrypoint())
+                 .networkDisabled(in.isNetworkDisabled())
+                 .onBuild(in.getOnBuild());
       }
+
    }
 }

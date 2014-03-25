@@ -39,6 +39,7 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.Test;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -55,6 +56,7 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
    private TemplateBuilder templateBuilder;
    private Factory sshFactory;
    private NodeAndInitialCredentials<Container> guest;
+   private URI endpoint;
 
    @Override
    protected DockerApi create(Properties props, Iterable<Module> modules) {
@@ -62,6 +64,7 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
       adapter = injector.getInstance(DockerComputeServiceAdapter.class);
       templateBuilder = injector.getInstance(TemplateBuilder.class);
       sshFactory = injector.getInstance(SshClient.Factory.class);
+      endpoint = URI.create(props.getProperty("docker.endpoint"));
       return injector.getInstance(DockerApi.class);
    }
 
@@ -78,8 +81,8 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
       String group = "foo";
       String name = "container-" + new Random().nextInt();
 
-      Template template = templateBuilder.smallest().osFamily(OsFamily.CENTOS).os64Bit(true)
-              .osDescriptionMatches("jclouds/centos:latest").build();
+      Template template = templateBuilder.smallest().osFamily(OsFamily.UBUNTU).os64Bit(true)
+              .osDescriptionMatches("jclouds/ubuntu:latest").build();
 
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
       assertEquals(guest.getNodeId(), guest.getNode().getId() + "");
@@ -90,7 +93,7 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
       // todo this is an hack as I'm using host-only IF
       Map<String, List<Map<String, String>>> portBindings = guest.getHostConfig().getPortBindings();
       int loginPort = Integer.parseInt(portBindings.get("22/tcp").get(0).get("HostPort"));
-      SshClient ssh = sshFactory.create(HostAndPort.fromParts("192.168.42.43", loginPort), creds);
+      SshClient ssh = sshFactory.create(HostAndPort.fromParts(endpoint.getHost(), loginPort), creds);
       try {
          ssh.connect();
          ExecResponse hello = ssh.exec("echo hello");

@@ -14,11 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.domain;
+package org.jclouds.docker.options;
+
+import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * @author Andrea Turli
  */
-public class PortBindings {
+public class ListImageOptions extends BaseHttpRequestOptions {
+
+   public static final ListImageOptions NONE = new ListImageOptions();
+
+   public ListImageOptions all(Boolean all) {
+      this.queryParameters.put("all", all.toString());
+      return this;
+   }
+
+   public static class Builder {
+      /**
+       * @see ListImageOptions#all
+       */
+      public static ListImageOptions all(Boolean all) {
+         ListImageOptions options = new ListImageOptions();
+         return options.all(all);
+      }
+   }
 
 }

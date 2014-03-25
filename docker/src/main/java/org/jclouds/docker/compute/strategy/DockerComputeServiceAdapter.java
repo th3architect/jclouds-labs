@@ -25,9 +25,9 @@ import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.Template;
-import org.jclouds.compute.domain.Volume;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.DockerApi;
+import org.jclouds.docker.compute.options.DockerTemplateOptions;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.HostConfig;
@@ -35,7 +35,6 @@ import org.jclouds.docker.domain.Image;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
-import org.jclouds.rest.ApiContext;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -63,12 +62,10 @@ public class DockerComputeServiceAdapter implements
    protected Logger logger = Logger.NULL;
 
    private final DockerApi api;
-   private final ApiContext<DockerApi> context;
 
    @Inject
-   public DockerComputeServiceAdapter(DockerApi api, ApiContext<DockerApi> context) {
+   public DockerComputeServiceAdapter(DockerApi api) {
       this.api = checkNotNull(api, "api");
-      this.context = context;
    }
 
    @Override
@@ -76,15 +73,11 @@ public class DockerComputeServiceAdapter implements
                                                                                   Template template) {
       checkNotNull(template, "template was null");
       checkNotNull(template.getOptions(), "template options was null");
+      DockerTemplateOptions templateOptions = DockerTemplateOptions.class.cast(template.getOptions());
 
       String imageId = checkNotNull(template.getImage().getId(), "template image id must not be null");
-      String defaultIdentity = context.getProviderMetadata().getApiMetadata().getDefaultIdentity().get();
-      String defaultCredential = context.getProviderMetadata().getApiMetadata().getDefaultCredential().get();
-      String loginUser = template.getOptions().getLoginUser() == null ? defaultIdentity :
-              template.getOptions().getLoginUser();
-      String loginUserPassword = template.getOptions().getLoginPassword() == null ? defaultCredential :
-              template.getOptions().getLoginUser();
-      boolean volumeBindings = !template.getHardware().getVolumes().isEmpty();
+      String loginUser = template.getImage().getDefaultCredentials().getUser();
+      String loginUserPassword = template.getImage().getDefaultCredentials().getPassword();
 
       Map<String, Object> exposedPorts = Maps.newHashMap();
       int[] inboundPorts = template.getOptions().getInboundPorts();
@@ -92,21 +85,22 @@ public class DockerComputeServiceAdapter implements
          exposedPorts.put(inboundPort + "/tcp", Maps.newHashMap());
       }
 
-      Map<String, Object> volumes = Maps.newLinkedHashMap();
-      volumes.put("/root", Maps.newHashMap());
-
-      Config config = Config.builder()
-              .image(imageId)
+      Config.Builder configBuilder = Config.builder()
+              .imageId(imageId)
               .cmd(ImmutableList.of("/usr/sbin/sshd", "-D"))
-              .attachStdout(true)
-              .attachStderr(true)
-              .volumes(volumes)
-              .workingDir("")
-              .exposedPorts(exposedPorts)
-              .build();
+              .exposedPorts(exposedPorts);
 
-      logger.debug(">> creating new container (%s)", "newContainer");
-      Container container = api.getRemoteApi().createContainer(config);
+      if (templateOptions.getVolumes().isPresent()) {
+         Map<String, Object> volumes = Maps.newLinkedHashMap();
+         for (String containerDir : templateOptions.getVolumes().get().values()) {
+            volumes.put(containerDir, Maps.newHashMap());
+         }
+         configBuilder.volumes(volumes);
+      }
+      Config config = configBuilder.build();
+
+      logger.debug(">> creating new container with config(%s)", config);
+      Container container = api.getRemoteApi().createContainer(name, config);
       logger.trace("<< container(%s)", container.getId());
 
       // set up for port bindings
@@ -116,22 +110,21 @@ public class DockerComputeServiceAdapter implements
               .publishAllPorts(true)
               .privileged(true);
 
-      // TODO improve volumes management
-      if (volumeBindings) {
-         for (Volume v : template.getHardware().getVolumes()) {
-            hostConfigBuilder.binds(ImmutableList.of(v.getDevice() + ":/root"));
+      // set up for volume bindings
+      if (templateOptions.getVolumes().isPresent()) {
+         for (Map.Entry<String,String> entry : templateOptions.getVolumes().get().entrySet()) {
+            hostConfigBuilder.binds(ImmutableList.of(entry.getKey() + ":" + entry.getValue()));
          }
-      } else {
-         hostConfigBuilder.binds(ImmutableList.of("/var/lib/docker:/root"));
       }
       HostConfig hostConfig = hostConfigBuilder.build();
 
       api.getRemoteApi().startContainer(container.getId(), hostConfig);
       container = api.getRemoteApi().inspectContainer(container.getId());
       if (!container.getState().isRunning()) {
-          throw new IllegalStateException(String.format("Container %s has not started correctly", container.getId()));
+         destroyNode(container.getId());
+         throw new IllegalStateException(String.format("Container %s has not started correctly", container.getId()));
       }
-      return new NodeAndInitialCredentials<Container>(container, container.getId() + "",
+      return new NodeAndInitialCredentials<Container>(container, container.getId(),
               LoginCredentials.builder().user(loginUser).password(loginUserPassword).build());
    }
 
@@ -148,16 +141,26 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Set<Image> listImages() {
-      return api.getRemoteApi().listImages(true);
+      //return api.getRemoteApi().listImages();
+      Set<Image> images = Sets.newHashSet();
+      for (Image image : api.getRemoteApi().listImages()) {
+         // less efficient than just listNodes but returns richer json that needs repoTags coming from listImages
+         Image inspected = api.getRemoteApi().inspectImage(image.getId());
+         if(image.getRepoTags() != null) {
+            inspected = Image.builder().fromImage(inspected).repoTags(image.getRepoTags()).build();
+         }
+         images.add(inspected);
+      }
+      return images;
    }
 
    @Override
-   public Image getImage(final String id) {
+   public Image getImage(final String imageId) {
       return find(listImages(), new Predicate<Image>() {
 
          @Override
          public boolean apply(Image input) {
-            return input.getId().equals(id);
+            return input.getId().equals(imageId);
          }
 
       }, null);
@@ -165,7 +168,12 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Iterable<Container> listNodes() {
-      return api.getRemoteApi().listContainers(false);
+      Set<Container> containers = Sets.newHashSet();
+      for (Container container : api.getRemoteApi().listContainers()) {
+         // less efficient than just listNodes but returns richer json
+         containers.add(api.getRemoteApi().inspectContainer(container.getId()));
+      }
+      return containers;
    }
 
    @Override
@@ -192,7 +200,7 @@ public class DockerComputeServiceAdapter implements
    @Override
    public void destroyNode(String id) {
       api.getRemoteApi().stopContainer(id);
-      api.getRemoteApi().removeContainer(id, true);
+      api.getRemoteApi().removeContainer(id);
    }
 
    @Override

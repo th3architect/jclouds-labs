@@ -16,49 +16,43 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Andrea Turli
- *         <p/>
- *         {
- *         "IPAddress": "172.17.0.3",
- *         "IPPrefixLen": 16,
- *         "Gateway": "172.17.42.1",
- *         "Bridge": "docker0",
- *         "PortMapping": null,
- *         "Ports": {
- *         "22/tcp": [
- *         {
- *         "HostIp": "0.0.0.0",
- *         "HostPort": "10022"
- *         }
- *         ]
- *         }
- *         }
  */
 public class NetworkSettings {
 
    @SerializedName("IPAddress")
-   private String ipAddress;
+   final private String ipAddress;
    @SerializedName("IPPrefixLen")
-   private int ipPrefixLen;
+   final private int ipPrefixLen;
    @SerializedName("Gateway")
-   private String gateway;
+   final private String gateway;
    @SerializedName("Bridge")
-   private String bridge;
+   final private String bridge;
+   @SerializedName("PortMapping")
+   final private String portMapping;
    @SerializedName("Ports")
-   private Map<String, List<Map<String, String>>> ports;
+   final private Map<String, List<Map<String, String>>> ports;
 
-   public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge, Map<String, List<Map<String, String>>> ports) {
+   @ConstructorProperties({ "IpAddress", "IpPrefixLen", "Gateway", "Bridge", "Ports" })
+   public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge, String portMapping,
+                          Map<String, List<Map<String, String>>> ports) {
       this.ipAddress = ipAddress;
       this.ipPrefixLen = ipPrefixLen;
       this.gateway = gateway;
       this.bridge = bridge;
-      this.ports = ports;
+      this.portMapping = portMapping;
+      this.ports = ports != null ? ImmutableMap.copyOf(ports) : ImmutableMap.<String, List<Map<String, String>>> of();
    }
 
    public String getIpAddress() {
@@ -77,18 +71,107 @@ public class NetworkSettings {
       return bridge;
    }
 
+   public String getPortMapping() {
+      return portMapping;
+   }
+
    public Map<String, List<Map<String, String>>> getPorts() {
       return ports;
    }
 
    @Override
-   public String toString() {
-      return "NetworkSettings{" +
-              "ipAddress='" + ipAddress + '\'' +
-              ", ipPrefixLen=" + ipPrefixLen +
-              ", gateway='" + gateway + '\'' +
-              ", bridge='" + bridge + '\'' +
-              ", ports=" + ports +
-              '}';
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      NetworkSettings that = (NetworkSettings) o;
+
+      return Objects.equal(this.ipAddress, that.ipAddress) &&
+              Objects.equal(this.ipPrefixLen, that.ipPrefixLen) &&
+              Objects.equal(this.gateway, that.gateway) &&
+              Objects.equal(this.bridge, that.bridge) &&
+              Objects.equal(this.portMapping, that.portMapping) &&
+              Objects.equal(this.ports, that.ports);
    }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(ipAddress, ipPrefixLen, gateway, bridge, portMapping, ports);
+   }
+
+   @Override
+   public String toString() {
+      return Objects.toStringHelper(this)
+              .add("ipAddress", ipAddress)
+              .add("ipPrefixLen", ipPrefixLen)
+              .add("gateway", gateway)
+              .add("bridge", bridge)
+              .add("portMapping", portMapping)
+              .add("ports", ports)
+              .toString();
+   }
+
+   public static Builder builder() {
+      return new Builder();
+   }
+
+   public Builder toBuilder() {
+      return builder().fromNetworkSettings(this);
+   }
+
+   public static final class Builder {
+
+      private String ipAddress;
+      private int ipPrefixLen;
+      private String gateway;
+      private String bridge;
+      private String portMapping;
+      private Map<String, List<Map<String, String>>> ports = ImmutableMap.of();
+
+      public Builder ipAddress(String ipAddress) {
+         this.ipAddress = ipAddress;
+         return this;
+      }
+
+      public Builder ipPrefixLen(int ipPrefixLen) {
+         this.ipPrefixLen = ipPrefixLen;
+         return this;
+      }
+
+      public Builder gateway(String gateway) {
+         this.gateway = gateway;
+         return this;
+      }
+
+      public Builder bridge(String bridge) {
+         this.bridge = bridge;
+         return this;
+      }
+
+      public Builder portMapping(String portMapping) {
+         this.portMapping = portMapping;
+         return this;
+      }
+
+      public Builder ports(Map<String, List<Map<String, String>>> ports) {
+         this.ports = ImmutableMap.copyOf(checkNotNull(ports, "ports"));
+         return this;
+      }
+
+      public NetworkSettings build() {
+         return new NetworkSettings(ipAddress, ipPrefixLen, gateway, bridge, portMapping, ports);
+      }
+
+      public Builder fromNetworkSettings(NetworkSettings in) {
+         return this
+                 .ipAddress(in.getIpAddress())
+                 .ipPrefixLen(in.getIpPrefixLen())
+                 .gateway(in.getGateway())
+                 .bridge(in.getBridge())
+                 .portMapping(in.getPortMapping())
+                 .ports(in.getPorts());
+      }
+
+   }
+
 }

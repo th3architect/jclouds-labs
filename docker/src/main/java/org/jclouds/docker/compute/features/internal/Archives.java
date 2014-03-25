@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getLast;
 
 /**
@@ -35,8 +36,7 @@ public class Archives {
 
    public static File tar(File baseDir, String archivePath) throws IOException {
       // Check that the directory is a directory, and get its contents
-      if (!baseDir.isDirectory())
-         throw new IllegalArgumentException("Compress: not a directory:  " + baseDir);
+      checkArgument(baseDir.isDirectory(), baseDir + " is not a directory");
       File[] files = baseDir.listFiles();
       File tarFile = new File(archivePath);
 
@@ -66,8 +66,7 @@ public class Archives {
 
    public static File tar(File baseDir, File tarFile) throws IOException {
       // Check that the directory is a directory, and get its contents
-      if (!baseDir.isDirectory())
-         throw new IllegalArgumentException("Compress: not a directory:  " + baseDir);
+      checkArgument(baseDir.isDirectory(), baseDir + " is not a directory");
       File[] files = baseDir.listFiles();
 
       String token = getLast(Splitter.on("/").split(baseDir.getAbsolutePath()));

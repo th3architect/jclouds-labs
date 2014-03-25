@@ -25,17 +25,21 @@ import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.extensions.ImageExtension;
+import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.docker.compute.extensions.DockerImageExtension;
 import org.jclouds.docker.compute.functions.ContainerToNodeMetadata;
 import org.jclouds.docker.compute.functions.ImageToImage;
+import org.jclouds.docker.compute.functions.StateToStatus;
+import org.jclouds.docker.compute.options.DockerTemplateOptions;
 import org.jclouds.docker.compute.strategy.DockerComputeServiceAdapter;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.domain.State;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 
 /**
- * @author Adrian Cole
+ * @author Andrea Turli
  */
 public class DockerComputeServiceContextModule extends
         ComputeServiceAdapterContextModule<Container, Hardware, Image, Location> {
@@ -53,6 +57,10 @@ public class DockerComputeServiceContextModule extends
       }).to(Class.class.cast(IdentityFunction.class));
       bind(new TypeLiteral<Function<Location, Location>>() {
       }).to(Class.class.cast(IdentityFunction.class));
+      bind(new TypeLiteral<Function<State, NodeMetadata.Status>>() {
+      }).to(StateToStatus.class);
+      bind(TemplateOptions.class).to(DockerTemplateOptions.class);
+
       bind(new TypeLiteral<ImageExtension>() {
       }).to(DockerImageExtension.class);
    }
@@ -61,4 +69,5 @@ public class DockerComputeServiceContextModule extends
    protected Optional<ImageExtension> provideImageExtension(Injector i) {
       return Optional.of(i.getInstance(ImageExtension.class));
    }
+
 }

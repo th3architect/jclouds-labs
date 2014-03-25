@@ -19,30 +19,38 @@ package org.jclouds.docker.domain;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 
+import java.beans.ConstructorProperties;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Andrea Turli
  */
 public class State {
    @SerializedName("Pid")
-   private String pid;
+   final private int pid;
    @SerializedName("Running")
-   private boolean running;
+   final private boolean running;
    @SerializedName("ExitCode")
-   private int exitCode;
+   final private int exitCode;
    @SerializedName("StartedAt")
-   private String startedAt;
+   final private String startedAt;
+   @SerializedName("FinishedAt")
+   final private String finishedAt;
    @SerializedName("Ghost")
-   private boolean ghost;
+   final private boolean ghost;
 
-   public State(String pid, boolean running, int exitCode, String startedAt, boolean ghost) {
-      this.pid = pid;
-      this.running = running;
-      this.exitCode = exitCode;
-      this.startedAt = startedAt;
-      this.ghost = ghost;
+   @ConstructorProperties({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Ghost" })
+   public State(int pid, boolean running, int exitCode, String startedAt, String finishedAt, boolean ghost) {
+      this.pid = checkNotNull(pid, "pid");
+      this.running = checkNotNull(running, "running");
+      this.exitCode = checkNotNull(exitCode, "exitCode");
+      this.startedAt = checkNotNull(startedAt, "startedAt");
+      this.finishedAt = checkNotNull(finishedAt, "finishedAt");
+      this.ghost = checkNotNull(ghost, "ghost");
    }
 
-   public String getPid() {
+   public int getPid() {
       return pid;
    }
 
@@ -58,8 +66,32 @@ public class State {
       return startedAt;
    }
 
+   public String getFinishedAt() {
+      return finishedAt;
+   }
+
    public boolean isGhost() {
       return ghost;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      State that = (State) o;
+
+      return Objects.equal(this.pid, that.pid) &&
+              Objects.equal(this.running, that.running) &&
+              Objects.equal(this.exitCode, that.exitCode) &&
+              Objects.equal(this.startedAt, that.startedAt) &&
+              Objects.equal(this.finishedAt, that.finishedAt) &&
+              Objects.equal(this.ghost, that.ghost);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(pid, running, exitCode, startedAt, finishedAt, ghost);
    }
 
    @Override
@@ -69,7 +101,70 @@ public class State {
               .add("running", running)
               .add("exitCode", exitCode)
               .add("startedAt", startedAt)
+              .add("finishedAt", finishedAt)
               .add("ghost", ghost)
               .toString();
+   }
+
+   public static Builder builder() {
+      return new Builder();
+   }
+
+   public Builder toBuilder() {
+      return builder().fromState(this);
+   }
+
+   public static final class Builder {
+
+      private int pid;
+      private boolean running;
+      private int exitCode;
+      private String startedAt;
+      private String finishedAt;
+      private boolean ghost;
+
+      public Builder pid(int pid) {
+         this.pid = pid;
+         return this;
+      }
+
+      public Builder running(boolean running) {
+         this.running = running;
+         return this;
+      }
+
+      public Builder exitCode(int exitCode) {
+         this.exitCode = exitCode;
+         return this;
+      }
+
+      public Builder startedAt(String startedAt) {
+         this.startedAt = startedAt;
+         return this;
+      }
+
+      public Builder finishedAt(String finishedAt) {
+         this.finishedAt = finishedAt;
+         return this;
+      }
+
+      public Builder ghost(boolean ghost) {
+         this.ghost = ghost;
+         return this;
+      }
+
+      public State build() {
+         return new State(pid, running, exitCode, startedAt, finishedAt, ghost);
+      }
+
+      public Builder fromState(State in) {
+         return this
+                 .pid(in.getPid())
+                 .running(in.isRunning())
+                 .exitCode(in.getExitCode())
+                 .startedAt(in.getStartedAt())
+                 .finishedAt(in.getFinishedAt())
+                 .ghost(in.isGhost());
+      }
    }
 }

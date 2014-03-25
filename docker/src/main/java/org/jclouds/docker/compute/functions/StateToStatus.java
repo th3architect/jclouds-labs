@@ -14,10 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.domain;
+package org.jclouds.docker.compute.functions;
+
+import com.google.common.base.Function;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeMetadata.Status;
+import org.jclouds.docker.domain.State;
+
+import javax.inject.Singleton;
 
 /**
+ * Transforms an {@link org.jclouds.docker.domain.Container} to the jclouds portable model.
+ *
  * @author Andrea Turli
  */
-public class PortSpecs {
+@Singleton
+public class StateToStatus implements Function<State, Status> {
+
+   @Override
+   public Status apply(final State state) {
+      if (state == null) return Status.UNRECOGNIZED;
+      return state.isRunning() ? NodeMetadata.Status.RUNNING : NodeMetadata.Status.SUSPENDED;
+   }
+
 }

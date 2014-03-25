@@ -16,14 +16,19 @@
  */
 package org.jclouds.docker.compute.features;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
 import org.jclouds.docker.compute.BaseDockerApiLiveTest;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.options.BuildOptions;
+import org.jclouds.docker.options.CreateImageOptions;
+import org.jclouds.docker.options.DeleteImageOptions;
+import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,99 +36,97 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Set;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 /**
  * @author Andrea Turli
  */
 public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
-   public static final String DEFAULT_IMAGE = "busybox";
-   public static final String CENTOS_IMAGE = "centos";
+   private static final String BUSYBOX_IMAGE = "busybox";
+   private Container container = null;
+   private Image image = null;
 
    @BeforeClass
    private void init() {
       setupProperties();
-      InputStream createImageStream = api().createImage(CENTOS_IMAGE);
+      CreateImageOptions options = CreateImageOptions.Builder.fromImage(BUSYBOX_IMAGE);
+      InputStream createImageStream = api().createImage(options);
       consumeStream(createImageStream, false);
    }
 
    @Test
    public void testVersion() {
-      Assert.assertEquals("0.7.5", api().getVersion().getVersion());
+      Assert.assertEquals(api().getVersion().getVersion(), "0.9.0");
    }
 
    @Test(dependsOnMethods = "testVersion")
-   public void testBuildImage() throws IOException, InterruptedException, URISyntaxException {
-      api().build("jclouds/centos", false, true, new File(Resources.getResource("centos/Dockerfile").toURI()));
+   public void testCreateImage() throws IOException, InterruptedException {
+      CreateImageOptions options = CreateImageOptions.Builder.fromImage(BUSYBOX_IMAGE);
+      InputStream createImageStream = api().createImage(options);
+      consumeStream(createImageStream, false);
+      image = api().inspectImage(BUSYBOX_IMAGE);
+      assertNotNull(image);
    }
 
-   @Test(dependsOnMethods = "testBuildImage")
-   public void testCrudForImage() throws IOException, InterruptedException {
-      Set<Image> images = api().listImages(true);
-      int size = images.size();
-
-      InputStream createImageStream = api().createImage(DEFAULT_IMAGE);
-      String createImageStdout = consumeStream(createImageStream, false);
-
-      InputStream deleteImageStream = api().deleteImage(DEFAULT_IMAGE);
-      String deleteImageStdout = consumeStream(deleteImageStream, false);
-
-      assertEquals(api().listImages(true).size(), size);
+   @Test(dependsOnMethods = "testCreateImage")
+   public void testListImages() {
+      Assert.assertNotNull(api().listImages());
    }
 
-   @Test(dependsOnMethods = "testCrudForImage")
-   public void testCrudForContainer() throws IOException, InterruptedException {
-      List<Container> containers = api().listContainers(true);
-      int size = containers.size();
-
-      Config config = Config.builder()
-              .image(CENTOS_IMAGE)
+   @Test(dependsOnMethods = "testListImages")
+   public void testCreateContainer() throws IOException, InterruptedException {
+      if(image == null) Assert.fail();
+      Config config = Config.builder().imageId(image.getId())
               .cmd(ImmutableList.of("/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"))
-              .attachStdout(true)
-              .attachStderr(true)
-              .volumesFrom("")
-              .workingDir("")
               .build();
-      Container container = api().createContainer(config);
-      assertEquals(api().inspectContainer(container.getId()), container);
-
-      api().removeContainer(container.getId(), true);
-      assertEquals(api().listContainers(true).size(), size);
+      container = api().createContainer("testCreateContainer", config);
+      assertNotNull(container);
+      assertNotNull(container.getId());
    }
 
-   @Test(dependsOnMethods = "testCrudForContainer")
-   public void testStartAndStopContainer() throws IOException, InterruptedException {
-      Config config = Config.builder().image(CENTOS_IMAGE)
-              //.cmd(ImmutableList.of("/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"))
-              .cmd(ImmutableList.of("/bin/sh", "-c", "yum -y install openssh-server openssh-clients; chkconfig sshd on; service sshd start"))
-              .attachStdout(true)
-              .attachStderr(true)
-              .volumesFrom("")
-              .workingDir("")
-              .build();
-      Container container = api().createContainer(config);
-      String containerId = container.getId();
-      api().startContainer(containerId);
-      Assert.assertTrue(api().inspectContainer(containerId).getState().isRunning());
-
-      Image image = api().commit(containerId, "sshd", "centos + ssh server");
-      Set<Image> images = api().listImages(true);
-      api().stopContainer(containerId);
-      Assert.assertFalse(api().inspectContainer(containerId).getState().isRunning());
-      api().removeContainer(containerId, true);
+   @Test(dependsOnMethods = "testCreateContainer")
+   public void testStartContainer() throws IOException, InterruptedException {
+      if(container == null) Assert.fail();
+      api().startContainer(container.getId());
+      Assert.assertTrue(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
-   @AfterClass
-   private void cleanUp() {
-      List<Container> containers = api().listContainers(true);
-      for (Container container : containers) {
-         api().stopContainer(container.getId());
-         api().removeContainer(container.getId(), true);
-      }
+   @Test(dependsOnMethods = "testStartContainer")
+   public void testStopContainer() {
+      if(container == null) Assert.fail();
+      api().stopContainer(container.getId());
+      Assert.assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
+   }
+
+   @Test(dependsOnMethods = "testStopContainer", expectedExceptions = NullPointerException.class)
+   public void testRemoveContainer() {
+      if(container == null) Assert.fail();
+      api().removeContainer(container.getId());
+      Assert.assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
+   }
+
+   @Test(dependsOnMethods = "testRemoveContainer", expectedExceptions = ResourceNotFoundException.class)
+   public void testDeleteImage() {
+      InputStream deleteImageStream = api().deleteImage(image.getId());
+      consumeStream(deleteImageStream, false);
+      assertNull(api().inspectImage(image.getId()));
+   }
+
+   @Test(dependsOnMethods = "testDeleteImage")
+   public void testBuildImage() throws IOException, InterruptedException, URISyntaxException {
+      BuildOptions options = BuildOptions.Builder.tag("testBuildImage").verbose(false).nocache(false);
+      InputStream buildImageStream = api().build(new File(Resources.getResource("centos/Dockerfile").toURI()), options);
+      String buildStream = consumeStream(buildImageStream, false);
+      Iterable<String> splitted = Splitter.on("\n").split(buildStream.replace("\r", "").trim());
+      String lastStreamedLine = Iterables.getLast(splitted).trim();
+      String rawImageId = Iterables.getLast(Splitter.on("Successfully built ").split(lastStreamedLine));
+      String imageId = rawImageId.substring(0, 11);
+      Image image = api().inspectImage(imageId);
+      api().removeContainer(image.getContainer());
+      api().deleteImage(imageId, DeleteImageOptions.Builder.force(true));
    }
 
    private RemoteApi api() {

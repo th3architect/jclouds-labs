@@ -21,6 +21,7 @@ import com.google.inject.Module;
 import org.jclouds.Constants;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.docker.compute.config.DockerComputeServiceContextModule;
 import org.jclouds.docker.config.DockerHttpApiModule;
 import org.jclouds.docker.config.DockerParserModule;
@@ -57,6 +58,8 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
       properties.setProperty(Constants.PROPERTY_MAX_RETRIES, "15");
       properties.setProperty("jclouds.ssh.retry-auth", "true");
       properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
+      properties.setProperty("image.login-user", "root");
+      properties.setProperty(ComputeServiceProperties.IMAGE_LOGIN_USER, "root:password");
       properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true,osVersionMatches=1[012].[01][04]");
       return properties;
    }
@@ -67,13 +70,11 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
          super(DockerApi.class);
          id("docker")
                  .name("Docker API")
-                 .defaultIdentity("root")
                  .identityName("user")
-                 .defaultCredential("password")
-                 .credentialName("Password")
+                 .credentialName("password")
                  .documentation(URI.create("http://docs.docker.io/en/latest/api/docker_remote_api/"))
-                 .version("1.8")
-                 .defaultEndpoint("http://localhost:4243")
+                 .version("1.10")
+                 .defaultEndpoint("http://127.0.0.1:4243")
                  .defaultProperties(DockerApiMetadata.defaultProperties())
                  .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(

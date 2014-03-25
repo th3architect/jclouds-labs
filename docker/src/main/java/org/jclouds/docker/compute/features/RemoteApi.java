@@ -23,6 +23,13 @@ import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.domain.Version;
+import org.jclouds.docker.options.BuildOptions;
+import org.jclouds.docker.options.CommitOptions;
+import org.jclouds.docker.options.CreateImageOptions;
+import org.jclouds.docker.options.DeleteImageOptions;
+import org.jclouds.docker.options.ListContainerOptions;
+import org.jclouds.docker.options.ListImageOptions;
+import org.jclouds.docker.options.RemoveContainerOptions;
 import org.jclouds.io.Payload;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
@@ -41,12 +48,12 @@ import javax.ws.rs.core.MediaType;
 import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
 
 /**
  * @author Andrea Turli
  */
+@Consumes(MediaType.APPLICATION_JSON)
 public interface RemoteApi extends Closeable {
 
    /**
@@ -57,123 +64,106 @@ public interface RemoteApi extends Closeable {
    @Named("version")
    @GET
    @Path("/version")
-   @Consumes(MediaType.APPLICATION_JSON)
    Version getVersion();
 
    /**
-    * List containers
+    * List all running containers
     *
-    * @return the running containers.
+    * @param options the options to list the containers (@see ListContainerOptions)
+    * @return a set of containers
     */
    @Named("containers:list")
    @GET
    @Path("/containers/json")
-   @Consumes(MediaType.APPLICATION_JSON)
    @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   List<Container> listContainers(
-           @QueryParam("all") boolean all,
-           @QueryParam("limit") String limit,
-           @QueryParam("since") String since,
-           @QueryParam("before") String before);
+   Set<Container> listContainers(ListContainerOptions... options);
 
    /**
-    * List containers
+    * Create a container
     *
-    * @return the running containers.
-    */
-   @Named("containers:list")
-   @GET
-   @Path("/containers/json")
-   @Consumes(MediaType.APPLICATION_JSON)
-   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   List<Container> listContainers(
-           @QueryParam("all") boolean all);
-
-   /**
-    * Create a container.
-    *
-    * @return the container created.
+    * @param name the name for the new container. Must match /?[a-zA-Z0-9_-]+.
+    * @param config the container’s configuration (@see BindToJsonPayload)
+    * @return a new container
     */
    @Named("container:create")
    @POST
    @Path("/containers/create")
-   @Consumes(MediaType.APPLICATION_JSON)
-   Container createContainer(@BinderParam(BindToJsonPayload.class) Config config);
+   Container createContainer(@QueryParam("name") String name, @BinderParam(BindToJsonPayload.class) Config config);
 
+   /**
+    * Return low-level information on the container id
+    * @param containerId  The id of the container to get.
+    * @return The details of the container or <code>null</code> if the container with the given id doesn't exist.
+    */
    @Named("container:inspect")
    @GET
    @Path("/containers/{id}/json")
-   @Consumes(MediaType.APPLICATION_JSON)
    @Fallback(Fallbacks.NullOnNotFoundOr404.class)
    Container inspectContainer(@PathParam("id") String containerId);
 
    /**
-    * Delete the container.
+    * Remove the container by id from the filesystem
     *
-    * @return the container.
+    * @param containerId The id of the container to be removed.
     */
    @Named("container:delete")
    @DELETE
    @Path("/containers/{id}")
-   void removeContainer(@PathParam("id") String containerId, @QueryParam("v") boolean v);
+   void removeContainer(@PathParam("id") String containerId);
 
    /**
-    * Start a container.
+    * Remove the container by id from the filesystem
     *
-    * @return the container.
+    * @param containerId The id of the container to be removed.
+    * @param options the operation’s configuration (@see RemoveContainerOptions)
+    */
+   @Named("container:delete")
+   @DELETE
+   @Path("/containers/{id}")
+   void removeContainer(@PathParam("id") String containerId, RemoveContainerOptions options);
+
+   /**
+    * Start a container by id.
+    *
+    * @param containerId The id of the container to be started.
     */
    @Named("container:start")
    @POST
    @Path("/containers/{id}/start")
-   @Consumes(MediaType.APPLICATION_JSON)
    void startContainer(@PathParam("id") String containerId);
 
    /**
     * Start a container.
     *
-    * @return the container.
+    * @param containerId The id of the container to be started.
+    * @param hostConfig the container’s host configuration
     */
    @Named("container:start")
    @POST
    @Path("/containers/{id}/start")
-   @Consumes(MediaType.APPLICATION_JSON)
    void startContainer(@PathParam("id") String containerId, @BinderParam(BindToJsonPayload.class) HostConfig hostConfig);
 
    /**
-    * Stop a container.
+    * Stop a container by id.
     *
-    * @return the container.
+    * @param containerId The id of the container to be stopped.
+    * @return the stream of the stop execution.
     */
    @Named("container:stop")
    @POST
    @Path("/containers/{id}/stop")
-   @Consumes(MediaType.APPLICATION_JSON)
-   InputStream stopContainer(@PathParam("id") String containerId);
+   void stopContainer(@PathParam("id") String containerId);
 
    /**
     * Create a new image from a container’s changes
     *
+    * @param options the commit’s configuration (@see CommitOptions)
     * @return a new image created from the current container's status.
     */
    @Named("container:commit")
    @POST
    @Path("/commit")
-   @Consumes(MediaType.APPLICATION_JSON)
-   Image commit(
-           @QueryParam("container") String containerId, @QueryParam("repo") String repository, @QueryParam("m") String message);
-
-   /**
-    * Create a new image from a container’s changes
-    *
-    * @return a new image created from the current container's status.
-    */
-   @Named("container:commit")
-   @POST
-   @Path("/commit")
-   @Consumes(MediaType.APPLICATION_JSON)
-   InputStream commit(
-           @QueryParam("container") String containerId, @QueryParam("repo") String repository, @QueryParam("tag") String tag,
-           @QueryParam("m") String message, @QueryParam("author") String author, @QueryParam("run") String run);
+   Image commit(CommitOptions options);
 
    /**
     * List images
@@ -183,63 +173,91 @@ public interface RemoteApi extends Closeable {
    @Named("images:list")
    @GET
    @Path("/images/json")
-   @Consumes(MediaType.APPLICATION_JSON)
    @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Image> listImages(@QueryParam("all") boolean all);
-
-   // Image
+   Set<Image> listImages();
 
    /**
-    * Create an image.
+    * List images
     *
-    * @return the image created.
+    * @param options the configuration to list images (@see ListImageOptions)
+    * @return the images available.
     */
-   @Named("image:create")
-   @POST
-   @Path("/images/create")
-   @Consumes(MediaType.APPLICATION_JSON)
-   InputStream createImage(@QueryParam("fromImage") String fromImage);
+   @Named("images:list")
+   @GET
+   @Path("/images/json")
+   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
+   Set<Image> listImages(ListImageOptions options);
 
    /**
-    * Create an image.
+    * Inspect an image
+    *
+    * @param imageId The id of the image to inspect.
+    * @return low-level information on the image name
+    */
+   @Named("image:inspect")
+   @GET
+   @Path("/images/{name}/json")
+   Image inspectImage(@PathParam("name") String imageId);
+
+   /**
+    * Create an image, either by pull it from the registry or by importing it
+    *
+    * @param options the configuration to create an image (@see CreateImageOptions)
+    * @return a stream of the image creation.
     */
    @Named("image:create")
    @POST
    @Path("/images/create")
-   @Consumes(MediaType.APPLICATION_JSON)
-   InputStream createImage(
-           @QueryParam("fromImage") String fromImage, @QueryParam("fromSrc") String fromSrc, @QueryParam("repo") String repo,
-           @QueryParam("tag") String tag, @QueryParam("registry") String registry);
+   InputStream createImage(CreateImageOptions options);
 
    /**
     * Delete an image.
+    *
+    * @param name the image name to be deleted
+    * @return the stream of the deletion execution.
     */
    @Named("image:delete")
    @DELETE
    @Path("/images/{name}")
-   @Consumes(MediaType.APPLICATION_JSON)
    InputStream deleteImage(@PathParam("name") String name);
 
+   /**
+    * Remove the image from the filesystem by name
+    *
+    * @param name the name of the image to be removed
+    * @param options the image deletion's options (@see DeleteImageOptions)
+    * @return the stream of the deletion execution.
+    */
+   @Named("image:delete")
+   @DELETE
+   @Path("/images/{name}")
+   InputStream deleteImage(@PathParam("name") String name, DeleteImageOptions options);
 
    /**
     * Build an image from Dockerfile via stdin
+    *
+    * @param inputStream The stream must be a tar archive compressed with one of the following algorithms: identity
+    *                    (no compression), gzip, bzip2, xz.
+    * @param options the image build's options (@see BuildOptions)
+    * @return a stream of the build execution
     */
    @Named("image:build")
    @POST
    @Path("/build")
-   @Consumes(MediaType.APPLICATION_JSON)
    @Headers(keys = "Content-Type", values = "application/tar")
-   InputStream build(@QueryParam("t") String tag, Payload inputStream);
+   InputStream build(Payload inputStream, BuildOptions options);
 
    /**
     * Build an image from Dockerfile via stdin
+    *
+    * @param dockerFile The file to be compressed with one of the following algorithms: identity, gzip, bzip2, xz.*
+    * @param options the image build's options (@see BuildOptions)
+    * @return a stream of the build execution
     */
    @Named("image:build")
    @POST
    @Path("/build")
-   @Consumes(MediaType.APPLICATION_JSON)
    @Headers(keys = "Content-Type", values = "application/tar")
-   InputStream build(@QueryParam("t") String tag, @QueryParam("q") boolean quiet, @QueryParam("nocache") boolean nocache,
-                     @BinderParam(BindInputStreamToRequest.class) File dockerFile);
+   InputStream build(@BinderParam(BindInputStreamToRequest.class) File dockerFile, BuildOptions options);
 
 }
