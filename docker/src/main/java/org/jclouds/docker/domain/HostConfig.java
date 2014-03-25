@@ -16,11 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 import org.jclouds.javax.annotation.Nullable;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Andrea Turli
@@ -28,26 +34,28 @@ import java.util.Map;
 public class HostConfig {
 
    @SerializedName("ContainerIDFile")
-   private String containerIDFile;
+   final private String containerIDFile;
    @SerializedName("Binds")
-   private List<String> binds;
+   final private List<String> binds;
    @SerializedName("Privileged")
-   private boolean privileged;
+   final private boolean privileged;
    @SerializedName("PortBindings")
-   private Map<String, List<Map<String, String>>> portBindings;
+   final private Map<String, List<Map<String, String>>> portBindings;
    @SerializedName("Links")
-   private List<String> links;
+   final private List<String> links;
    @SerializedName("PublishAllPorts")
-   private boolean publishAllPorts;
+   final private boolean publishAllPorts;
 
-   public HostConfig(String containerIDFile, List<String> binds, boolean privileged,
-                     Map<String, List<Map<String, String>>> portBindings, @Nullable List<String> links,
-                     boolean publishAllPorts) {
+   @ConstructorProperties({ "ContainerIDFile", "Binds", "Privileged", "PortBindings", "Links", "Size",
+           "PublishAllPorts" })
+   public HostConfig(@Nullable String containerIDFile, @Nullable List<String> binds, @Nullable boolean privileged,
+                     @Nullable Map<String, List<Map<String, String>>> portBindings, @Nullable List<String> links,
+                     @Nullable boolean publishAllPorts) {
       this.containerIDFile = containerIDFile;
-      this.binds = binds;
+      this.binds = binds != null ? ImmutableList.copyOf(binds) : ImmutableList.<String> of();
       this.privileged = privileged;
-      this.portBindings = portBindings;
-      this.links = links;
+      this.portBindings = portBindings != null ? ImmutableMap.copyOf(portBindings) : ImmutableMap.<String, List<Map<String, String>>> of();
+      this.links = links != null ? ImmutableList.copyOf(links) : ImmutableList.<String> of();
       this.publishAllPorts = publishAllPorts;
    }
 
@@ -77,15 +85,35 @@ public class HostConfig {
    }
 
    @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      HostConfig that = (HostConfig) o;
+
+      return Objects.equal(this.containerIDFile, that.containerIDFile) &&
+              Objects.equal(this.binds, that.binds) &&
+              Objects.equal(this.privileged, that.privileged) &&
+              Objects.equal(this.portBindings, that.portBindings) &&
+              Objects.equal(this.links, that.links) &&
+              Objects.equal(this.publishAllPorts, that.publishAllPorts);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(containerIDFile, binds, privileged, portBindings, links, publishAllPorts);
+   }
+
+   @Override
    public String toString() {
-      return "HostConfig{" +
-              "containerIDFile='" + containerIDFile + '\'' +
-              ", binds='" + binds + '\'' +
-              ", privileged=" + privileged +
-              ", portBindings=" + portBindings +
-              ", links=" + links +
-              ", publishAllPorts=" + publishAllPorts +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("containerIDFile", containerIDFile)
+              .add("binds", binds)
+              .add("privileged", privileged)
+              .add("portBindings", portBindings)
+              .add("links", links)
+              .add("publishAllPorts", publishAllPorts)
+              .toString();
    }
 
    public static Builder builder() {
@@ -99,10 +127,10 @@ public class HostConfig {
    public static final class Builder {
 
       private String containerIDFile;
-      private List<String> binds;
+      private List<String> binds = ImmutableList.of();
       private boolean privileged;
-      private Map<String, List<Map<String, String>>> portBindings;
-      private List<String> links;
+      private Map<String, List<Map<String, String>>> portBindings = ImmutableMap.of();
+      private List<String> links = ImmutableList.of();
       private boolean publishAllPorts;
 
       public Builder containerIDFile(String containerIDFile) {
@@ -111,7 +139,7 @@ public class HostConfig {
       }
 
       public Builder binds(List<String> binds) {
-         this.binds = binds;
+         this.binds = ImmutableList.copyOf(checkNotNull(binds, "binds"));
          return this;
       }
 
@@ -121,12 +149,12 @@ public class HostConfig {
       }
 
       public Builder links(List<String> links) {
-         this.links = links;
+         this.links = ImmutableList.copyOf(checkNotNull(links, "links"));
          return this;
       }
 
       public Builder portBindings(Map<String, List<Map<String, String>>> portBindings) {
-         this.portBindings = portBindings;
+         this.portBindings = ImmutableMap.copyOf(portBindings);
          return this;
       }
 

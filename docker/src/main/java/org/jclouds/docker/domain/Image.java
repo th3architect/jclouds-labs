@@ -16,56 +16,82 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Image {
 
-   @SerializedName("Id")
-   private String id;
-   @SerializedName("RepoTags")
-   private List<String> repoTags;
-   @SerializedName("Repository")
-   private String repository;
-   @SerializedName("Tag")
-   private String tag;
+   @SerializedName("id")
+   final private String id;
+   @SerializedName("parent")
+   final private String parent;
    @SerializedName("Created")
-   private long created;
+   final private String created;
+   @SerializedName("container")
+   final private String container;
+   @SerializedName("docker_version")
+   final private String dockerVersion;
+   @SerializedName("architecture")
+   final private String architecture;
+   @SerializedName("os")
+   final private String os;
    @SerializedName("Size")
-   private final long size;
+   final private long size;
    @SerializedName("VirtualSize")
-   private long virtualSize;
+   final private long virtualSize;
+   @SerializedName("RepoTags")
+   final private List<String> repoTags;
 
-   public Image(String id, List<String> repoTags, String repository, String tag, long created, long size,
-                long virtualSize) {
-      this.id = id;
-      this.repoTags = repoTags;
-      this.repository = repository;
-      this.tag = tag;
+   @ConstructorProperties({ "id", "parent", "created", "container", "docker_version", "architecture", "os", "Size",
+           "VirtualSize", "RepoTags" })
+   public Image(String id, @Nullable String parent, @Nullable String created, @Nullable String container,
+                @Nullable String dockerVersion, @Nullable String architecture, @Nullable String os, long size,
+                @Nullable long virtualSize, @Nullable List<String> repoTags) {
+      this.id = checkNotNull(id, "id");
+      this.parent = parent;
       this.created = created;
+      this.container = container;
+      this.dockerVersion = dockerVersion;
+      this.architecture = architecture;
+      this.os = os;
       this.size = size;
       this.virtualSize = virtualSize;
+      this.repoTags = repoTags != null ? ImmutableList.copyOf(repoTags) : ImmutableList.<String> of();
    }
 
    public String getId() {
       return id;
    }
 
-   public List<String> getRepoTags() {
-      return repoTags;
+   public String getParent() {
+      return parent;
    }
 
-   public String getRepository() {
-      return repository;
-   }
-
-   public String getTag() {
-      return tag;
-   }
-
-   public long getCreated() {
+   public String getCreated() {
       return created;
+   }
+
+   public String getContainer() {
+      return container;
+   }
+
+   public String getDockerVersion() {
+      return dockerVersion;
+   }
+
+   public String getArchitecture() {
+      return architecture;
+   }
+
+   public String getOs() {
+      return os;
    }
 
    public long getSize() {
@@ -76,17 +102,48 @@ public class Image {
       return virtualSize;
    }
 
+   public List<String> getRepoTags() {
+      return repoTags;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Image that = (Image) o;
+
+      return Objects.equal(this.id, that.id) &&
+              Objects.equal(this.parent, that.parent) &&
+              Objects.equal(this.created, that.created) &&
+              Objects.equal(this.container, that.container) &&
+              Objects.equal(this.dockerVersion, that.dockerVersion) &&
+              Objects.equal(this.architecture, that.architecture) &&
+              Objects.equal(this.os, that.os) &&
+              Objects.equal(this.size, that.size) &&
+              Objects.equal(this.virtualSize, that.virtualSize);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(id, parent, created, container, dockerVersion, architecture, os, size,
+              virtualSize);
+   }
+
    @Override
    public String toString() {
-      return "Image{" +
-              "id='" + id + '\'' +
-              ", repoTags=" + repoTags +
-              ", repository='" + repository + '\'' +
-              ", tag='" + tag + '\'' +
-              ", created=" + created +
-              ", size=" + size +
-              ", virtualSize=" + virtualSize +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("id", id)
+              .add("parent", parent)
+              .add("created", created)
+              .add("container", container)
+              .add("dockerVersion", dockerVersion)
+              .add("architecture", architecture)
+              .add("os", os)
+              .add("size", size)
+              .add("virtualSize", virtualSize)
+              .add("repoTags", repoTags)
+              .toString();
    }
 
    public static Builder builder() {
@@ -100,35 +157,49 @@ public class Image {
    public static final class Builder {
 
       private String id;
-      private List<String> repoTags;
-      private String repository;
-      private String tag;
-      private long created;
+      private String parent;
+      private String created;
+      private String container;
+      private Config containerConfig;
+      private String dockerVersion;
+      private String architecture;
+      private String os;
       private long size;
       private long virtualSize;
+      private List<String> repoTags = ImmutableList.of();
 
       public Builder id(String id) {
          this.id = id;
          return this;
       }
 
-      public Builder repoTags(List<String> repoTags) {
-         this.repoTags = repoTags;
+      public Builder parent(String parent) {
+         this.parent = parent;
          return this;
       }
 
-      public Builder repository(String repository) {
-         this.repository = repository;
-         return this;
-      }
-
-      public Builder tag(String tag) {
-         this.tag = tag;
-         return this;
-      }
-
-      public Builder created(long created) {
+      public Builder created(String created) {
          this.created = created;
+         return this;
+      }
+
+      public Builder container(String container) {
+         this.container = container;
+         return this;
+      }
+
+      public Builder dockerVersion(String dockerVersion) {
+         this.dockerVersion = dockerVersion;
+         return this;
+      }
+
+      public Builder architecture(String architecture) {
+         this.architecture = architecture;
+         return this;
+      }
+
+      public Builder os(String os) {
+         this.os = os;
          return this;
       }
 
@@ -142,20 +213,28 @@ public class Image {
          return this;
       }
 
+      public Builder repoTags(List<String> repoTags) {
+         this.repoTags = ImmutableList.copyOf(checkNotNull(repoTags, "repoTags"));
+         return this;
+      }
+
       public Image build() {
-         return new Image(id, repoTags, repository, tag, created, size, virtualSize);
+         return new Image(id, parent, created, container, dockerVersion, architecture, os, size,
+                 virtualSize, repoTags);
       }
 
       public Builder fromImage(Image in) {
          return this
                  .id(in.getId())
-                 .repoTags(in.getRepoTags())
+                 .parent(in.getParent())
                  .created(in.getCreated())
-                 .repository(in.getRepository())
-                 .tag(in.getTag())
-                 .created(in.getCreated())
+                 .container(in.getContainer())
+                 .dockerVersion(in.getDockerVersion())
+                 .architecture(in.getArchitecture())
+                 .os(in.getOs())
                  .size(in.getSize())
                  .virtualSize(in.getVirtualSize());
+                 //DO NOT add .repoTags(in.getRepoTags());
       }
    }
 }

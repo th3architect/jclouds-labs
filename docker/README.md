@@ -8,7 +8,8 @@ Please follow these steps to configure your workstation for jclouds-docker:
 
 - install the latest Docker release (please visit http://www.docker.io/gettingstarted/)
 
-If you are on OS X, please consider [dvm](https://github.com/fnichol/dvm) as simplified way to install docker locally.
+If you are on OS X, please consider [boot2docker](http://docs.docker.io/en/latest/installation/mac/) as simplified
+way to install docker locally.
 
 #How it works
 

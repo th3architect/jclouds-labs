@@ -47,7 +47,7 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
    @Override
    public Image apply(org.jclouds.docker.domain.Image from) {
       checkNotNull(from, "image");
-      String description = checkNotNull(Iterables.getFirst(from.getRepoTags(), ""), "productItem.description");
+      String description = checkNotNull(Iterables.getFirst(from.getRepoTags(), null));
 
       OsFamily osFamily = osFamily().apply(description);
       String osVersion = parseVersion(description);
@@ -56,7 +56,7 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
               .description(description)
               .family(osFamily)
               .version(osVersion)
-              .is64Bit(true) // TODO how to detect it via API?
+              .is64Bit(is64bit(from))
               .build();
 
       return new ImageBuilder()
@@ -66,6 +66,11 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
               .operatingSystem(os)
               .status(Image.Status.AVAILABLE)
               .build();
+   }
+
+   private boolean is64bit(org.jclouds.docker.domain.Image inspectedImage) {
+      if(inspectedImage.getArchitecture() == null) return true;
+      return inspectedImage.getArchitecture().matches("x86_64|amd64");
    }
 
    /**

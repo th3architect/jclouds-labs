@@ -16,13 +16,18 @@
  */
 package org.jclouds.docker.binders;
 
+import com.google.common.base.Throwables;
 import com.google.common.io.Files;
+import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.compute.features.internal.Archives;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.io.Payload;
 import org.jclouds.io.Payloads;
+import org.jclouds.logging.Logger;
 import org.jclouds.rest.Binder;
 
+import javax.annotation.Resource;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -37,6 +42,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 public class BindInputStreamToRequest implements Binder {
+
+   @Resource
+   @Named(ComputeServiceConstants.COMPUTE_LOGGER)
+   protected Logger logger = Logger.NULL;
 
    @SuppressWarnings("unchecked")
    @Override
@@ -56,7 +65,8 @@ public class BindInputStreamToRequest implements Binder {
          payload.getContentMetadata().setContentType(MediaType.TEXT_PLAIN);
          request.setPayload(payload);
       } catch (IOException e) {
-         e.printStackTrace();
+         logger.error("Couldn't create a tarball for {}", targetFile, e);
+         throw Throwables.propagate(e);
       }
       return request;
    }

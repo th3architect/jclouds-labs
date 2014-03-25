@@ -16,6 +16,7 @@
  */
 package org.jclouds.docker.compute;
 
+import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
@@ -28,6 +29,7 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.reference.ComputeServiceConstants;
+import org.jclouds.docker.compute.options.DockerTemplateOptions;
 import org.jclouds.logging.Logger;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -41,6 +43,7 @@ import org.testng.annotations.Test;
 import javax.annotation.Resource;
 import javax.inject.Named;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
@@ -49,7 +52,7 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Andrea Turli
  */
-@Test(groups = "live", testName = "DockerExperimentLiveTest")
+@Test(groups = "live", singleThreaded = true, testName = "DockerExperimentLiveTest")
 public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
 
    public static final String TEST_LAUNCH_CLUSTER = "jclouds";
@@ -73,15 +76,21 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
    }
 
    @Test
-   public void testLaunchCentosServerWithInboundPorts() throws RunNodesException {
+   public void testLaunchUbuntuServerWithInboundPorts() throws RunNodesException {
       int numNodes = 1;
       ComputeService compute = context.getComputeService();
+
       Template template = compute.templateBuilder().smallest()
-              .osFamily(OsFamily.CENTOS).os64Bit(true)
-              .osDescriptionMatches("jclouds/centos:latest")
+              .osFamily(OsFamily.UBUNTU).os64Bit(true)
+              .osDescriptionMatches("jclouds/ubuntu:latest")
               .build();
       Statement bootInstructions = AdminAccess.standard();
-      template.getOptions().runScript(bootInstructions)
+
+      DockerTemplateOptions templateOptions = template.getOptions().as(DockerTemplateOptions.class);
+
+      Map<String,String> volumes = Maps.newHashMap();
+      volumes.put("/var/lib/docker", "/root");
+      templateOptions.volumes(volumes).runScript(bootInstructions)
               .inboundPorts(22, 80, 8080);
 
       Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(TEST_LAUNCH_CLUSTER, numNodes, template);

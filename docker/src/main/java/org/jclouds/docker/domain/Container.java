@@ -16,10 +16,16 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
+import java.beans.ConstructorProperties;
 import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Andrea Turli
@@ -27,71 +33,74 @@ import java.util.List;
 public class Container {
 
    @SerializedName("Id")
-   private String id;
-   @SerializedName("Names")
-   private List<String> names;
+   final private String id;
+   @SerializedName("Name")
+   final private String name;
    @SerializedName("Created")
-   private String created;
+   final private String created;
    @SerializedName("Path")
-   private String path;
+   final private String path;
    @SerializedName("Args")
-   private String[] args;
+   final private String[] args;
    @SerializedName("Config")
-   private Config config;
+   final private Config config;
    @SerializedName("State")
-   private State state;
+   final private State state;
    @SerializedName("Image")
-   private String image;
+   final private String image;
    @SerializedName("NetworkSettings")
-   private NetworkSettings networkSettings;
-   @SerializedName("SysInitPath")
-   private String sysInitPath;
+   final private NetworkSettings networkSettings;
    @SerializedName("ResolvConfPath")
-   private String resolvConfPath;
+   final private String resolvConfPath;
+   @SerializedName("Driver")
+   final private String driver;
+   @SerializedName("ExecDriver")
+   final private String execDriver;
    @SerializedName("Volumes")
-   private Volumes volumes;
-   @SerializedName("SizeRw")
-   private long sizeRw;
-   @SerializedName("SizeRootFs")
-   private long sizeRootFs;
+   final private Map<String, String> volumes;
+   @SerializedName("VolumesRW")
+   final private Map<String, Boolean> volumesRw;
    @SerializedName("Command")
-   private String command;
+   final private String command;
    @SerializedName("Status")
-   private String status;
+   final private String status;
    @SerializedName("HostConfig")
-   private HostConfig hostConfig;
+   final private HostConfig hostConfig;
    @SerializedName("Ports")
-   private List<Port> ports;
+   final private List<Port> ports;
 
-   public Container(String id, List<String> names, String created, String path, String[] args, Config config, State state, String image,
-                    NetworkSettings networkSettings, String sysInitPath, String resolvConfPath, Volumes volumes,
-                    long sizeRw, long sizeRootFs, String command, String status, HostConfig hostConfig, List<Port> ports) {
-      this.id = id;
-      this.names = names;
-      this.created = created;
-      this.path = path;
-      this.args = args;
-      this.config = config;
-      this.state = state;
-      this.image = image;
-      this.networkSettings = networkSettings;
-      this.sysInitPath = sysInitPath;
-      this.resolvConfPath = resolvConfPath;
-      this.volumes = volumes;
-      this.sizeRw = sizeRw;
-      this.sizeRootFs = sizeRootFs;
-      this.command = command;
-      this.status = status;
-      this.hostConfig = hostConfig;
-      this.ports = ports;
+   @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
+           "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports" })
+   public Container(String id, String name, String created, String path, String[] args, Config config, State state,
+                    String image,  NetworkSettings networkSettings, String resolvConfPath,
+                    String driver, String execDriver, Map<String, String> volumes, Map<String, Boolean> volumesRW,
+                    String command, String status, HostConfig hostConfig, List<Port> ports) {
+      this.id = checkNotNull(id, "id");
+      this.name = checkNotNull(name, "name");
+      this.created = checkNotNull(created, "created");
+      this.path = checkNotNull(path, "path");
+      this.args = checkNotNull(args, "args");
+      this.config = checkNotNull(config, "config");
+      this.state = checkNotNull(state, "state");
+      this.image = checkNotNull(image, "image");
+      this.networkSettings = checkNotNull(networkSettings, "networkSettings");
+      this.resolvConfPath = checkNotNull(resolvConfPath, "resolvConfPath");
+      this.driver = checkNotNull(driver, "driver");
+      this.execDriver = checkNotNull(execDriver, "execDriver");
+      this.volumes = checkNotNull(volumes, "volumes");
+      this.volumesRw = checkNotNull(volumesRW, "volumesRW");
+      this.command = checkNotNull(command, "command");
+      this.status = checkNotNull(status, "status");
+      this.hostConfig = checkNotNull(hostConfig, "hostConfig");
+      this.ports = checkNotNull(ports, "ports");
    }
 
    public String getId() {
       return id;
    }
 
-   public List<String> getNames() {
-      return names;
+   public String getName() {
+      return name;
    }
 
    public String getCreated() {
@@ -122,24 +131,24 @@ public class Container {
       return networkSettings;
    }
 
-   public String getSysInitPath() {
-      return sysInitPath;
-   }
-
    public String getResolvConfPath() {
       return resolvConfPath;
    }
 
-   public Volumes getVolumes() {
+   public String getDriver() {
+      return driver;
+   }
+
+   public String getExecDriver() {
+      return execDriver;
+   }
+
+   public Map<String, String> getVolumes() {
       return volumes;
    }
 
-   public long getSizeRw() {
-      return sizeRw;
-   }
-
-   public long getSizeRootFs() {
-      return sizeRootFs;
+   public Map<String, Boolean> getVolumesRw() {
+      return volumesRw;
    }
 
    public String getCommand() {
@@ -159,27 +168,60 @@ public class Container {
    }
 
    @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Container that = (Container) o;
+
+      return Objects.equal(this.id, that.id) &&
+              Objects.equal(this.name, that.name) &&
+              Objects.equal(this.created, that.created) &&
+              Objects.equal(this.path, that.path) &&
+              Objects.equal(this.args, that.args) &&
+              Objects.equal(this.config, that.config) &&
+              Objects.equal(this.state, that.state) &&
+              Objects.equal(this.image, that.image) &&
+              Objects.equal(this.networkSettings, that.networkSettings) &&
+              Objects.equal(this.resolvConfPath, that.resolvConfPath) &&
+              Objects.equal(this.driver, that.driver) &&
+              Objects.equal(this.execDriver, that.execDriver) &&
+              Objects.equal(this.volumes, that.volumes) &&
+              Objects.equal(this.volumesRw, that.volumesRw) &&
+              Objects.equal(this.command, that.command) &&
+              Objects.equal(this.status, that.status) &&
+              Objects.equal(this.hostConfig, that.hostConfig) &&
+              Objects.equal(this.ports, that.ports);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(id, name, created, path, args, config, state, image, networkSettings, resolvConfPath,
+              driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
+   }
+
+   @Override
    public String toString() {
-      return "Container{" +
-              "id='" + id + '\'' +
-              ", names=" + names +
-              ", created='" + created + '\'' +
-              ", path='" + path + '\'' +
-              ", args=" + Arrays.toString(args) +
-              ", config=" + config +
-              ", state=" + state +
-              ", image='" + image + '\'' +
-              ", networkSettings=" + networkSettings +
-              ", sysInitPath='" + sysInitPath + '\'' +
-              ", resolvConfPath='" + resolvConfPath + '\'' +
-              ", volumes=" + volumes +
-              ", sizeRw=" + sizeRw +
-              ", sizeRootFs=" + sizeRootFs +
-              ", command='" + command + '\'' +
-              ", status='" + status + '\'' +
-              ", hostConfig=" + hostConfig +
-              ", ports=" + ports +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("id", id)
+              .add("name", name)
+              .add("created", created)
+              .add("path", path)
+              .add("args", args)
+              .add("config", config)
+              .add("state", state)
+              .add("image", image)
+              .add("networkSettings", networkSettings)
+              .add("resolvConfPath", resolvConfPath)
+              .add("driver", driver)
+              .add("execDriver", execDriver)
+              .add("volumes", volumes)
+              .add("volumesRw", volumesRw)
+              .add("command", command)
+              .add("status", status)
+              .add("hostConfig", hostConfig)
+              .add("ports", ports)
+              .toString();
    }
 
    public static Builder builder() {
@@ -193,7 +235,7 @@ public class Container {
    public static final class Builder {
 
       private String id;
-      private List<String> names;
+      private String name;
       private String created;
       private String path;
       private String[] args;
@@ -201,23 +243,23 @@ public class Container {
       private State state;
       private String image;
       private NetworkSettings networkSettings;
-      private String sysInitPath;
       private String resolvConfPath;
-      private Volumes volumes;
-      private long sizeRw;
-      private long sizeRootFs;
+      private String driver;
+      private String execDriver;
+      private Map<String, String> volumes = ImmutableMap.of();
+      private Map<String, Boolean> volumesRw = ImmutableMap.of();
       private String command;
       private String status;
       private HostConfig hostConfig;
-      private List<Port> ports;
+      private List<Port> ports = ImmutableList.of();
 
       public Builder id(String id) {
          this.id = id;
          return this;
       }
 
-      public Builder names(List<String> names) {
-         this.names = names;
+      public Builder name(String name) {
+         this.name = name;
          return this;
       }
 
@@ -256,28 +298,28 @@ public class Container {
          return this;
       }
 
-      public Builder sysInitPath(String sysInitPath) {
-         this.sysInitPath = sysInitPath;
-         return this;
-      }
-
       public Builder resolvConfPath(String resolvConfPath) {
          this.resolvConfPath = resolvConfPath;
          return this;
       }
 
-      public Builder volumes(Volumes volumes) {
+      public Builder driver(String driver) {
+         this.driver = driver;
+         return this;
+      }
+
+      public Builder execDriver(String execDriver) {
+         this.execDriver = execDriver;
+         return this;
+      }
+
+      public Builder volumes(Map<String, String> volumes) {
          this.volumes = volumes;
          return this;
       }
 
-      public Builder sizeRw(long sizeRw) {
-         this.sizeRw = sizeRw;
-         return this;
-      }
-
-      public Builder sizeRootFs(long sizeRootFs) {
-         this.sizeRootFs = sizeRootFs;
+      public Builder volumesRw(Map<String, Boolean> volumesRw) {
+         this.volumesRw = volumesRw;
          return this;
       }
 
@@ -302,14 +344,14 @@ public class Container {
       }
 
       public Container build() {
-         return new Container(id, names, created, path, args, config, state, image,
-                 networkSettings, sysInitPath, resolvConfPath, volumes, sizeRw, sizeRootFs, command, status, hostConfig, ports);
+         return new Container(id, name, created, path, args, config, state, image, networkSettings, resolvConfPath,
+                 driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
       }
 
       public Builder fromContainer(Container in) {
          return this
                  .id(in.getId())
-                 .names(in.getNames())
+                 .name(in.getName())
                  .created(in.getCreated())
                  .path(in.getPath())
                  .args(in.getArgs())
@@ -317,11 +359,11 @@ public class Container {
                  .state(in.getState())
                  .image(in.getImage())
                  .networkSettings(in.getNetworkSettings())
-                 .sysInitPath(in.getSysInitPath())
                  .resolvConfPath(in.getResolvConfPath())
+                 .driver(in.getDriver())
+                 .execDriver(in.getExecDriver())
                  .volumes(in.getVolumes())
-                 .sizeRw(in.getSizeRw())
-                 .sizeRootFs(in.getSizeRootFs())
+                 .volumesRw(in.getVolumesRw())
                  .command(in.getCommand())
                  .status(in.getStatus())
                  .hostConfig(in.getHostConfig())

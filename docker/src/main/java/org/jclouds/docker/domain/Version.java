@@ -19,30 +19,35 @@ package org.jclouds.docker.domain;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 
+import java.beans.ConstructorProperties;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Andrea Turli
  */
 public class Version {
    @SerializedName("Arch")
-   private String arch;
+   final private String arch;
    @SerializedName("GitCommit")
-   private String gitCommit;
+   final private String gitCommit;
    @SerializedName("GoVersion")
-   private String goVersion;
+   final private String goVersion;
    @SerializedName("KernelVersion")
-   private String kernelVersion;
+   final private String kernelVersion;
    @SerializedName("Os")
-   private String os;
+   final private String os;
    @SerializedName("Version")
-   private String version;
+   final private String version;
 
+   @ConstructorProperties({ "Arch", "GitCommit", "GoVersion", "KernelVersion", "Os", "Version" })
    public Version(String arch, String gitCommit, String goVersion, String kernelVersion, String os, String version) {
-      this.arch = arch;
-      this.gitCommit = gitCommit;
-      this.goVersion = goVersion;
-      this.kernelVersion = kernelVersion;
-      this.os = os;
-      this.version = version;
+      this.arch = checkNotNull(arch, "arch");
+      this.gitCommit = checkNotNull(gitCommit, "gitCommit");
+      this.goVersion = checkNotNull(goVersion, "goVersion");
+      this.kernelVersion = checkNotNull(kernelVersion, "kernelVersion");
+      this.os = checkNotNull(os, "os");
+      this.version = checkNotNull(version, "version");
    }
 
    public String getArch() {
@@ -73,32 +78,32 @@ public class Version {
    public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
-      Version version1 = (Version) o;
-      if (arch != null ? !arch.equals(version1.arch) : version1.arch != null) return false;
-      if (gitCommit != null ? !gitCommit.equals(version1.gitCommit) : version1.gitCommit != null) return false;
-      if (goVersion != null ? !goVersion.equals(version1.goVersion) : version1.goVersion != null) return false;
-      if (kernelVersion != null ? !kernelVersion.equals(version1.kernelVersion) : version1.kernelVersion != null)
-         return false;
-      if (os != null ? !os.equals(version1.os) : version1.os != null) return false;
-      if (version != null ? !version.equals(version1.version) : version1.version != null) return false;
-      return true;
+
+      Version that = (Version) o;
+
+      return Objects.equal(this.arch, that.arch) &&
+              Objects.equal(this.gitCommit, that.gitCommit) &&
+              Objects.equal(this.goVersion, that.goVersion) &&
+              Objects.equal(this.kernelVersion, that.kernelVersion) &&
+              Objects.equal(this.os, that.os) &&
+              Objects.equal(this.version, that.version);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(arch, gitCommit, goVersion, os, version);
+      return Objects.hashCode(arch, gitCommit, goVersion, kernelVersion, os, version);
    }
 
    @Override
    public String toString() {
-      return "Version{" +
-              "arch='" + arch + '\'' +
-              ", gitCommit='" + gitCommit + '\'' +
-              ", goVersion='" + goVersion + '\'' +
-              ", kernelVersion='" + kernelVersion + '\'' +
-              ", os='" + os + '\'' +
-              ", version='" + version + '\'' +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("arch", arch)
+              .add("gitCommit", gitCommit)
+              .add("goVersion", goVersion)
+              .add("kernelVersion", kernelVersion)
+              .add("os", os)
+              .add("version", version)
+              .toString();
    }
 
    public static Builder builder() {

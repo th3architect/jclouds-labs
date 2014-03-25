@@ -16,7 +16,12 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
+
+import java.beans.ConstructorProperties;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Andrea Turli
@@ -24,19 +29,20 @@ import com.google.gson.annotations.SerializedName;
 public class Port {
 
    @SerializedName("PrivatePort")
-   private int privatePort;
+   final private int privatePort;
    @SerializedName("PublicPort")
-   private int publicPort;
+   final private int publicPort;
    @SerializedName("Type")
-   private String type;
+   final private String type;
    @SerializedName("IP")
-   private String ip;
+   final private String ip;
 
+   @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "Ip" })
    public Port(int privatePort, int publicPort, String type, String ip) {
-      this.privatePort = privatePort;
-      this.publicPort = publicPort;
-      this.type = type;
-      this.ip = ip;
+      this.privatePort = checkNotNull(privatePort, "privatePort");
+      this.publicPort = checkNotNull(publicPort, "publicPort");
+      this.type = checkNotNull(type, "type");
+      this.ip = checkNotNull(ip, "ip");
    }
 
    public int getPrivatePort() {
@@ -56,12 +62,30 @@ public class Port {
    }
 
    @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Port that = (Port) o;
+
+      return Objects.equal(this.privatePort, that.privatePort) &&
+              Objects.equal(this.publicPort, that.publicPort) &&
+              Objects.equal(this.type, that.type) &&
+              Objects.equal(this.ip, that.ip);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(privatePort, publicPort, type, ip);
+   }
+
+   @Override
    public String toString() {
-      return "Port{" +
-              "privatePort=" + privatePort +
-              ", publicPort=" + publicPort +
-              ", type='" + type + '\'' +
-              ", ip='" + ip + '\'' +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("privatePort", privatePort)
+              .add("publicPort", publicPort)
+              .add("type", type)
+              .add("ip", ip)
+              .toString();
    }
 }

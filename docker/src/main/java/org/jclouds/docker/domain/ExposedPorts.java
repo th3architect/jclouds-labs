@@ -16,19 +16,26 @@
  */
 package org.jclouds.docker.domain;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
+
+import java.beans.ConstructorProperties;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Andrea Turli
  */
 public class ExposedPorts {
 
-   private String portAndProtocol;
-   private Set<String> hostPorts;
+   final private String portAndProtocol;
+   final private Set<String> hostPorts;
 
+   @ConstructorProperties({ "PortAndProtocol", "HostPorts" })
    public ExposedPorts(String portAndProtocol, Set<String> hostPorts) {
-      this.portAndProtocol = portAndProtocol;
-      this.hostPorts = hostPorts;
+      this.portAndProtocol = checkNotNull(portAndProtocol, "portAndProtocol");
+      this.hostPorts = hostPorts != null ? ImmutableSet.copyOf(hostPorts) : ImmutableSet.<String> of();
    }
 
    public String getPortAndProtocol() {
@@ -40,11 +47,27 @@ public class ExposedPorts {
    }
 
    @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      ExposedPorts that = (ExposedPorts) o;
+
+      return Objects.equal(this.portAndProtocol, that.portAndProtocol) &&
+             Objects.equal(this.hostPorts, that.hostPorts);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(portAndProtocol, hostPorts);
+   }
+
+   @Override
    public String toString() {
-      return "ExposedPorts{" +
-              "portAndProtocol='" + portAndProtocol + '\'' +
-              ", hostPorts=" + hostPorts +
-              '}';
+      return Objects.toStringHelper(this)
+              .add("portAndProtocol", portAndProtocol)
+              .add("hostPorts", hostPorts)
+              .toString();
    }
 
    public static Builder builder() {
@@ -58,7 +81,7 @@ public class ExposedPorts {
    public static final class Builder {
 
       private String portAndProtocol;
-      private Set<String> hostPorts;
+      private Set<String> hostPorts = ImmutableSet.of();
 
       public Builder portAndProtocol(String portAndProtocol) {
          this.portAndProtocol = portAndProtocol;
@@ -66,7 +89,7 @@ public class ExposedPorts {
       }
 
       public Builder hostPorts(Set<String> hostPorts) {
-         this.hostPorts = hostPorts;
+         this.hostPorts = ImmutableSet.copyOf(checkNotNull(hostPorts, "hostPorts"));
          return this;
       }
 

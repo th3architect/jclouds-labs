@@ -14,7 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.domain;
+package org.jclouds.docker.options;
 
-public class Volumes {
+import org.jclouds.http.options.BaseHttpRequestOptions;
+
+/**
+ * Options to customize image deletion.
+ * 
+ * @author Andrea Turli
+ */
+public class DeleteImageOptions extends BaseHttpRequestOptions {
+
+   public static final DeleteImageOptions NONE = new DeleteImageOptions();
+
+   public DeleteImageOptions force(Boolean force) {
+      this.queryParameters.put("force", force.toString());
+      return this;
+   }
+
+   public static class Builder {
+
+      /**
+       * @see DeleteImageOptions#force
+       */
+      public static DeleteImageOptions force(Boolean force) {
+         DeleteImageOptions options = new DeleteImageOptions();
+         return options.force(force);
+      }
+   }
+
 }

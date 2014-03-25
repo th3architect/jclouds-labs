@@ -32,6 +32,7 @@ import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.compute.functions.ImageToImage;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.options.CommitOptions;
 import org.jclouds.logging.Logger;
 
 import javax.annotation.Resource;
@@ -42,8 +43,8 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_AVAILABLE;
 
 /**
@@ -57,16 +58,19 @@ public class DockerImageExtension implements ImageExtension {
    @Resource
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
    private Logger logger = Logger.NULL;
-   private DockerApi api;
+   private final DockerApi api;
    private final ListeningExecutorService userExecutor;
    private final Predicate<AtomicReference<Image>> imageAvailablePredicate;
+   private final DockerApi dockerApi;
 
    @Inject
    public DockerImageExtension(DockerApi api, @Named(Constants.PROPERTY_USER_THREADS) ListeningExecutorService
-           userExecutor, @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<AtomicReference<Image>> imageAvailablePredicate) {
+           userExecutor, @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<AtomicReference<Image>> imageAvailablePredicate,
+                               DockerApi dockerApi) {
       this.api = checkNotNull(api, "api");
       this.userExecutor = checkNotNull(userExecutor, "userExecutor");
       this.imageAvailablePredicate = checkNotNull(imageAvailablePredicate, "imageAvailablePredicate");
+      this.dockerApi = checkNotNull(dockerApi, "dockerApi");
    }
 
    @Override
@@ -80,16 +84,17 @@ public class DockerImageExtension implements ImageExtension {
 
    @Override
    public ListenableFuture<Image> createImage(ImageTemplate template) {
-      checkState(template instanceof CloneImageTemplate,
+      checkArgument(template instanceof CloneImageTemplate,
               " docker only currently supports creating images through cloning.");
       CloneImageTemplate cloneTemplate = (CloneImageTemplate) template;
 
       Container container = api.getRemoteApi().inspectContainer(cloneTemplate.getSourceNodeId());
-      org.jclouds.docker.domain.Image dockerImage = api.getRemoteApi().commit(container.getId(), cloneTemplate.getName(),
-              cloneTemplate.getName());
+      CommitOptions options = CommitOptions.Builder.containerId(container.getId()).tag(cloneTemplate.getName());
+      org.jclouds.docker.domain.Image dockerImage = api.getRemoteApi().commit(options);
 
       dockerImage = org.jclouds.docker.domain.Image.builder().fromImage(dockerImage)
-              .repoTags(ImmutableList.of(cloneTemplate.getName() + ":latest")).build();
+              .repoTags(ImmutableList.of(cloneTemplate.getName() + ":latest"))
+              .build();
 
       logger.info(">> Registered new image %s, waiting for it to become available.", dockerImage.getId());
       final AtomicReference<Image> image = Atomics.newReference(new ImageToImage().apply(dockerImage));
@@ -108,7 +113,7 @@ public class DockerImageExtension implements ImageExtension {
       try {
          api.getRemoteApi().deleteImage(id);
       } catch (Exception e) {
-         logger.error(e, "Could not delete machine with id %s ", id);
+         logger.error(e, "Could not delete image with id %s ", id);
          return false;
       }
       return true;
