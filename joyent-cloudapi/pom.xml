@@ -22,7 +22,7 @@
   <parent>
     <groupId>io.cloudsoft.jclouds.labs</groupId>
     <artifactId>jclouds-labs</artifactId>
-    <version>1.7.2-ea-brooklyn.3</version>
+    <version>1.7.2-ea-brooklyn.4</version>
   </parent>
 
   <!-- TODO: when out of labs, switch to org.jclouds.api -->
@@ -51,19 +51,19 @@
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.7.2-ea-brooklyn.3</version>
+      <version>1.7.2-ea-brooklyn.4</version>
     </dependency>
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.7.2-ea-brooklyn.3</version>
+      <version>1.7.2-ea-brooklyn.4</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.cloudsoft.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.7.2-ea-brooklyn.3</version>
+      <version>1.7.2-ea-brooklyn.4</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>io.cloudsoft.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
-      <version>1.7.2-ea-brooklyn.3</version>
+      <version>1.7.2-ea-brooklyn.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
