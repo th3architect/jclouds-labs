@@ -23,13 +23,13 @@
     <parent>
         <groupId>io.cloudsoft.jclouds.labs</groupId>
         <artifactId>jclouds-labs</artifactId>
-        <version>1.7.2-ea-brooklyn.4</version>
+        <version>1.7.2-ea-brooklyn.5</version>
     </parent>
 
     <!-- TODO: when out of labs, switch to org.jclouds.provider -->
     <groupId>io.cloudsoft.jclouds.labs</groupId>
     <artifactId>docker</artifactId>
-    <version>1.7.2-ea-brooklyn.4</version>
+    <version>1.7.2-ea-brooklyn.5</version>
     <name>jclouds docker API</name>
     <description>ComputeService binding to the Docker v1.8 API</description>
     <packaging>bundle</packaging>
