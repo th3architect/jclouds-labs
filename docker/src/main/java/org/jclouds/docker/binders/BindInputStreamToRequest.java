@@ -16,8 +16,17 @@
  */
 package org.jclouds.docker.binders;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.annotation.Resource;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.ws.rs.core.MediaType;
+
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.compute.features.internal.Archives;
 import org.jclouds.http.HttpRequest;
@@ -26,16 +35,8 @@ import org.jclouds.io.Payloads;
 import org.jclouds.logging.Logger;
 import org.jclouds.rest.Binder;
 
-import javax.annotation.Resource;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Throwables;
+import com.google.common.io.Files;
 
 /**
  * @author Andrea Turli
@@ -65,7 +66,7 @@ public class BindInputStreamToRequest implements Binder {
          payload.getContentMetadata().setContentType(MediaType.TEXT_PLAIN);
          request.setPayload(payload);
       } catch (IOException e) {
-         logger.error("Couldn't create a tarball for {}", targetFile, e);
+         logger.error(e, "Couldn't create a tarball for %s", targetFile);
          throw Throwables.propagate(e);
       }
       return request;

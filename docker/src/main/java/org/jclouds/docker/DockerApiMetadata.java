@@ -16,8 +16,11 @@
  */
 package org.jclouds.docker;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Module;
+import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
+import static org.jclouds.reflect.Reflection2.typeToken;
+import java.net.URI;
+import java.util.Properties;
+
 import org.jclouds.Constants;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
@@ -27,11 +30,8 @@ import org.jclouds.docker.config.DockerHttpApiModule;
 import org.jclouds.docker.config.DockerParserModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
-import java.net.URI;
-import java.util.Properties;
-
-import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
-import static org.jclouds.reflect.Reflection2.typeToken;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Module;
 
 /**
  * Implementation of {@link BaseHttpApiMetadata} for the Docker API
@@ -58,7 +58,6 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
       properties.setProperty(Constants.PROPERTY_MAX_RETRIES, "15");
       properties.setProperty("jclouds.ssh.retry-auth", "true");
       properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
-      properties.setProperty("image.login-user", "root");
       properties.setProperty(ComputeServiceProperties.IMAGE_LOGIN_USER, "root:password");
       properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true,osVersionMatches=1[012].[01][04]");
       return properties;

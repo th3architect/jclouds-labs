@@ -16,6 +16,21 @@
  */
 package org.jclouds.docker.compute.features;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Set;
+
+import javax.inject.Named;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
 import org.jclouds.Fallbacks;
 import org.jclouds.docker.binders.BindInputStreamToRequest;
 import org.jclouds.docker.domain.Config;
@@ -36,20 +51,6 @@ import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.Headers;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
-import javax.inject.Named;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import java.io.Closeable;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Set;
-
 /**
  * @author Andrea Turli
  */
@@ -69,6 +70,17 @@ public interface RemoteApi extends Closeable {
    /**
     * List all running containers
     *
+    * @return a set of containers
+    */
+   @Named("containers:list")
+   @GET
+   @Path("/containers/json")
+   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
+   Set<Container> listContainers();
+
+   /**
+    * List all running containers
+    *
     * @param options the options to list the containers (@see ListContainerOptions)
     * @return a set of containers
     */
@@ -76,7 +88,7 @@ public interface RemoteApi extends Closeable {
    @GET
    @Path("/containers/json")
    @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Container> listContainers(ListContainerOptions... options);
+   Set<Container> listContainers(ListContainerOptions options);
 
    /**
     * Create a container
@@ -197,7 +209,7 @@ public interface RemoteApi extends Closeable {
    @Named("image:inspect")
    @GET
    @Path("/images/{name}/json")
-   Image inspectImage(@PathParam("name") String imageId);
+   Image inspectImage(@PathParam("name") String imageName);
 
    /**
     * Create an image, either by pull it from the registry or by importing it

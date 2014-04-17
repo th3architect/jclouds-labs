@@ -16,18 +16,18 @@
  */
 package org.jclouds.docker.compute.features.internal;
 
-import com.google.common.base.Splitter;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Iterables.getLast;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.getLast;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+
+import com.google.common.base.Splitter;
 
 /**
  * @author Andrea Turli
@@ -36,7 +36,7 @@ public class Archives {
 
    public static File tar(File baseDir, String archivePath) throws IOException {
       // Check that the directory is a directory, and get its contents
-      checkArgument(baseDir.isDirectory(), baseDir + " is not a directory");
+      checkArgument(baseDir.isDirectory(), "%s is not a directory", baseDir);
       File[] files = baseDir.listFiles();
       File tarFile = new File(archivePath);
 
@@ -66,7 +66,7 @@ public class Archives {
 
    public static File tar(File baseDir, File tarFile) throws IOException {
       // Check that the directory is a directory, and get its contents
-      checkArgument(baseDir.isDirectory(), baseDir + " is not a directory");
+      checkArgument(baseDir.isDirectory(), "%s is not a directory", baseDir);
       File[] files = baseDir.listFiles();
 
       String token = getLast(Splitter.on("/").split(baseDir.getAbsolutePath()));

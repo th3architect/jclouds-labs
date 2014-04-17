@@ -16,35 +16,31 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Guice;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import java.util.List;
+import java.util.Map;
+
 import org.easymock.EasyMock;
-import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.functions.GroupNamingConvention;
-import org.jclouds.docker.DockerApi;
-import org.jclouds.docker.DockerApiMetadata;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.NetworkSettings;
 import org.jclouds.docker.domain.Port;
 import org.jclouds.docker.domain.State;
-import org.jclouds.providers.AnonymousProviderMetadata;
-import org.jclouds.rest.ApiContext;
+import org.jclouds.providers.ProviderMetadata;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Guice;
 
 /**
  * Unit tests for the {@link org.jclouds.docker.compute.functions.ContainerToNodeMetadata} class.
@@ -122,24 +118,19 @@ public class ContainerToNodeMetadataTest {
               .hostConfig(HostConfig.builder().publishAllPorts(true).build())
               .ports(ImmutableList.<Port>of())
               .build();
-      ApiContext<DockerApi> context = EasyMock.createMock(ApiContext.class);
-      ApiMetadata dockerApiMetadata = Guice.createInjector().getInstance(DockerApiMetadata.class);
-      expect(context.getProviderMetadata()).andReturn(new AnonymousProviderMetadata(dockerApiMetadata,
-              "http://127.0.0.1:4243"));
-      replay(context);
+      ProviderMetadata providerMetadata = EasyMock.createMock(ProviderMetadata.class);
+      expect(providerMetadata.getEndpoint()).andReturn("http://127.0.0.1:4243");
+      replay(providerMetadata);
 
       GroupNamingConvention.Factory namingConvention = Guice.createInjector().getInstance(GroupNamingConvention.Factory.class);
 
-      function = new ContainerToNodeMetadata(context, toPortableStatus(), namingConvention);
+      function = new ContainerToNodeMetadata(providerMetadata, toPortableStatus(), namingConvention);
    }
 
    private Function<State, NodeMetadata.Status> toPortableStatus() {
       StateToStatus function = EasyMock.createMock(StateToStatus.class);
-
          expect(function.apply(anyObject(State.class))).andReturn(NodeMetadata.Status.RUNNING);
-
          replay(function);
-
          return function;
    }
 
@@ -164,10 +155,8 @@ public class ContainerToNodeMetadataTest {
 
       expect(mockContainer.getId()).andReturn(container.getId());
       expect(mockContainer.getName()).andReturn(container.getName());
-      expect(mockContainer.getImage()).andReturn(container.getImage());
       expect(mockContainer.getNetworkSettings()).andReturn(container.getNetworkSettings()).anyTimes();
-      expect(mockContainer.getState()).andReturn(container.getState());
-      expect(mockContainer.getConfig()).andReturn(container.getConfig());
+      expect(mockContainer.getConfig()).andReturn(container.getConfig()).anyTimes();
 
       replay(mockContainer);
 

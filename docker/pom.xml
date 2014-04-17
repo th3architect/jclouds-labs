@@ -30,12 +30,12 @@
   <groupId>org.apache.jclouds.labs</groupId>
   <artifactId>docker</artifactId>
   <name>jclouds docker API</name>
-  <description>ComputeService binding to the Docker v1.8 API</description>
+  <description>ComputeService binding to the Docker API</description>
   <packaging>bundle</packaging>
 
   <properties>
     <test.docker.endpoint>https://localhost:4243</test.docker.endpoint>
-    <test.docker.api-version>1.8</test.docker.api-version>
+    <test.docker.api-version>1.10</test.docker.api-version>
     <test.docker.identity>FIXME</test.docker.identity>
     <test.docker.credential>FIXME</test.docker.credential>
     <jclouds.osgi.export>org.jclouds.docker*;version="${project.version}"</jclouds.osgi.export>
@@ -128,6 +128,7 @@
                   <systemPropertyVariables>
                     <test.docker.endpoint>${test.docker.endpoint}</test.docker.endpoint>
                     <test.docker.api-version>${test.docker.api-version}</test.docker.api-version>
+                    <test.docker.credential>${test.docker.identity}</test.docker.credential>
                     <test.docker.credential>${test.docker.credential}</test.docker.credential>
                   </systemPropertyVariables>
                 </configuration>

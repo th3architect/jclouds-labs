@@ -16,16 +16,16 @@
  */
 package org.jclouds.docker.compute.options;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
+import static com.google.common.base.Objects.equal;
+import java.util.Map;
+
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.scriptbuilder.domain.Statement;
 
-import java.util.Map;
-
-import static com.google.common.base.Objects.equal;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Contains options supported in the {@code ComputeService#runNode} operation on the

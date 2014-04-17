@@ -16,33 +16,35 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Singleton;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.getOnlyElement;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
+import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.compute.reference.ComputeServiceConstants;
-import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Port;
 import org.jclouds.docker.domain.State;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
 import org.jclouds.logging.Logger;
-import org.jclouds.rest.ApiContext;
+import org.jclouds.providers.ProviderMetadata;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterables.getOnlyElement;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Singleton;
 
 /**
  * @author Andrea Turli
@@ -54,14 +56,14 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
    protected Logger logger = Logger.NULL;
 
-   private final ApiContext<DockerApi> context;
+   private final ProviderMetadata providerMetadata;
    private final Function<State, NodeMetadata.Status> toPortableStatus;
    private final GroupNamingConvention nodeNamingConvention;
 
    @Inject
-   public ContainerToNodeMetadata(ApiContext<DockerApi> context, Function<State,
+   public ContainerToNodeMetadata(ProviderMetadata providerMetadata, Function<State,
            NodeMetadata.Status> toPortableStatus, GroupNamingConvention.Factory namingConvention) {
-      this.context = checkNotNull(context, "context");
+      this.providerMetadata = checkNotNull(providerMetadata, "providerMetadata");
       this.toPortableStatus = checkNotNull(toPortableStatus, "toPortableStatus cannot be null");
       this.nodeNamingConvention = checkNotNull(namingConvention, "namingConvention").createWithoutPrefix();
    }
@@ -73,8 +75,13 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
       NodeMetadataBuilder builder = new NodeMetadataBuilder();
       builder.id(container.getId())
               .name(name).group(group)
-              .hostname(container.getConfig().getHostname());
-      // TODO Set up location properly and hardware
+              .hostname(container.getConfig().getHostname())
+               // TODO Set up hardware
+              .hardware(new HardwareBuilder()
+                      .ram(container.getConfig().getMemory())
+                      .processor(new Processor(container.getConfig().getCpuShares(), container.getConfig().getCpuShares()))
+                      .build());
+      // TODO Set up location properly
       LocationBuilder locationBuilder = new LocationBuilder();
       locationBuilder.description("");
       locationBuilder.id("");
@@ -85,7 +92,7 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
       builder.loginPort(getLoginPort(container));
       builder.publicAddresses(getPublicIpAddresses());
       builder.privateAddresses(getPrivateIpAddresses(container));
-      builder.operatingSystem(OperatingSystem.builder().description("unrecognized").family(OsFamily.UNRECOGNIZED).build());
+      builder.operatingSystem(OperatingSystem.builder().description("linux").family(OsFamily.LINUX).build());
       return builder.build();
    }
 
@@ -99,7 +106,7 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
    }
 
    private List<String> getPublicIpAddresses() {
-      String dockerIpAddress = URI.create(context.getProviderMetadata().getEndpoint()).getHost();
+      String dockerIpAddress = URI.create(providerMetadata.getEndpoint()).getHost();
       return ImmutableList.of(dockerIpAddress);
    }
 
