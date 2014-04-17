@@ -16,17 +16,18 @@
  */
 package org.jclouds.docker.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static org.jclouds.docker.config.DockerParserModule.ContainerTypeAdapter;
+import static org.jclouds.docker.config.DockerParserModule.ImageTypeAdapter;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Image;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.jclouds.docker.config.DockerParserModule.ContainerTypeAdapter;
-import static org.jclouds.docker.config.DockerParserModule.ImageTypeAdapter;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Unit tests for the {@link org.jclouds.docker.config.DockerParserModule} class.
