@@ -16,17 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
@@ -34,51 +34,51 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Config {
 
    @SerializedName("Hostname")
-   final private String hostname;
+   private final String hostname;
    @SerializedName("Domainname")
-   final private String domainName;
+   private final String domainName;
    @SerializedName("User")
-   final private String user;
+   private final String user;
    @SerializedName("Memory")
-   final private int memory;
+   private final int memory;
    @SerializedName("MemorySwap")
-   final private int memorySwap;
+   private final int memorySwap;
    @SerializedName("CpuShares")
-   final private int cpuShares;
+   private final int cpuShares;
    @SerializedName("AttachStdin")
-   final private boolean attachStdin;
+   private final boolean attachStdin;
    @SerializedName("AttachStdout")
-   final private boolean attachStdout;
+   private final boolean attachStdout;
    @SerializedName("AttachStderr")
-   final private boolean attachStderr;
+   private final boolean attachStderr;
    @SerializedName("ExposedPorts")
-   final private Map<String, ?> exposedPorts;
+   private final Map<String, ?> exposedPorts;
    @SerializedName("Tty")
-   final private boolean tty;
+   private final boolean tty;
    @SerializedName("OpenStdin")
-   final private boolean openStdin;
+   private final boolean openStdin;
    @SerializedName("StdinOnce")
-   final private boolean stdinOnce;
+   private final boolean stdinOnce;
    @SerializedName("Env")
-   final private List<String> env;
+   private final List<String> env;
    @SerializedName("Cmd")
-   final private List<String> cmd;
+   private final List<String> cmd;
    @SerializedName("Dns")
-   final private List<String> dns;
+   private final List<String> dns;
    @SerializedName("Image")
-   final private String imageId;
+   private final String imageId;
    @SerializedName("Volumes")
-   final private Map<String, ?> volumes;
+   private final Map<String, ?> volumes;
    @SerializedName("VolumesFrom")
-   final private String volumesFrom;
+   private final String volumesFrom;
    @SerializedName("WorkingDir")
-   final private String workingDir;
+   private final String workingDir;
    @SerializedName("Entrypoint")
-   final private String entrypoint;
+   private final String entrypoint;
    @SerializedName("NetworkDisabled")
-   final private boolean networkDisabled;
+   private final boolean networkDisabled;
    @SerializedName("OnBuild")
-   final private String onBuild;
+   private final String onBuild;
 
 
    @ConstructorProperties({ "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",

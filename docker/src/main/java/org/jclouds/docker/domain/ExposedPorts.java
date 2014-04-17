@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ExposedPorts {
 
-   final private String portAndProtocol;
-   final private Set<String> hostPorts;
+   private final String portAndProtocol;
+   private final Set<String> hostPorts;
 
    @ConstructorProperties({ "PortAndProtocol", "HostPorts" })
    public ExposedPorts(String portAndProtocol, Set<String> hostPorts) {

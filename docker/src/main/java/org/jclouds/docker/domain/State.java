@@ -16,29 +16,28 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.gson.annotations.SerializedName;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
  */
 public class State {
    @SerializedName("Pid")
-   final private int pid;
+   private final int pid;
    @SerializedName("Running")
-   final private boolean running;
+   private final boolean running;
    @SerializedName("ExitCode")
-   final private int exitCode;
+   private final int exitCode;
    @SerializedName("StartedAt")
-   final private String startedAt;
+   private final String startedAt;
    @SerializedName("FinishedAt")
-   final private String finishedAt;
+   private final String finishedAt;
    @SerializedName("Ghost")
-   final private boolean ghost;
+   private final boolean ghost;
 
    @ConstructorProperties({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Ghost" })
    public State(int pid, boolean running, int exitCode, String startedAt, String finishedAt, boolean ghost) {

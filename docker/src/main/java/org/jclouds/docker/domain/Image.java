@@ -29,25 +29,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Image {
 
    @SerializedName("id")
-   final private String id;
+   private final String id;
    @SerializedName("parent")
-   final private String parent;
+   private final String parent;
    @SerializedName("Created")
-   final private String created;
+   private final String created;
    @SerializedName("container")
-   final private String container;
+   private final String container;
    @SerializedName("docker_version")
-   final private String dockerVersion;
+   private final String dockerVersion;
    @SerializedName("architecture")
-   final private String architecture;
+   private final String architecture;
    @SerializedName("os")
-   final private String os;
+   private final String os;
    @SerializedName("Size")
-   final private long size;
+   private final long size;
    @SerializedName("VirtualSize")
-   final private long virtualSize;
+   private final long virtualSize;
    @SerializedName("RepoTags")
-   final private List<String> repoTags;
+   private final List<String> repoTags;
 
    @ConstructorProperties({ "id", "parent", "created", "container", "docker_version", "architecture", "os", "Size",
            "VirtualSize", "RepoTags" })

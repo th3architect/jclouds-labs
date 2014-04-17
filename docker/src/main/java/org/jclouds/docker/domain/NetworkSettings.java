@@ -16,15 +16,14 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
@@ -32,17 +31,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NetworkSettings {
 
    @SerializedName("IPAddress")
-   final private String ipAddress;
+   private final String ipAddress;
    @SerializedName("IPPrefixLen")
-   final private int ipPrefixLen;
+   private final int ipPrefixLen;
    @SerializedName("Gateway")
-   final private String gateway;
+   private final String gateway;
    @SerializedName("Bridge")
-   final private String bridge;
+   private final String bridge;
    @SerializedName("PortMapping")
-   final private String portMapping;
+   private final String portMapping;
    @SerializedName("Ports")
-   final private Map<String, List<Map<String, String>>> ports;
+   private final Map<String, List<Map<String, String>>> ports;
 
    @ConstructorProperties({ "IpAddress", "IpPrefixLen", "Gateway", "Bridge", "Ports" })
    public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge, String portMapping,

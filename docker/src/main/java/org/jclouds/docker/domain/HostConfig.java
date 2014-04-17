@@ -34,17 +34,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HostConfig {
 
    @SerializedName("ContainerIDFile")
-   final private String containerIDFile;
+   private final String containerIDFile;
    @SerializedName("Binds")
-   final private List<String> binds;
+   private final List<String> binds;
    @SerializedName("Privileged")
-   final private boolean privileged;
+   private final boolean privileged;
    @SerializedName("PortBindings")
-   final private Map<String, List<Map<String, String>>> portBindings;
+   private final Map<String, List<Map<String, String>>> portBindings;
    @SerializedName("Links")
-   final private List<String> links;
+   private final List<String> links;
    @SerializedName("PublishAllPorts")
-   final private boolean publishAllPorts;
+   private final boolean publishAllPorts;
 
    @ConstructorProperties({ "ContainerIDFile", "Binds", "Privileged", "PortBindings", "Links", "Size",
            "PublishAllPorts" })

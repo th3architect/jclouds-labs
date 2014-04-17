@@ -16,16 +16,15 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
@@ -33,41 +32,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Container {
 
    @SerializedName("Id")
-   final private String id;
+   private final String id;
    @SerializedName("Name")
-   final private String name;
+   private final String name;
    @SerializedName("Created")
-   final private String created;
+   private final String created;
    @SerializedName("Path")
-   final private String path;
+   private final String path;
    @SerializedName("Args")
-   final private String[] args;
+   private final String[] args;
    @SerializedName("Config")
-   final private Config config;
+   private final Config config;
    @SerializedName("State")
-   final private State state;
+   private final State state;
    @SerializedName("Image")
-   final private String image;
+   private final String image;
    @SerializedName("NetworkSettings")
-   final private NetworkSettings networkSettings;
+   private final NetworkSettings networkSettings;
    @SerializedName("ResolvConfPath")
-   final private String resolvConfPath;
+   private final String resolvConfPath;
    @SerializedName("Driver")
-   final private String driver;
+   private final String driver;
    @SerializedName("ExecDriver")
-   final private String execDriver;
+   private final String execDriver;
    @SerializedName("Volumes")
-   final private Map<String, String> volumes;
+   private final Map<String, String> volumes;
    @SerializedName("VolumesRW")
-   final private Map<String, Boolean> volumesRw;
+   private final Map<String, Boolean> volumesRw;
    @SerializedName("Command")
-   final private String command;
+   private final String command;
    @SerializedName("Status")
-   final private String status;
+   private final String status;
    @SerializedName("HostConfig")
-   final private HostConfig hostConfig;
+   private final HostConfig hostConfig;
    @SerializedName("Ports")
-   final private List<Port> ports;
+   private final List<Port> ports;
 
    @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
            "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports" })

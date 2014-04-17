@@ -65,16 +65,13 @@ public class ContainerToNodeMetadataTest {
               .attachStdin(false)
               .attachStdout(false)
               .attachStderr(false)
-              //.portSpecs(null)
               .exposedPorts(ImmutableMap.of("22/tcp", ImmutableMap.of()))
               .tty(false)
               .openStdin(false)
               .stdinOnce(false)
               .env(null)
               .cmd(ImmutableList.of("/usr/sbin/sshd", "-D"))
-              //.dns(null)
               .imageId("jclouds/ubuntu")
-              //.volumes(null)
               .volumesFrom("")
               .workingDir("")
               .entrypoint(null)
@@ -103,7 +100,6 @@ public class ContainerToNodeMetadataTest {
                       .ipPrefixLen(16)
                       .gateway("172.17.42.1")
                       .bridge("docker0")
-                      //.portMapping(null)
                       .ports(ImmutableMap.<String, List<Map<String, String>>>of("22/tcp",
                               ImmutableList.<Map<String, String>>of(ImmutableMap.of("HostIp", "0.0.0.0", "HostPort",
                                       "49199"))))
@@ -141,7 +137,7 @@ public class ContainerToNodeMetadataTest {
 
       verify(mockContainer);
 
-      assertEquals(node.getId(), container.getId().toString());
+      assertEquals(node.getId(), "6d35806c1bd2b25cd92bba2d2c2c5169dc2156f53ab45c2b62d76e2d2fee14a9");
       assertEquals(node.getGroup(), "hopeful_mclean");
       assertEquals(node.getImageId(), "af0f59f1c19eef9471c3b8c8d587c39b8f130560b54f3766931b37d76d5de4b6");
       assertEquals(node.getLoginPort(), 49199);
@@ -155,9 +151,10 @@ public class ContainerToNodeMetadataTest {
 
       expect(mockContainer.getId()).andReturn(container.getId());
       expect(mockContainer.getName()).andReturn(container.getName());
-      expect(mockContainer.getNetworkSettings()).andReturn(container.getNetworkSettings()).anyTimes();
       expect(mockContainer.getConfig()).andReturn(container.getConfig()).anyTimes();
-
+      expect(mockContainer.getNetworkSettings()).andReturn(container.getNetworkSettings()).anyTimes();
+      expect(mockContainer.getState()).andReturn(container.getState());
+      expect(mockContainer.getImage()).andReturn(container.getImage());
       replay(mockContainer);
 
       return mockContainer;

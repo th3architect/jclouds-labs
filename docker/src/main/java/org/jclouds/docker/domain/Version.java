@@ -16,29 +16,28 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.gson.annotations.SerializedName;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
  */
 public class Version {
    @SerializedName("Arch")
-   final private String arch;
+   private final String arch;
    @SerializedName("GitCommit")
-   final private String gitCommit;
+   private final String gitCommit;
    @SerializedName("GoVersion")
-   final private String goVersion;
+   private final String goVersion;
    @SerializedName("KernelVersion")
-   final private String kernelVersion;
+   private final String kernelVersion;
    @SerializedName("Os")
-   final private String os;
+   private final String os;
    @SerializedName("Version")
-   final private String version;
+   private final String version;
 
    @ConstructorProperties({ "Arch", "GitCommit", "GoVersion", "KernelVersion", "Os", "Version" })
    public Version(String arch, String gitCommit, String goVersion, String kernelVersion, String os, String version) {

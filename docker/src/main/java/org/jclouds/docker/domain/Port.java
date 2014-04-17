@@ -29,13 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Port {
 
    @SerializedName("PrivatePort")
-   final private int privatePort;
+   private final int privatePort;
    @SerializedName("PublicPort")
-   final private int publicPort;
+   private final int publicPort;
    @SerializedName("Type")
-   final private String type;
+   private final String type;
    @SerializedName("IP")
-   final private String ip;
+   private final String ip;
 
    @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "Ip" })
    public Port(int privatePort, int publicPort, String type, String ip) {

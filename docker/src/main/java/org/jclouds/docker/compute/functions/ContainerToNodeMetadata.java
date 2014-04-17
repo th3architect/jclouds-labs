@@ -73,11 +73,13 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
       String name = cleanUpName(container.getName());
       String group = nodeNamingConvention.extractGroup(name);
       NodeMetadataBuilder builder = new NodeMetadataBuilder();
-      builder.id(container.getId())
-              .name(name).group(group)
+      builder.ids(container.getId())
+              .name(name)
+              .group(group)
               .hostname(container.getConfig().getHostname())
                // TODO Set up hardware
               .hardware(new HardwareBuilder()
+                      .id("")
                       .ram(container.getConfig().getMemory())
                       .processor(new Processor(container.getConfig().getCpuShares(), container.getConfig().getCpuShares()))
                       .build());
