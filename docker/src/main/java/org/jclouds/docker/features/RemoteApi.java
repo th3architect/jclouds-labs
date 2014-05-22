@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.features;
+package org.jclouds.docker.features;
 
 import java.io.Closeable;
 import java.io.File;
@@ -33,8 +33,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks;
 import org.jclouds.docker.binders.BindInputStreamToRequest;
-import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.domain.Version;
@@ -100,7 +100,7 @@ public interface RemoteApi extends Closeable {
    @Named("container:create")
    @POST
    @Path("/containers/create")
-   Container createContainer(@QueryParam("name") String name, @BinderParam(BindToJsonPayload.class) Config config);
+   Container createContainer(@QueryParam("name") String name, @BinderParam(BindToJsonPayload.class) ContainerConfig config);
 
    /**
     * Return low-level information on the container id
@@ -203,7 +203,7 @@ public interface RemoteApi extends Closeable {
    /**
     * Inspect an image
     *
-    * @param imageId The id of the image to inspect.
+    * @param imageName The id of the image to inspect.
     * @return low-level information on the image name
     */
    @Named("image:inspect")

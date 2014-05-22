@@ -26,7 +26,7 @@ import com.google.inject.Module;
 import org.jclouds.Constants;
 import org.jclouds.apis.BaseApiLiveTest;
 import org.jclouds.docker.DockerApi;
-import org.jclouds.docker.compute.features.internal.Archives;
+import org.jclouds.docker.features.internal.Archives;
 import org.jclouds.io.Payload;
 import org.jclouds.io.Payloads;
 import org.jclouds.sshj.config.SshjSshClientModule;

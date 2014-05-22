@@ -25,10 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
+import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.ImageBuilder;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.OperatingSystem;
+import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.functions.GroupNamingConvention;
-import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.NetworkSettings;
 import org.jclouds.docker.domain.Port;
@@ -38,6 +42,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
@@ -55,7 +60,7 @@ public class ContainerToNodeMetadataTest {
 
    @BeforeMethod
    public void setup() {
-      Config config = Config.builder()
+      ContainerConfig containerConfig = ContainerConfig.builder()
               .hostname("6d35806c1bd2")
               .domainName("")
               .user("")
@@ -92,7 +97,7 @@ public class ContainerToNodeMetadataTest {
               .created("2014-03-22T07:16:45.784120972Z")
               .path("/usr/sbin/sshd")
               .args(new String[] {"-D"})
-              .config(config)
+              .containerConfig(containerConfig)
               .state(state)
               .image("af0f59f1c19eef9471c3b8c8d587c39b8f130560b54f3766931b37d76d5de4b6")
               .networkSettings(NetworkSettings.builder()
@@ -120,7 +125,28 @@ public class ContainerToNodeMetadataTest {
 
       GroupNamingConvention.Factory namingConvention = Guice.createInjector().getInstance(GroupNamingConvention.Factory.class);
 
-      function = new ContainerToNodeMetadata(providerMetadata, toPortableStatus(), namingConvention);
+      Supplier<Map<String, ? extends Image>> images = new Supplier<Map<String, ? extends Image>>() {
+         @Override
+         public Map<String, ? extends Image> get() {
+            OperatingSystem os = OperatingSystem.builder()
+                    .description("Ubuntu 12.04 64bit")
+                    .family(OsFamily.UBUNTU)
+                    .version("12.04")
+                    .is64Bit(true)
+                    .build();
+
+            return ImmutableMap.of("af0f59f1c19eef9471c3b8c8d587c39b8f130560b54f3766931b37d76d5de4b6",
+                    new ImageBuilder()
+                            .ids("af0f59f1c19eef9471c3b8c8d587c39b8f130560b54f3766931b37d76d5de4b6")
+                            .name("ubuntu")
+                            .description("Ubuntu 12.04 64bit")
+                            .operatingSystem(os)
+                            .status(Image.Status.AVAILABLE)
+                            .build());
+         }
+      };
+
+      function = new ContainerToNodeMetadata(providerMetadata, toPortableStatus(), namingConvention, images);
    }
 
    private Function<State, NodeMetadata.Status> toPortableStatus() {
@@ -151,10 +177,10 @@ public class ContainerToNodeMetadataTest {
 
       expect(mockContainer.getId()).andReturn(container.getId());
       expect(mockContainer.getName()).andReturn(container.getName());
-      expect(mockContainer.getConfig()).andReturn(container.getConfig()).anyTimes();
+      expect(mockContainer.getContainerConfig()).andReturn(container.getContainerConfig()).anyTimes();
       expect(mockContainer.getNetworkSettings()).andReturn(container.getNetworkSettings()).anyTimes();
       expect(mockContainer.getState()).andReturn(container.getState());
-      expect(mockContainer.getImage()).andReturn(container.getImage());
+      expect(mockContainer.getImage()).andReturn(container.getImage()).anyTimes();
       replay(mockContainer);
 
       return mockContainer;

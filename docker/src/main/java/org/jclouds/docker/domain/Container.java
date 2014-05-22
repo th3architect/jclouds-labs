@@ -42,7 +42,7 @@ public class Container {
    @SerializedName("Args")
    private final String[] args;
    @SerializedName("Config")
-   private final Config config;
+   private final ContainerConfig containerConfig;
    @SerializedName("State")
    private final State state;
    @SerializedName("Image")
@@ -70,23 +70,24 @@ public class Container {
 
    @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
            "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports" })
-   public Container(String id, String name, String created, String path, String[] args, Config config, State state,
-                    String image,  NetworkSettings networkSettings, String resolvConfPath,
-                    String driver, String execDriver, Map<String, String> volumes, Map<String, Boolean> volumesRW,
-                    String command, String status, HostConfig hostConfig, List<Port> ports) {
+   public Container(String id, String name, String created, String path, String[] args,
+                    ContainerConfig containerConfig, State state, String image,  NetworkSettings networkSettings,
+                    String resolvConfPath, String driver, String execDriver, Map<String, String> volumes,
+                    Map<String, Boolean> volumesRW, String command, String status, HostConfig hostConfig,
+                    List<Port> ports) {
       this.id = checkNotNull(id, "id");
       this.name = checkNotNull(name, "name");
       this.created = checkNotNull(created, "created");
       this.path = checkNotNull(path, "path");
       this.args = checkNotNull(args, "args");
-      this.config = checkNotNull(config, "config");
+      this.containerConfig = checkNotNull(containerConfig, "containerConfig");
       this.state = checkNotNull(state, "state");
       this.image = checkNotNull(image, "image");
       this.networkSettings = checkNotNull(networkSettings, "networkSettings");
       this.resolvConfPath = checkNotNull(resolvConfPath, "resolvConfPath");
       this.driver = checkNotNull(driver, "driver");
       this.execDriver = checkNotNull(execDriver, "execDriver");
-      this.volumes = checkNotNull(volumes, "volumes");
+      this.volumes = checkNotNull(ImmutableMap.copyOf(volumes), "volumes");
       this.volumesRw = checkNotNull(volumesRW, "volumesRW");
       this.command = checkNotNull(command, "command");
       this.status = checkNotNull(status, "status");
@@ -114,8 +115,8 @@ public class Container {
       return args;
    }
 
-   public Config getConfig() {
-      return config;
+   public ContainerConfig getContainerConfig() {
+      return containerConfig;
    }
 
    public State getState() {
@@ -178,7 +179,7 @@ public class Container {
               Objects.equal(this.created, that.created) &&
               Objects.equal(this.path, that.path) &&
               Objects.equal(this.args, that.args) &&
-              Objects.equal(this.config, that.config) &&
+              Objects.equal(this.containerConfig, that.containerConfig) &&
               Objects.equal(this.state, that.state) &&
               Objects.equal(this.image, that.image) &&
               Objects.equal(this.networkSettings, that.networkSettings) &&
@@ -195,7 +196,7 @@ public class Container {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(id, name, created, path, args, config, state, image, networkSettings, resolvConfPath,
+      return Objects.hashCode(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
               driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
    }
 
@@ -207,7 +208,7 @@ public class Container {
               .add("created", created)
               .add("path", path)
               .add("args", args)
-              .add("config", config)
+              .add("containerConfig", containerConfig)
               .add("state", state)
               .add("image", image)
               .add("networkSettings", networkSettings)
@@ -238,7 +239,7 @@ public class Container {
       private String created;
       private String path;
       private String[] args;
-      private Config config;
+      private ContainerConfig containerConfig;
       private State state;
       private String image;
       private NetworkSettings networkSettings;
@@ -277,8 +278,8 @@ public class Container {
          return this;
       }
 
-      public Builder config(Config config) {
-         this.config = config;
+      public Builder containerConfig(ContainerConfig containerConfig) {
+         this.containerConfig = containerConfig;
          return this;
       }
 
@@ -343,7 +344,7 @@ public class Container {
       }
 
       public Container build() {
-         return new Container(id, name, created, path, args, config, state, image, networkSettings, resolvConfPath,
+         return new Container(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
                  driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
       }
 
@@ -354,7 +355,7 @@ public class Container {
                  .created(in.getCreated())
                  .path(in.getPath())
                  .args(in.getArgs())
-                 .config(in.getConfig())
+                 .containerConfig(in.getContainerConfig())
                  .state(in.getState())
                  .image(in.getImage())
                  .networkSettings(in.getNetworkSettings())

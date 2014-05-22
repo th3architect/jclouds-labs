@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.features;
+package org.jclouds.docker.features;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.io.Resources;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+
 import org.jclouds.docker.compute.BaseDockerApiLiveTest;
-import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
@@ -32,13 +35,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.io.Resources;
 
 /**
  * @author Andrea Turli
@@ -79,10 +79,10 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
    @Test(dependsOnMethods = "testListImages")
    public void testCreateContainer() throws IOException, InterruptedException {
       if(image == null) Assert.fail();
-      Config config = Config.builder().imageId(image.getId())
+      ContainerConfig containerConfig = ContainerConfig.builder().imageId(image.getId())
               .cmd(ImmutableList.of("/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"))
               .build();
-      container = api().createContainer("testCreateContainer", config);
+      container = api().createContainer("testCreateContainer", containerConfig);
       assertNotNull(container);
       assertNotNull(container.getId());
    }

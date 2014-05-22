@@ -31,7 +31,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * @author Andrea Turli
  */
-public class Config {
+public class ContainerConfig {
 
    @SerializedName("Hostname")
    private final String hostname;
@@ -84,11 +84,11 @@ public class Config {
    @ConstructorProperties({ "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",
            "AttachStdout", "AttachStderr", "PortSpecs", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd",
            "Dns", "Image", "Volumes", "VolumesFrom", "WorkingDir", "Entrypoint", "NetworkDisabled", "OnBuild" })
-   Config(@Nullable String hostname, @Nullable String domainName, @Nullable String user, int memory, int memorySwap,
+   ContainerConfig(@Nullable String hostname, @Nullable String domainName, @Nullable String user, int memory, int memorySwap,
           int cpuShares, boolean attachStdin, boolean attachStdout, boolean attachStderr,
           Map<String, ?> exposedPorts, boolean tty, boolean openStdin, boolean stdinOnce,
           @Nullable List<String> env, @Nullable List<String> cmd, @Nullable List<String> dns, String imageId,
-          Map<String, ?> volumes, @Nullable String volumesFrom, @Nullable String workingDir,
+          @Nullable Map<String, ?> volumes, @Nullable String volumesFrom, @Nullable String workingDir,
           @Nullable String entrypoint, @Nullable boolean networkDisabled, @Nullable String onBuild) {
       this.hostname = hostname;
       this.domainName = domainName;
@@ -103,7 +103,7 @@ public class Config {
       this.tty = checkNotNull(tty, "tty");
       this.openStdin = checkNotNull(openStdin, "openStdin");
       this.stdinOnce = checkNotNull(stdinOnce, "stdinOnce");
-      this.env = env != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String> of();
+      this.env = env != null ? ImmutableList.copyOf(env) : ImmutableList.<String> of();
       this.cmd = cmd != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String> of();
       this.dns = dns != null ? ImmutableList.copyOf(dns) : ImmutableList.<String> of();
       this.imageId = checkNotNull(imageId, "imageId");
@@ -212,7 +212,7 @@ public class Config {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
 
-      Config that = (Config) o;
+      ContainerConfig that = (ContainerConfig) o;
 
       return Objects.equal(this.hostname, that.hostname) &&
               Objects.equal(this.domainName, that.domainName) &&
@@ -423,13 +423,13 @@ public class Config {
          return this;
       }
 
-      public Config build() {
-         return new Config(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
+      public ContainerConfig build() {
+         return new ContainerConfig(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
                  attachStderr, exposedPorts, tty, openStdin, stdinOnce, env, cmd, dns, imageId, volumes,
                  volumesFrom, workingDir, entrypoint, networkDisabled, onBuild);
       }
 
-      public Builder fromConfig(Config in) {
+      public Builder fromConfig(ContainerConfig in) {
          return this
                  .hostname(in.getHostname())
                  .domainName(in.getDomainName())

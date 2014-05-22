@@ -62,13 +62,15 @@ public class DockerImageExtension implements ImageExtension {
    private final DockerApi api;
    private final ListeningExecutorService userExecutor;
    private final Predicate<AtomicReference<Image>> imageAvailablePredicate;
+   private final ImageToImage imageToImage;
 
    @Inject
    public DockerImageExtension(DockerApi api, @Named(Constants.PROPERTY_USER_THREADS) ListeningExecutorService
-           userExecutor, @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<AtomicReference<Image>> imageAvailablePredicate) {
+           userExecutor, @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<AtomicReference<Image>> imageAvailablePredicate, ImageToImage imageToImage) {
       this.api = checkNotNull(api, "api");
       this.userExecutor = checkNotNull(userExecutor, "userExecutor");
       this.imageAvailablePredicate = checkNotNull(imageAvailablePredicate, "imageAvailablePredicate");
+      this.imageToImage = imageToImage;
    }
 
    @Override
@@ -95,7 +97,7 @@ public class DockerImageExtension implements ImageExtension {
               .build();
 
       logger.info(">> Registered new image %s, waiting for it to become available.", dockerImage.getId());
-      final AtomicReference<Image> image = Atomics.newReference(new ImageToImage().apply(dockerImage));
+      final AtomicReference<Image> image = Atomics.newReference(imageToImage.apply(dockerImage));
       return userExecutor.submit(new Callable<Image>() {
          @Override
          public Image call() throws Exception {

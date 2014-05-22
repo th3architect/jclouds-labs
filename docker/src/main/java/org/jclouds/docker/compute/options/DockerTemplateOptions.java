@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableMap;
  * creation method followed by an instance mutator (if needed):
  * <p/>
  * <code>
- * import static org.jclouds.aws.ec2.compute.options.DockerTemplateOptions.Builder.*;
+ * import static org.jclouds.docker.compute.options.DockerTemplateOptions.Builder.*;
  * <p/>
  * ComputeService api = // get connection
  * templateBuilder.options(inboundPorts(22, 80, 8080, 443));

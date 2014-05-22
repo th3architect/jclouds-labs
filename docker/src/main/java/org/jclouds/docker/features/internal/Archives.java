@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.features.internal;
+package org.jclouds.docker.features.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getLast;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -28,6 +26,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import com.google.common.base.Splitter;
+import com.google.common.io.Files;
 
 /**
  * @author Andrea Turli
@@ -35,33 +34,7 @@ import com.google.common.base.Splitter;
 public class Archives {
 
    public static File tar(File baseDir, String archivePath) throws IOException {
-      // Check that the directory is a directory, and get its contents
-      checkArgument(baseDir.isDirectory(), "%s is not a directory", baseDir);
-      File[] files = baseDir.listFiles();
-      File tarFile = new File(archivePath);
-
-      String token = getLast(Splitter.on("/").split(archivePath.substring(0, archivePath.lastIndexOf("/"))));
-
-      byte[] buf = new byte[1024];
-      int len;
-      TarArchiveOutputStream tos = new TarArchiveOutputStream(new FileOutputStream(tarFile));
-      tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-      for (File file : files) {
-         TarArchiveEntry tarEntry = new TarArchiveEntry(file);
-         tarEntry.setName("/" + getLast(Splitter.on(token).split(file.toString())));
-         tos.putArchiveEntry(tarEntry);
-         if (!file.isDirectory()) {
-            FileInputStream fin = new FileInputStream(file);
-            BufferedInputStream in = new BufferedInputStream(fin);
-            while ((len = in.read(buf)) != -1) {
-               tos.write(buf, 0, len);
-            }
-            in.close();
-         }
-         tos.closeArchiveEntry();
-      }
-      tos.close();
-      return tarFile;
+      return tar(baseDir, new File(archivePath));
    }
 
    public static File tar(File baseDir, File tarFile) throws IOException {
@@ -71,25 +44,21 @@ public class Archives {
 
       String token = getLast(Splitter.on("/").split(baseDir.getAbsolutePath()));
 
-      byte[] buf = new byte[1024];
-      int len;
       TarArchiveOutputStream tos = new TarArchiveOutputStream(new FileOutputStream(tarFile));
       tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-      for (File file : files) {
-         TarArchiveEntry tarEntry = new TarArchiveEntry(file);
-         tarEntry.setName("/" + getLast(Splitter.on(token).split(file.toString())));
-         tos.putArchiveEntry(tarEntry);
-         if (!file.isDirectory()) {
-            FileInputStream fin = new FileInputStream(file);
-            BufferedInputStream in = new BufferedInputStream(fin);
-            while ((len = in.read(buf)) != -1) {
-               tos.write(buf, 0, len);
+      try {
+         for (File file : files) {
+            TarArchiveEntry tarEntry = new TarArchiveEntry(file);
+            tarEntry.setName("/" + getLast(Splitter.on(token).split(file.toString())));
+            tos.putArchiveEntry(tarEntry);
+            if (!file.isDirectory()) {
+               Files.asByteSource(file).copyTo(tos);
+               tos.closeArchiveEntry();
             }
-            in.close();
          }
-         tos.closeArchiveEntry();
+      } finally {
+         tos.close();
       }
-      tos.close();
       return tarFile;
    }
 

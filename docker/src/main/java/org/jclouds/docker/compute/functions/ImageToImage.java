@@ -16,9 +16,12 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.get;
+
+import javax.annotation.Resource;
+import javax.inject.Named;
+
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.ImageBuilder;
 import org.jclouds.compute.domain.OperatingSystem;
@@ -26,11 +29,9 @@ import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.inject.Named;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterables.get;
+import com.google.common.base.Function;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 
 /**
  * @author Andrea Turli
@@ -47,7 +48,7 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
    @Override
    public Image apply(org.jclouds.docker.domain.Image from) {
       checkNotNull(from, "image");
-      String description = checkNotNull(Iterables.getFirst(from.getRepoTags(), null));
+      String description = checkNotNull(Iterables.getFirst(from.getRepoTags(), "image must have at least one repo tag"));
 
       OsFamily osFamily = osFamily().apply(description);
       String osVersion = parseVersion(description);
@@ -80,17 +81,14 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
     */
    private Function<String, OsFamily> osFamily() {
       return new Function<String, OsFamily>() {
-         OsFamily osFamily = OsFamily.UNRECOGNIZED;
 
          @Override
          public OsFamily apply(final String description) {
             if (description != null) {
-               if (description.contains(CENTOS)) osFamily = OsFamily.CENTOS;
-               else if (description.contains(UBUNTU))
-                  osFamily = OsFamily.UBUNTU;
+               if (description.contains(CENTOS)) return OsFamily.CENTOS;
+               else if (description.contains(UBUNTU)) return OsFamily.UBUNTU;
             }
-            logger.debug("os family for item: %s is %s", description, osFamily);
-            return osFamily;
+            return OsFamily.UNRECOGNIZED;
          }
       };
    }

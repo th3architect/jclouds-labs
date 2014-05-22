@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.features;
+package org.jclouds.docker.features;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.io.Files;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.AssertJUnit.fail;
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
+
 import org.jclouds.docker.DockerApi;
-import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.internal.BaseDockerMockTest;
 import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
@@ -33,14 +35,12 @@ import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.fail;
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.io.Files;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 /**
  * Mock tests for the {@link org.jclouds.docker.DockerApi} class.
@@ -95,7 +95,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
          Container container = remoteApi.inspectContainer(containerId);
          assertRequestHasCommonFields(server.takeRequest(), "/containers/" + containerId + "/json");
          assertNotNull(container);
-         assertNotNull(container.getConfig());
+         assertNotNull(container.getContainerConfig());
          assertNotNull(container.getHostConfig());
          assertEquals(container.getName(), "/hopeful_mclean");
          assertEquals(container.getState().isRunning(), true);
@@ -127,7 +127,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
 
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
-      Config config = Config.builder().cmd(ImmutableList.of("date"))
+      ContainerConfig containerConfig = ContainerConfig.builder().cmd(ImmutableList.of("date"))
               .attachStdin(false)
               .attachStderr(true)
               .attachStdout(true)
@@ -135,7 +135,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
               .imageId("base")
               .build();
       try {
-         Container container = remoteApi.createContainer("test", config);
+         Container container = remoteApi.createContainer("test", containerConfig);
          assertNotNull(container);
          assertEquals(container.getId(), "c6c74153ae4b1d1633d68890a68d89c40aa5e284a1ea016cbc6ef0e634ee37b2");
       } finally {

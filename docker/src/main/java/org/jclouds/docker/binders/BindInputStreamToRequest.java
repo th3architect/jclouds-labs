@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 
 import org.jclouds.compute.reference.ComputeServiceConstants;
-import org.jclouds.docker.compute.features.internal.Archives;
+import org.jclouds.docker.features.internal.Archives;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.io.Payload;
 import org.jclouds.io.Payloads;

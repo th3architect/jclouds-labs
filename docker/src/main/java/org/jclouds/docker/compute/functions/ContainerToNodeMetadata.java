@@ -27,10 +27,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jclouds.compute.domain.HardwareBuilder;
+import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
-import org.jclouds.compute.domain.OperatingSystem;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.compute.reference.ComputeServiceConstants;
@@ -43,6 +42,7 @@ import org.jclouds.logging.Logger;
 import org.jclouds.providers.ProviderMetadata;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 
@@ -56,16 +56,19 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
    protected Logger logger = Logger.NULL;
 
+   private final Supplier<Map<String, ? extends Image>> images;
    private final ProviderMetadata providerMetadata;
    private final Function<State, NodeMetadata.Status> toPortableStatus;
    private final GroupNamingConvention nodeNamingConvention;
 
    @Inject
    public ContainerToNodeMetadata(ProviderMetadata providerMetadata, Function<State,
-           NodeMetadata.Status> toPortableStatus, GroupNamingConvention.Factory namingConvention) {
+           NodeMetadata.Status> toPortableStatus, GroupNamingConvention.Factory namingConvention,
+                                  Supplier<Map<String, ? extends Image>> images) {
       this.providerMetadata = checkNotNull(providerMetadata, "providerMetadata");
       this.toPortableStatus = checkNotNull(toPortableStatus, "toPortableStatus cannot be null");
       this.nodeNamingConvention = checkNotNull(namingConvention, "namingConvention").createWithoutPrefix();
+      this.images = checkNotNull(images, "images cannot be null");
    }
 
    @Override
@@ -76,12 +79,12 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
       builder.ids(container.getId())
               .name(name)
               .group(group)
-              .hostname(container.getConfig().getHostname())
+              .hostname(container.getContainerConfig().getHostname())
                // TODO Set up hardware
               .hardware(new HardwareBuilder()
                       .id("")
-                      .ram(container.getConfig().getMemory())
-                      .processor(new Processor(container.getConfig().getCpuShares(), container.getConfig().getCpuShares()))
+                      .ram(container.getContainerConfig().getMemory())
+                      .processor(new Processor(container.getContainerConfig().getCpuShares(), container.getContainerConfig().getCpuShares()))
                       .build());
       // TODO Set up location properly
       LocationBuilder locationBuilder = new LocationBuilder();
@@ -94,7 +97,11 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
       builder.loginPort(getLoginPort(container));
       builder.publicAddresses(getPublicIpAddresses());
       builder.privateAddresses(getPrivateIpAddresses(container));
-      builder.operatingSystem(OperatingSystem.builder().description("linux").family(OsFamily.LINUX).build());
+
+      Image image = images.get().get(container.getImage());
+      builder.imageId(image.getId());
+      builder.operatingSystem(image.getOperatingSystem());
+
       return builder.build();
    }
 

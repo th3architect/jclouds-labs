@@ -16,15 +16,21 @@
  */
 package org.jclouds.docker.compute;
 
-import com.beust.jcommander.internal.Maps;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Module;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+import javax.inject.Named;
+
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
@@ -40,14 +46,10 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.annotation.Resource;
-import javax.inject.Named;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import com.beust.jcommander.internal.Maps;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Module;
 
 /**
  * @author Andrea Turli
@@ -80,9 +82,13 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
       int numNodes = 1;
       ComputeService compute = context.getComputeService();
 
+      for (Image image : compute.listImages()) {
+         System.out.println(image);
+      }
+
       Template template = compute.templateBuilder().smallest()
-              .osFamily(OsFamily.UBUNTU).os64Bit(true)
-              .osDescriptionMatches("jclouds/ubuntu:latest")
+              .osFamily(OsFamily.CENTOS).os64Bit(true)
+              .osDescriptionMatches("brooklyn/centos:latest")
               .build();
       Statement bootInstructions = AdminAccess.standard();
 
@@ -115,9 +121,9 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
       int numNodes = 1;
       ComputeService compute = context.getComputeService();
       Template template = compute.templateBuilder()
-              .smallest().osFamily(OsFamily.UBUNTU)
+              .smallest().osFamily(OsFamily.CENTOS)
               .os64Bit(true)
-              .osDescriptionMatches("jclouds/ubuntu:latest")
+              .osDescriptionMatches("brooklyn/centos:latest")
               .build();
       Statement bootInstructions = AdminAccess.standard();
       template.getOptions().runScript(bootInstructions)

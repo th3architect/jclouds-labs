@@ -16,11 +16,16 @@
  */
 package org.jclouds.docker.compute.strategy;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.HardwareBuilder;
@@ -28,26 +33,18 @@ import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.compute.options.DockerTemplateOptions;
-import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Iterables.contains;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * defines the connection between the {@link org.jclouds.docker.DockerApi} implementation and
@@ -85,7 +82,7 @@ public class DockerComputeServiceAdapter implements
          exposedPorts.put(inboundPort + "/tcp", Maps.newHashMap());
       }
 
-      Config.Builder configBuilder = Config.builder()
+      ContainerConfig.Builder containerConfigBuilder = ContainerConfig.builder()
               .imageId(imageId)
               .cmd(ImmutableList.of("/usr/sbin/sshd", "-D"))
               .exposedPorts(exposedPorts);
@@ -95,12 +92,12 @@ public class DockerComputeServiceAdapter implements
          for (String containerDir : templateOptions.getVolumes().get().values()) {
             volumes.put(containerDir, Maps.newHashMap());
          }
-         configBuilder.volumes(volumes);
+         containerConfigBuilder.volumes(volumes);
       }
-      Config config = configBuilder.build();
+      ContainerConfig containerConfig = containerConfigBuilder.build();
 
-      logger.debug(">> creating new container with config(%s)", config);
-      Container container = api.getRemoteApi().createContainer(name, config);
+      logger.debug(">> creating new container with containerConfig(%s)", containerConfig);
+      Container container = api.getRemoteApi().createContainer(name, containerConfig);
       logger.trace("<< container(%s)", container.getId());
 
       // set up for port bindings
@@ -141,7 +138,6 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Set<Image> listImages() {
-      //return api.getRemoteApi().listImages();
       Set<Image> images = Sets.newHashSet();
       for (Image image : api.getRemoteApi().listImages()) {
          // less efficient than just listNodes but returns richer json that needs repoTags coming from listImages
@@ -156,14 +152,7 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Image getImage(final String imageId) {
-      return find(listImages(), new Predicate<Image>() {
-
-         @Override
-         public boolean apply(Image input) {
-            return input.getId().equals(imageId);
-         }
-
-      }, null);
+      return api.getRemoteApi().inspectImage(imageId);
    }
 
    @Override
@@ -178,13 +167,11 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Iterable<Container> listNodesByIds(final Iterable<String> ids) {
-      return filter(listNodes(), new Predicate<Container>() {
-
-         @Override
-         public boolean apply(Container server) {
-            return contains(ids, server.getId());
-         }
-      });
+      Set<Container> containers = Sets.newHashSet();
+      for (String id : ids) {
+         containers.add(api.getRemoteApi().inspectContainer(id));
+      }
+      return containers;
    }
 
    @Override
