@@ -25,38 +25,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
  */
 public class CreateImageOptions extends BaseHttpRequestOptions {
 
-   /*
-   private final String fromImage;
-   private final String fromSrc;
-   private final String repo;
-   private final String tag;
-   private final String registry;
-
-   public CreateImageOptions(String fromImage, String fromSrc, String repo, String tag, String registry) {
-      this.fromImage = fromImage;
-      this.fromSrc = fromSrc;
-      this.repo = repo;
-      this.tag = tag;
-      this.registry = registry;
-
-      if (fromImage != null) {
-         queryParameters.put("fromImage", fromImage);
-      }
-      if (fromSrc != null) {
-         queryParameters.put("fromSrc", fromSrc);
-      }
-      if (repo != null) {
-         queryParameters.put("repo", repo);
-      }
-      if (tag != null) {
-         queryParameters.put("tag", tag);
-      }
-      if (registry != null) {
-         queryParameters.put("registry", registry);
-      }
-   }
-   */
-
    public static final CreateImageOptions NONE = new CreateImageOptions();
 
    public CreateImageOptions fromImage(String fromImage) {

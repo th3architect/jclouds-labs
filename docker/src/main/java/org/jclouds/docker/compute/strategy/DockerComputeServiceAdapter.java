@@ -37,6 +37,7 @@ import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.options.RemoveContainerOptions;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
@@ -186,8 +187,8 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public void destroyNode(String id) {
-      api.getRemoteApi().stopContainer(id);
-      api.getRemoteApi().removeContainer(id);
+      //api.getRemoteApi().stopContainer(id);
+      api.getRemoteApi().removeContainer(id, RemoveContainerOptions.Builder.force(true));
    }
 
    @Override

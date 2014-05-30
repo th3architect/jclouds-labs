@@ -36,8 +36,6 @@ import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Port;
 import org.jclouds.docker.domain.State;
-import org.jclouds.domain.LocationBuilder;
-import org.jclouds.domain.LocationScope;
 import org.jclouds.logging.Logger;
 import org.jclouds.providers.ProviderMetadata;
 
@@ -86,12 +84,14 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
                       .ram(container.getContainerConfig().getMemory())
                       .processor(new Processor(container.getContainerConfig().getCpuShares(), container.getContainerConfig().getCpuShares()))
                       .build());
+      /*
       // TODO Set up location properly
       LocationBuilder locationBuilder = new LocationBuilder();
       locationBuilder.description("");
       locationBuilder.id("");
       locationBuilder.scope(LocationScope.HOST);
       builder.location(locationBuilder.build());
+      */
       builder.status(toPortableStatus.apply(container.getState()));
       builder.imageId(container.getImage());
       builder.loginPort(getLoginPort(container));

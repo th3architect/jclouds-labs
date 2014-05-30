@@ -21,6 +21,8 @@ import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
+import org.jclouds.javax.annotation.Nullable;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
@@ -44,12 +46,13 @@ public class NetworkSettings {
    private final Map<String, List<Map<String, String>>> ports;
 
    @ConstructorProperties({ "IpAddress", "IpPrefixLen", "Gateway", "Bridge", "Ports" })
-   public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge, String portMapping,
-                          Map<String, List<Map<String, String>>> ports) {
-      this.ipAddress = ipAddress;
-      this.ipPrefixLen = ipPrefixLen;
-      this.gateway = gateway;
-      this.bridge = bridge;
+   public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge,
+                          @Nullable String portMapping,
+                          @Nullable Map<String, List<Map<String, String>>> ports) {
+      this.ipAddress = checkNotNull(ipAddress, "ipAddress");
+      this.ipPrefixLen = checkNotNull(ipPrefixLen, "ipPrefixLen");
+      this.gateway = checkNotNull(gateway, "gateway");
+      this.bridge = checkNotNull(bridge, "bridge");
       this.portMapping = portMapping;
       this.ports = ports != null ? ImmutableMap.copyOf(ports) : ImmutableMap.<String, List<Map<String, String>>> of();
    }

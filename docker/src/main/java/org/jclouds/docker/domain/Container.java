@@ -88,11 +88,11 @@ public class Container {
       this.driver = checkNotNull(driver, "driver");
       this.execDriver = checkNotNull(execDriver, "execDriver");
       this.volumes = checkNotNull(ImmutableMap.copyOf(volumes), "volumes");
-      this.volumesRw = checkNotNull(volumesRW, "volumesRW");
+      this.volumesRw = checkNotNull(ImmutableMap.copyOf(volumesRW), "volumesRW");
       this.command = checkNotNull(command, "command");
       this.status = checkNotNull(status, "status");
       this.hostConfig = checkNotNull(hostConfig, "hostConfig");
-      this.ports = checkNotNull(ports, "ports");
+      this.ports = checkNotNull(ImmutableList.copyOf(ports), "ports");
    }
 
    public String getId() {

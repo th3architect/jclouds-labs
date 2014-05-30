@@ -16,8 +16,12 @@
  */
 package org.jclouds.docker.features;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +35,6 @@ import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.DeleteImageOptions;
 import org.jclouds.rest.ResourceNotFoundException;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -59,7 +62,7 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test
    public void testVersion() {
-      Assert.assertEquals(api().getVersion().getVersion(), "0.9.0");
+      assertEquals(api().getVersion().getVersion(), "0.10.0");
    }
 
    @Test(dependsOnMethods = "testVersion")
@@ -73,12 +76,12 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testCreateImage")
    public void testListImages() {
-      Assert.assertNotNull(api().listImages());
+      assertNotNull(api().listImages());
    }
 
    @Test(dependsOnMethods = "testListImages")
    public void testCreateContainer() throws IOException, InterruptedException {
-      if(image == null) Assert.fail();
+      if(image == null) fail();
       ContainerConfig containerConfig = ContainerConfig.builder().imageId(image.getId())
               .cmd(ImmutableList.of("/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"))
               .build();
@@ -89,23 +92,23 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testCreateContainer")
    public void testStartContainer() throws IOException, InterruptedException {
-      if(container == null) Assert.fail();
+      if(container == null) fail();
       api().startContainer(container.getId());
-      Assert.assertTrue(api().inspectContainer(container.getId()).getState().isRunning());
+      assertTrue(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
    @Test(dependsOnMethods = "testStartContainer")
    public void testStopContainer() {
-      if(container == null) Assert.fail();
+      if(container == null) fail();
       api().stopContainer(container.getId());
-      Assert.assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
+      assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
    @Test(dependsOnMethods = "testStopContainer", expectedExceptions = NullPointerException.class)
    public void testRemoveContainer() {
-      if(container == null) Assert.fail();
+      if(container == null) fail();
       api().removeContainer(container.getId());
-      Assert.assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
+      assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
    @Test(dependsOnMethods = "testRemoveContainer", expectedExceptions = ResourceNotFoundException.class)

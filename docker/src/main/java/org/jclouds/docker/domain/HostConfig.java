@@ -16,17 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
@@ -48,15 +48,15 @@ public class HostConfig {
 
    @ConstructorProperties({ "ContainerIDFile", "Binds", "Privileged", "PortBindings", "Links", "Size",
            "PublishAllPorts" })
-   public HostConfig(@Nullable String containerIDFile, @Nullable List<String> binds, @Nullable boolean privileged,
+   public HostConfig(@Nullable String containerIDFile, @Nullable List<String> binds, boolean privileged,
                      @Nullable Map<String, List<Map<String, String>>> portBindings, @Nullable List<String> links,
-                     @Nullable boolean publishAllPorts) {
+                     boolean publishAllPorts) {
       this.containerIDFile = containerIDFile;
       this.binds = binds != null ? ImmutableList.copyOf(binds) : ImmutableList.<String> of();
-      this.privileged = privileged;
+      this.privileged = checkNotNull(privileged, "privileged");
       this.portBindings = portBindings != null ? ImmutableMap.copyOf(portBindings) : ImmutableMap.<String, List<Map<String, String>>> of();
       this.links = links != null ? ImmutableList.copyOf(links) : ImmutableList.<String> of();
-      this.publishAllPorts = publishAllPorts;
+      this.publishAllPorts = checkNotNull(publishAllPorts, "publishAllPorts");
    }
 
    public String getContainerIDFile() {

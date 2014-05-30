@@ -29,6 +29,7 @@ import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -81,6 +82,12 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
    public void testLaunchUbuntuServerWithInboundPorts() throws RunNodesException {
       int numNodes = 1;
       ComputeService compute = context.getComputeService();
+
+
+      for (ComputeMetadata node : compute.listNodes()) {
+         System.out.println(node);
+      }
+
 
       for (Image image : compute.listImages()) {
          System.out.println(image);

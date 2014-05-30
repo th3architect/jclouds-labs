@@ -292,7 +292,6 @@ public class ContainerConfig {
       private boolean attachStdin;
       private boolean attachStdout;
       private boolean attachStderr;
-      private Map<String, ?> portSpecs = ImmutableMap.of();
       private Map<String, ?> exposedPorts = ImmutableMap.of();
       private boolean tty;
       private boolean openStdin;

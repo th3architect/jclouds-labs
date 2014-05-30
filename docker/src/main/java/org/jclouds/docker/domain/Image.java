@@ -16,15 +16,15 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.gson.annotations.SerializedName;
 
 public class Image {
 
@@ -160,7 +160,6 @@ public class Image {
       private String parent;
       private String created;
       private String container;
-      private Config containerConfig;
       private String dockerVersion;
       private String architecture;
       private String os;

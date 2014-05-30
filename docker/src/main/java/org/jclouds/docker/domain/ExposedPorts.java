@@ -16,24 +16,28 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSet;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Andrea Turli
  */
 public class ExposedPorts {
 
+   @SerializedName("PortAndProtocol")
    private final String portAndProtocol;
+   @SerializedName("HostPorts")
    private final Set<String> hostPorts;
 
    @ConstructorProperties({ "PortAndProtocol", "HostPorts" })
-   public ExposedPorts(String portAndProtocol, Set<String> hostPorts) {
+   public ExposedPorts(String portAndProtocol, @Nullable Set<String> hostPorts) {
       this.portAndProtocol = checkNotNull(portAndProtocol, "portAndProtocol");
       this.hostPorts = hostPorts != null ? ImmutableSet.copyOf(hostPorts) : ImmutableSet.<String> of();
    }
