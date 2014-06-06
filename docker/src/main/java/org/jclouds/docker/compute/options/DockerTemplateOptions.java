@@ -17,6 +17,8 @@
 package org.jclouds.docker.compute.options;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
 import java.util.Map;
 
 import org.jclouds.compute.options.TemplateOptions;
@@ -25,6 +27,7 @@ import org.jclouds.scriptbuilder.domain.Statement;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -44,6 +47,14 @@ import com.google.common.collect.ImmutableMap;
  * @author Andrea Turli
  */
 public class DockerTemplateOptions extends TemplateOptions implements Cloneable {
+
+   protected Optional<String> dns = Optional.absent();
+   protected Optional<String> hostname = Optional.absent();
+   protected Optional<Integer> memory = Optional.absent();
+   protected Optional<Integer> cpuShares = Optional.absent();
+   protected Optional<List<String>> commands = Optional.absent();
+   protected Optional<Map<String, String>> volumes = Optional.absent();
+
    @Override
    public DockerTemplateOptions clone() {
       DockerTemplateOptions options = new DockerTemplateOptions();
@@ -56,13 +67,26 @@ public class DockerTemplateOptions extends TemplateOptions implements Cloneable 
       super.copyTo(to);
       if (to instanceof DockerTemplateOptions) {
          DockerTemplateOptions eTo = DockerTemplateOptions.class.cast(to);
-         if (getVolumes().isPresent()) {
+         if (volumes.isPresent()) {
             eTo.volumes(getVolumes().get());
+         }
+         if (hostname.isPresent()) {
+            eTo.hostname(hostname.get());
+         }
+         if (dns.isPresent()) {
+            eTo.dns(dns.get());
+         }
+         if (memory.isPresent()) {
+            eTo.memory(memory.get());
+         }
+         if (commands.isPresent()) {
+            eTo.commands(commands.get());
+         }
+         if (cpuShares.isPresent()) {
+            eTo.cpuShares(cpuShares.get());
          }
       }
    }
-
-   protected Optional<Map<String, String>> volumes = Optional.absent();
 
    @Override
    public boolean equals(Object o) {
@@ -71,20 +95,29 @@ public class DockerTemplateOptions extends TemplateOptions implements Cloneable 
       if (o == null || getClass() != o.getClass())
          return false;
       DockerTemplateOptions that = DockerTemplateOptions.class.cast(o);
-      return super.equals(that) && equal(this.volumes, that.volumes);
+      return super.equals(that) && equal(this.volumes, that.volumes) &&
+              equal(this.hostname, that.hostname) &&
+              equal(this.dns, that.dns) &&
+              equal(this.memory, that.memory) &&
+              equal(this.commands, that.commands) &&
+              equal(this.cpuShares, that.cpuShares);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(super.hashCode(), volumes);
+      return Objects.hashCode(super.hashCode(), volumes, hostname, dns, memory, commands, cpuShares);
    }
 
    @Override
-   public Objects.ToStringHelper string() {
-      Objects.ToStringHelper toString = super.string();
-      if (volumes.isPresent())
-         toString.add("volumes", volumes.get());
-      return toString;
+   public String toString() {
+      return Objects.toStringHelper(this)
+              .add("dns", dns)
+              .add("hostname", hostname)
+              .add("memory", memory)
+              .add("cpuShares", cpuShares)
+              .add("commands", commands)
+              .add("volumes", volumes)
+              .toString();
    }
 
    public static final DockerTemplateOptions NONE = new DockerTemplateOptions();
@@ -94,9 +127,56 @@ public class DockerTemplateOptions extends TemplateOptions implements Cloneable 
       return this;
    }
 
+   public TemplateOptions dns(String dns) {
+      checkNotNull(dns, "dns was null");
+      this.dns = Optional.of(dns);
+      return this;
+   }
+
+   public TemplateOptions hostname(String hostname) {
+      checkNotNull(hostname, "hostname was null");
+      this.hostname = Optional.of(hostname);
+      return this;
+   }
+
+   public TemplateOptions memory(int memory) {
+      checkNotNull(memory, "memory was null");
+      this.memory = Optional.of(memory);
+      return this;
+   }
+
+   public TemplateOptions commands(Iterable<String> commands) {
+      for (String command : checkNotNull(commands, "commands"))
+         checkNotNull(command, "all commands must be non-empty");
+      this.commands = Optional.<List<String>> of(ImmutableList.copyOf(commands));
+      return this;
+   }
+
+   public TemplateOptions commands(String... commands) {
+      return commands(ImmutableList.copyOf(checkNotNull(commands, "commands")));
+   }
+
+   public TemplateOptions cpuShares(int cpuShares) {
+      checkNotNull(cpuShares, "cpuShares was null");
+      this.cpuShares = Optional.of(cpuShares);
+      return this;
+   }
+
    public Optional<Map<String, String>> getVolumes() {
       return volumes;
    }
+
+   public Optional<String> getDns() { return dns; }
+
+   public Optional<String> getHostname() { return hostname; }
+
+   public Optional<Integer> getMemory() { return memory; }
+
+   public Optional<List<String>> getCommands() {
+      return commands;
+   }
+
+   public Optional<Integer> getCpuShares() { return cpuShares; }
 
    public static class Builder {
 
@@ -106,6 +186,51 @@ public class DockerTemplateOptions extends TemplateOptions implements Cloneable 
       public static DockerTemplateOptions volumes(Map<String, String> volumes) {
          DockerTemplateOptions options = new DockerTemplateOptions();
          return DockerTemplateOptions.class.cast(options.volumes(volumes));
+      }
+
+      /**
+       * @see DockerTemplateOptions#dns(String)
+       */
+      public static DockerTemplateOptions dns(String dns) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.dns(dns));
+      }
+
+      /**
+       * @see DockerTemplateOptions#hostname(String)
+       */
+      public static DockerTemplateOptions hostname(String hostname) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.hostname(hostname));
+      }
+
+      /**
+       * @see DockerTemplateOptions#memory(int)
+       */
+      public static DockerTemplateOptions memory(int memory) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.memory(memory));
+      }
+
+      /**
+       * @see DockerTemplateOptions#commands(Iterable)
+       */
+      public static DockerTemplateOptions commands(String... commands) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.commands(commands));
+      }
+
+      public static DockerTemplateOptions commands(Iterable<String> commands) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.commands(commands));
+      }
+
+      /**
+       * @see DockerTemplateOptions#cpuShares(int)
+       */
+      public static DockerTemplateOptions cpuShares(int cpuShares) {
+         DockerTemplateOptions options = new DockerTemplateOptions();
+         return DockerTemplateOptions.class.cast(options.cpuShares(cpuShares));
       }
 
       // methods that only facilitate returning the correct object type

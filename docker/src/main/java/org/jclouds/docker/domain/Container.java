@@ -42,7 +42,7 @@ public class Container {
    @SerializedName("Args")
    private final String[] args;
    @SerializedName("Config")
-   private final ContainerConfig containerConfig;
+   private final Config containerConfig;
    @SerializedName("State")
    private final State state;
    @SerializedName("Image")
@@ -70,8 +70,8 @@ public class Container {
 
    @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
            "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports" })
-   public Container(String id, String name, String created, String path, String[] args,
-                    ContainerConfig containerConfig, State state, String image,  NetworkSettings networkSettings,
+   protected Container(String id, String name, String created, String path, String[] args,
+                       Config containerConfig, State state, String image,  NetworkSettings networkSettings,
                     String resolvConfPath, String driver, String execDriver, Map<String, String> volumes,
                     Map<String, Boolean> volumesRW, String command, String status, HostConfig hostConfig,
                     List<Port> ports) {
@@ -115,7 +115,7 @@ public class Container {
       return args;
    }
 
-   public ContainerConfig getContainerConfig() {
+   public Config getContainerConfig() {
       return containerConfig;
    }
 
@@ -239,7 +239,7 @@ public class Container {
       private String created;
       private String path;
       private String[] args;
-      private ContainerConfig containerConfig;
+      private Config containerConfig;
       private State state;
       private String image;
       private NetworkSettings networkSettings;
@@ -278,7 +278,7 @@ public class Container {
          return this;
       }
 
-      public Builder containerConfig(ContainerConfig containerConfig) {
+      public Builder containerConfig(Config containerConfig) {
          this.containerConfig = containerConfig;
          return this;
       }

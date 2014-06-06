@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 
 import org.jclouds.docker.compute.BaseDockerApiLiveTest;
 import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.ContainerConfig;
+import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
@@ -81,8 +81,8 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testListImages")
    public void testCreateContainer() throws IOException, InterruptedException {
-      if(image == null) fail();
-      ContainerConfig containerConfig = ContainerConfig.builder().imageId(image.getId())
+      if (image == null) fail();
+      Config containerConfig = Config.builder().imageId(image.getId())
               .cmd(ImmutableList.of("/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"))
               .build();
       container = api().createContainer("testCreateContainer", containerConfig);
@@ -92,21 +92,21 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testCreateContainer")
    public void testStartContainer() throws IOException, InterruptedException {
-      if(container == null) fail();
+      if (container == null) fail();
       api().startContainer(container.getId());
       assertTrue(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
    @Test(dependsOnMethods = "testStartContainer")
    public void testStopContainer() {
-      if(container == null) fail();
+      if (container == null) fail();
       api().stopContainer(container.getId());
       assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
    }
 
    @Test(dependsOnMethods = "testStopContainer", expectedExceptions = NullPointerException.class)
    public void testRemoveContainer() {
-      if(container == null) fail();
+      if (container == null) fail();
       api().removeContainer(container.getId());
       assertFalse(api().inspectContainer(container.getId()).getState().isRunning());
    }

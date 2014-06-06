@@ -21,25 +21,23 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 import java.util.Set;
 
 import org.jclouds.docker.DockerApi;
+import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.internal.BaseDockerMockTest;
 import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.ListContainerOptions;
+import org.jclouds.io.Payload;
 import org.jclouds.io.Payloads;
 import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.io.Files;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
@@ -110,6 +108,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
          Container container = remoteApi.inspectContainer(containerId);
          assertRequestHasCommonFields(server.takeRequest(), "/containers/" + containerId + "/json");
          assertNotNull(container);
+         assertNotNull(container.getId(), containerId);
          assertNotNull(container.getContainerConfig());
          assertNotNull(container.getHostConfig());
          assertEquals(container.getName(), "/hopeful_mclean");
@@ -141,7 +140,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
 
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
-      ContainerConfig containerConfig = ContainerConfig.builder().cmd(ImmutableList.of("date"))
+      Config containerConfig = Config.builder().cmd(ImmutableList.of("date"))
               .attachStdin(false)
               .attachStderr(true)
               .attachStdout(true)
@@ -169,7 +168,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
 
       try {
          remoteApi.removeContainer(containerId);
-         assertRequestHasCommonFields(server.takeRequest(), "DELETE", "/containers/"+containerId);
+         assertRequestHasCommonFields(server.takeRequest(), "DELETE", "/containers/" + containerId);
       } finally {
          api.close();
          server.shutdown();
@@ -321,13 +320,12 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
       server.enqueue(new MockResponse().setResponseCode(200));
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
-      String content = new String(payloadFromResource("/Dockerfile"));
-      File dockerFile = createDockerFile(content);
+      File dockerFile = File.createTempFile("docker", "tmp");
       try {
          remoteApi.build(dockerFile, BuildOptions.NONE);
          assertRequestHasCommonFields(server.takeRequest(), "POST", "/build");
       } finally {
-         dockerFile.deleteOnExit();
+         dockerFile.delete();
          api.close();
          server.shutdown();
       }
@@ -338,8 +336,14 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
       server.enqueue(new MockResponse().setResponseCode(200));
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
+
+      File file = File.createTempFile("docker", "tmp");
+      FileInputStream data = new FileInputStream(file);
+      Payload payload = Payloads.newInputStreamPayload(data);
+      payload.getContentMetadata().setContentLength(file.length());
+
       try {
-         remoteApi.build(Payloads.newInputStreamPayload(getClass().getResourceAsStream("/Dockerfile")), BuildOptions.NONE);
+         remoteApi.build(payload, BuildOptions.NONE);
          assertRequestHasCommonFields(server.takeRequest(), "POST", "/build");
       } finally {
          api.close();
@@ -354,8 +358,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
 
-      String content = new String(payloadFromResource("/Dockerfile"));
-      File dockerFile = createDockerFile(content);
+      File dockerFile = File.createTempFile("docker", "tmp");
       try {
          try {
             remoteApi.build(dockerFile, BuildOptions.NONE);
@@ -370,14 +373,4 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
       }
    }
 
-   private File createDockerFile(String content) {
-      File newTempDir = Files.createTempDir();
-      File dockerFile = new File(newTempDir + "/dockerFile");
-      try {
-         Files.write(content, dockerFile, Charsets.UTF_8);
-      } catch(IOException e) {
-         throw Throwables.propagate(e);
-      }
-      return dockerFile;
-   }
 }

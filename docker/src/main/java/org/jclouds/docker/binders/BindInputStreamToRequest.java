@@ -25,7 +25,6 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.core.MediaType;
 
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.features.internal.Archives;
@@ -63,7 +62,7 @@ public class BindInputStreamToRequest implements Binder {
          FileInputStream data = new FileInputStream(archive);
          Payload payload = Payloads.newInputStreamPayload(data);
          payload.getContentMetadata().setContentLength(data.getChannel().size());
-         payload.getContentMetadata().setContentType(MediaType.TEXT_PLAIN);
+         payload.getContentMetadata().setContentType("application/tar");
          request.setPayload(payload);
       } catch (IOException e) {
          logger.error(e, "Couldn't create a tarball for %s", targetFile);

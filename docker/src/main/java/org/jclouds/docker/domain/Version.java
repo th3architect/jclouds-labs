@@ -40,7 +40,7 @@ public class Version {
    private final String version;
 
    @ConstructorProperties({ "Arch", "GitCommit", "GoVersion", "KernelVersion", "Os", "Version" })
-   public Version(String arch, String gitCommit, String goVersion, String kernelVersion, String os, String version) {
+   protected Version(String arch, String gitCommit, String goVersion, String kernelVersion, String os, String version) {
       this.arch = checkNotNull(arch, "arch");
       this.gitCommit = checkNotNull(gitCommit, "gitCommit");
       this.goVersion = checkNotNull(goVersion, "goVersion");

@@ -37,7 +37,7 @@ public class ExposedPorts {
    private final Set<String> hostPorts;
 
    @ConstructorProperties({ "PortAndProtocol", "HostPorts" })
-   public ExposedPorts(String portAndProtocol, @Nullable Set<String> hostPorts) {
+   protected ExposedPorts(String portAndProtocol, @Nullable Set<String> hostPorts) {
       this.portAndProtocol = checkNotNull(portAndProtocol, "portAndProtocol");
       this.hostPorts = hostPorts != null ? ImmutableSet.copyOf(hostPorts) : ImmutableSet.<String> of();
    }

@@ -33,8 +33,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks;
 import org.jclouds.docker.binders.BindInputStreamToRequest;
+import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.domain.Version;
@@ -100,7 +100,7 @@ public interface RemoteApi extends Closeable {
    @Named("container:create")
    @POST
    @Path("/containers/create")
-   Container createContainer(@QueryParam("name") String name, @BinderParam(BindToJsonPayload.class) ContainerConfig config);
+   Container createContainer(@QueryParam("name") String name, @BinderParam(BindToJsonPayload.class) Config config);
 
    /**
     * Return low-level information on the container id

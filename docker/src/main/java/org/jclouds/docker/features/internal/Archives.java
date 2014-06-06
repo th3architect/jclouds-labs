@@ -53,8 +53,8 @@ public class Archives {
             tos.putArchiveEntry(tarEntry);
             if (!file.isDirectory()) {
                Files.asByteSource(file).copyTo(tos);
-               tos.closeArchiveEntry();
             }
+            tos.closeArchiveEntry();
          }
       } finally {
          tos.close();

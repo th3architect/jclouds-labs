@@ -38,7 +38,7 @@ public class Port {
    private final String ip;
 
    @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "Ip" })
-   public Port(int privatePort, int publicPort, String type, String ip) {
+   protected Port(int privatePort, int publicPort, String type, String ip) {
       this.privatePort = checkNotNull(privatePort, "privatePort");
       this.publicPort = checkNotNull(publicPort, "publicPort");
       this.type = checkNotNull(type, "type");

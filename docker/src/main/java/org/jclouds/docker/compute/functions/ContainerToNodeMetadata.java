@@ -84,14 +84,6 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
                       .ram(container.getContainerConfig().getMemory())
                       .processor(new Processor(container.getContainerConfig().getCpuShares(), container.getContainerConfig().getCpuShares()))
                       .build());
-      /*
-      // TODO Set up location properly
-      LocationBuilder locationBuilder = new LocationBuilder();
-      locationBuilder.description("");
-      locationBuilder.id("");
-      locationBuilder.scope(LocationScope.HOST);
-      builder.location(locationBuilder.build());
-      */
       builder.status(toPortableStatus.apply(container.getState()));
       builder.imageId(container.getImage());
       builder.loginPort(getLoginPort(container));
@@ -121,8 +113,8 @@ public class ContainerToNodeMetadata implements Function<Container, NodeMetadata
 
    protected static int getLoginPort(Container container) {
       if (container.getNetworkSettings() != null) {
-          Map<String, List<Map<String,String>>> ports = container.getNetworkSettings().getPorts();
-          if(ports != null) {
+          Map<String, List<Map<String, String>>> ports = container.getNetworkSettings().getPorts();
+          if (ports != null) {
             return Integer.parseInt(getOnlyElement(ports.get("22/tcp")).get("HostPort"));
           }
       // this is needed in case the container list is coming from listContainers

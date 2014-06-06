@@ -16,6 +16,22 @@
  */
 package org.jclouds.docker.internal;
 
+import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
+import static org.jclouds.http.utils.Queries.encodeQueryLine;
+import static org.jclouds.util.Strings2.toStringAndClose;
+import static org.testng.Assert.assertEquals;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+
+import org.jclouds.ContextBuilder;
+import org.jclouds.concurrent.config.ExecutorServiceModule;
+import org.jclouds.docker.DockerApi;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMultimap;
@@ -24,21 +40,6 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Module;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
-import org.jclouds.ContextBuilder;
-import org.jclouds.concurrent.config.ExecutorServiceModule;
-import org.jclouds.docker.DockerApi;
-
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Properties;
-import java.util.Set;
-
-import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
-import static org.jclouds.http.utils.Queries.encodeQueryLine;
-import static org.jclouds.util.Strings2.toStringAndClose;
-import static org.testng.Assert.assertEquals;
 
 /**
  * Base class for all Docker mock tests.

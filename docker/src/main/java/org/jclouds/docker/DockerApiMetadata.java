@@ -72,7 +72,7 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
                  .identityName("user")
                  .credentialName("password")
                  .documentation(URI.create("http://docs.docker.io/en/latest/api/docker_remote_api/"))
-                 .version("1.10")
+                 .version("1.11")
                  .defaultEndpoint("http://127.0.0.1:4243")
                  .defaultProperties(DockerApiMetadata.defaultProperties())
                  .view(typeToken(ComputeServiceContext.class))

@@ -31,7 +31,6 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
-import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
@@ -84,13 +83,8 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
       ComputeService compute = context.getComputeService();
 
 
-      for (ComputeMetadata node : compute.listNodes()) {
+      for (ComputeMetadata node : compute.listHardwareProfiles()) {
          System.out.println(node);
-      }
-
-
-      for (Image image : compute.listImages()) {
-         System.out.println(image);
       }
 
       Template template = compute.templateBuilder().smallest()
@@ -101,10 +95,11 @@ public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
 
       DockerTemplateOptions templateOptions = template.getOptions().as(DockerTemplateOptions.class);
 
-      Map<String,String> volumes = Maps.newHashMap();
+      Map<String, String> volumes = Maps.newHashMap();
       volumes.put("/var/lib/docker", "/root");
-      templateOptions.volumes(volumes).runScript(bootInstructions)
-              .inboundPorts(22, 80, 8080);
+      templateOptions.volumes(volumes)
+                     .runScript(bootInstructions)
+                     .inboundPorts(22, 80, 8080);
 
       Set<? extends NodeMetadata> nodes = context.getComputeService().createNodesInGroup(TEST_LAUNCH_CLUSTER, numNodes, template);
       assertEquals(numNodes, nodes.size(), "wrong number of nodes");

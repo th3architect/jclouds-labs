@@ -51,7 +51,7 @@ public class Image {
 
    @ConstructorProperties({ "id", "parent", "created", "container", "docker_version", "architecture", "os", "Size",
            "VirtualSize", "RepoTags" })
-   public Image(String id, @Nullable String parent, @Nullable String created, @Nullable String container,
+   protected Image(String id, @Nullable String parent, @Nullable String created, @Nullable String container,
                 @Nullable String dockerVersion, @Nullable String architecture, @Nullable String os, long size,
                 @Nullable long virtualSize, @Nullable List<String> repoTags) {
       this.id = checkNotNull(id, "id");

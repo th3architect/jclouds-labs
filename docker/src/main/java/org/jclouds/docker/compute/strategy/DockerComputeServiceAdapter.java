@@ -17,7 +17,6 @@
 package org.jclouds.docker.compute.strategy;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +32,8 @@ import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.compute.options.DockerTemplateOptions;
+import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.ContainerConfig;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.RemoveContainerOptions;
@@ -71,22 +70,34 @@ public class DockerComputeServiceAdapter implements
                                                                                   Template template) {
       checkNotNull(template, "template was null");
       checkNotNull(template.getOptions(), "template options was null");
-      DockerTemplateOptions templateOptions = DockerTemplateOptions.class.cast(template.getOptions());
 
       String imageId = checkNotNull(template.getImage().getId(), "template image id must not be null");
       String loginUser = template.getImage().getDefaultCredentials().getUser();
       String loginUserPassword = template.getImage().getDefaultCredentials().getPassword();
 
+      DockerTemplateOptions templateOptions = DockerTemplateOptions.class.cast(template.getOptions());
+      int[] inboundPorts = templateOptions.getInboundPorts();
+
       Map<String, Object> exposedPorts = Maps.newHashMap();
-      int[] inboundPorts = template.getOptions().getInboundPorts();
       for (int inboundPort : inboundPorts) {
          exposedPorts.put(inboundPort + "/tcp", Maps.newHashMap());
       }
 
-      ContainerConfig.Builder containerConfigBuilder = ContainerConfig.builder()
+      Config.Builder containerConfigBuilder = Config.builder()
               .imageId(imageId)
-              .cmd(ImmutableList.of("/usr/sbin/sshd", "-D"))
               .exposedPorts(exposedPorts);
+
+      if (templateOptions.getCommands().isPresent()) {
+         containerConfigBuilder.cmd(templateOptions.getCommands().get());
+      }
+
+      if (templateOptions.getMemory().isPresent()) {
+         containerConfigBuilder.memory(templateOptions.getMemory().get());
+      }
+
+      if (templateOptions.getCpuShares().isPresent()) {
+         containerConfigBuilder.cpuShares(templateOptions.getCpuShares().get());
+      }
 
       if (templateOptions.getVolumes().isPresent()) {
          Map<String, Object> volumes = Maps.newLinkedHashMap();
@@ -95,22 +106,22 @@ public class DockerComputeServiceAdapter implements
          }
          containerConfigBuilder.volumes(volumes);
       }
-      ContainerConfig containerConfig = containerConfigBuilder.build();
+      Config containerConfig = containerConfigBuilder.build();
 
       logger.debug(">> creating new container with containerConfig(%s)", containerConfig);
       Container container = api.getRemoteApi().createContainer(name, containerConfig);
       logger.trace("<< container(%s)", container.getId());
 
-      // set up for port bindings
-      Map<String, List<Map<String, String>>> portBindings = Maps.newHashMap();
       HostConfig.Builder hostConfigBuilder = HostConfig.builder()
-              .portBindings(portBindings)
               .publishAllPorts(true)
               .privileged(true);
 
+      if (templateOptions.getDns().isPresent()) {
+         hostConfigBuilder.dns(templateOptions.getDns().get());
+      }
       // set up for volume bindings
       if (templateOptions.getVolumes().isPresent()) {
-         for (Map.Entry<String,String> entry : templateOptions.getVolumes().get().entrySet()) {
+         for (Map.Entry<String, String> entry : templateOptions.getVolumes().get().entrySet()) {
             hostConfigBuilder.binds(ImmutableList.of(entry.getKey() + ":" + entry.getValue()));
          }
       }
@@ -143,7 +154,7 @@ public class DockerComputeServiceAdapter implements
       for (Image image : api.getRemoteApi().listImages()) {
          // less efficient than just listNodes but returns richer json that needs repoTags coming from listImages
          Image inspected = api.getRemoteApi().inspectImage(image.getId());
-         if(image.getRepoTags() != null) {
+         if (image.getRepoTags() != null) {
             inspected = Image.builder().fromImage(inspected).repoTags(image.getRepoTags()).build();
          }
          images.add(inspected);
@@ -187,7 +198,6 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public void destroyNode(String id) {
-      //api.getRemoteApi().stopContainer(id);
       api.getRemoteApi().removeContainer(id, RemoveContainerOptions.Builder.force(true));
    }
 

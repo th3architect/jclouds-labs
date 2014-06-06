@@ -40,7 +40,7 @@ public class State {
    private final boolean ghost;
 
    @ConstructorProperties({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Ghost" })
-   public State(int pid, boolean running, int exitCode, String startedAt, String finishedAt, boolean ghost) {
+   protected State(int pid, boolean running, int exitCode, String startedAt, String finishedAt, boolean ghost) {
       this.pid = checkNotNull(pid, "pid");
       this.running = checkNotNull(running, "running");
       this.exitCode = checkNotNull(exitCode, "exitCode");

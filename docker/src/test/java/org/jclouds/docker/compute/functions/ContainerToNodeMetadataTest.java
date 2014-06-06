@@ -32,7 +32,7 @@ import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.ContainerConfig;
+import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.NetworkSettings;
 import org.jclouds.docker.domain.Port;
@@ -60,7 +60,7 @@ public class ContainerToNodeMetadataTest {
 
    @BeforeMethod
    public void setup() {
-      ContainerConfig containerConfig = ContainerConfig.builder()
+      Config containerConfig = Config.builder()
               .hostname("6d35806c1bd2")
               .domainName("")
               .user("")

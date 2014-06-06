@@ -70,7 +70,7 @@ public class ImageToImage implements Function<org.jclouds.docker.domain.Image, o
    }
 
    private boolean is64bit(org.jclouds.docker.domain.Image inspectedImage) {
-      if(inspectedImage.getArchitecture() == null) return true;
+      if (inspectedImage.getArchitecture() == null) return true;
       return inspectedImage.getArchitecture().matches("x86_64|amd64");
    }
 

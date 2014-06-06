@@ -46,7 +46,7 @@ public class NetworkSettings {
    private final Map<String, List<Map<String, String>>> ports;
 
    @ConstructorProperties({ "IpAddress", "IpPrefixLen", "Gateway", "Bridge", "Ports" })
-   public NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge,
+   protected NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge,
                           @Nullable String portMapping,
                           @Nullable Map<String, List<Map<String, String>>> ports) {
       this.ipAddress = checkNotNull(ipAddress, "ipAddress");
