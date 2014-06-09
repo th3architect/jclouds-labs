@@ -16,17 +16,16 @@
  */
 package org.jclouds.docker.binders;
 
+import static org.testng.Assert.fail;
+
 import org.testng.annotations.Test;
 
-/**
- * @author Andrea Turli
- */
 @Test(groups = "unit", testName = "BindInputStreamToRequestTest")
 public class BindInputStreamToRequestTest {
-/*
+
    @Test
    public void test() {
       fail();
    }
-*/
+
 }

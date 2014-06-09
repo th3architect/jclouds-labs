@@ -42,9 +42,6 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.google.inject.Module;
 
-/**
- * @author Andrea Turli
- */
 @Test(groups = "live", singleThreaded = true)
 public class BaseDockerApiLiveTest extends BaseApiLiveTest<DockerApi> {
 

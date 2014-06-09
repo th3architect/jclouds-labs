@@ -27,8 +27,6 @@ import org.jclouds.rest.config.HttpApiModule;
 
 /**
  * Configures the Docker connection.
- *
- * @author Andrea Turli
  */
 @ConfiguresHttpApi
 public class DockerHttpApiModule extends HttpApiModule<DockerApi> {

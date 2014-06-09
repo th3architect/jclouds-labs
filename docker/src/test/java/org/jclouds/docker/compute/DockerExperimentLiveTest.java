@@ -51,9 +51,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 
-/**
- * @author Andrea Turli
- */
 @Test(groups = "live", singleThreaded = true, testName = "DockerExperimentLiveTest")
 public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
 

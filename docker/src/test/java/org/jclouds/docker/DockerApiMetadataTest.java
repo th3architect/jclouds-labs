@@ -16,19 +16,17 @@
  */
 package org.jclouds.docker;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.apis.Apis;
 import org.jclouds.compute.internal.BaseComputeServiceApiMetadataTest;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-
 /**
  * Unit tests for the {@link DockerApiMetadata} class.
- *
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "AbiquoApiMetadataTest")
 public class DockerApiMetadataTest extends BaseComputeServiceApiMetadataTest {

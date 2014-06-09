@@ -16,21 +16,20 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import com.google.common.collect.ImmutableList;
-import org.easymock.EasyMock;
-import org.jclouds.compute.domain.Image;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.testng.Assert.assertEquals;
 
+import org.easymock.EasyMock;
+import org.jclouds.compute.domain.Image;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.google.common.collect.ImmutableList;
+
 /**
  * Unit tests for the {@link org.jclouds.docker.compute.functions.ImageToImage} class.
- *
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "ImageToImageTest")
 public class ImageToImageTest {

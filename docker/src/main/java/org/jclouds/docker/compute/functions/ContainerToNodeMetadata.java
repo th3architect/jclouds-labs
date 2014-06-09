@@ -22,9 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.Image;
@@ -32,11 +30,9 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.functions.GroupNamingConvention;
-import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Port;
 import org.jclouds.docker.domain.State;
-import org.jclouds.logging.Logger;
 import org.jclouds.providers.ProviderMetadata;
 
 import com.google.common.base.Function;
@@ -44,15 +40,8 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 
-/**
- * @author Andrea Turli
- */
 @Singleton
 public class ContainerToNodeMetadata implements Function<Container, NodeMetadata> {
-
-   @Resource
-   @Named(ComputeServiceConstants.COMPUTE_LOGGER)
-   protected Logger logger = Logger.NULL;
 
    private final Supplier<Map<String, ? extends Image>> images;
    private final ProviderMetadata providerMetadata;

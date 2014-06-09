@@ -43,9 +43,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
 
-/**
- * @author Andrea Turli
- */
 public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    private static final String BUSYBOX_IMAGE = "busybox";

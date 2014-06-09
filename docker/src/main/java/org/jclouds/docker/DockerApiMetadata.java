@@ -35,8 +35,6 @@ import com.google.inject.Module;
 
 /**
  * Implementation of {@link BaseHttpApiMetadata} for the Docker API
- *
- * @author Andrea Turli
  */
 public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
 

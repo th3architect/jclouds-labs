@@ -43,8 +43,6 @@ import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 /**
  * Base class for all Docker mock tests.
- * 
- * @author Andrea Turli
  */
 public class BaseDockerMockTest {
    private final Set<Module> modules = ImmutableSet.<Module> of(new ExecutorServiceModule(sameThreadExecutor(),

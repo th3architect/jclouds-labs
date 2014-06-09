@@ -16,21 +16,19 @@
  */
 package org.jclouds.docker.compute.functions;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+
 import org.easymock.EasyMock;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.docker.domain.State;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
-
 /**
  * Unit tests for the {@link StateToStatus} class.
- *
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "StateToStatusTest")
 public class StateToStatusTest {

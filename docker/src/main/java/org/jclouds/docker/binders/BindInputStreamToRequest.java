@@ -37,9 +37,6 @@ import org.jclouds.rest.Binder;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
 
-/**
- * @author Andrea Turli
- */
 @Singleton
 public class BindInputStreamToRequest implements Binder {
 

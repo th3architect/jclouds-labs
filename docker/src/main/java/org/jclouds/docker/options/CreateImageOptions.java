@@ -20,8 +20,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * Options to customize container creation.
- * 
- * @author Andrea Turli
  */
 public class CreateImageOptions extends BaseHttpRequestOptions {
 

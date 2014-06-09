@@ -27,9 +27,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Andrea Turli
- */
 public class NetworkSettings {
 
    @SerializedName("IPAddress")

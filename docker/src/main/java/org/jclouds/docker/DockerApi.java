@@ -24,7 +24,6 @@ import java.io.Closeable;
 /**
  * Provides synchronous access to Docker Remote API.
  *
- * @author Andrea Turli
  * @see <a href="http://docs.docker.io/en/latest/api/docker_remote_api_v1.8/#docker-remote-api-v1-8"></a>
  */
 public interface DockerApi extends Closeable {

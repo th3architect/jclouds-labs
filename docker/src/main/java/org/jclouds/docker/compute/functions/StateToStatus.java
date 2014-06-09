@@ -16,17 +16,16 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import com.google.common.base.Function;
+import javax.inject.Singleton;
+
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadata.Status;
 import org.jclouds.docker.domain.State;
 
-import javax.inject.Singleton;
+import com.google.common.base.Function;
 
 /**
  * Transforms an {@link org.jclouds.docker.domain.Container} to the jclouds portable model.
- *
- * @author Andrea Turli
  */
 @Singleton
 public class StateToStatus implements Function<State, Status> {

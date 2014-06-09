@@ -51,9 +51,6 @@ import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.Headers;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
-/**
- * @author Andrea Turli
- */
 @Consumes(MediaType.APPLICATION_JSON)
 public interface RemoteApi extends Closeable {
 

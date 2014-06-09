@@ -28,9 +28,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Andrea Turli
- */
 public class Config {
 
    @SerializedName("Hostname")

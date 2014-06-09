@@ -49,8 +49,6 @@ import com.google.inject.Guice;
 
 /**
  * Unit tests for the {@link org.jclouds.docker.compute.functions.ContainerToNodeMetadata} class.
- * 
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "ContainerToNodeMetadataTest")
 public class ContainerToNodeMetadataTest {

@@ -16,9 +16,6 @@
  */
 package org.jclouds.docker.config;
 
-/**
- * @author Andrea Turli
- */
 public class DockerProperties {
 
    /**

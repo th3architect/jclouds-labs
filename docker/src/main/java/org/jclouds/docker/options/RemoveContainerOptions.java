@@ -20,8 +20,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * Options to customize container removal.
- * 
- * @author Andrea Turli
  */
 public class RemoveContainerOptions extends BaseHttpRequestOptions {
 

@@ -26,9 +26,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Andrea Turli
- */
 public class ExposedPorts {
 
    @SerializedName("PortAndProtocol")

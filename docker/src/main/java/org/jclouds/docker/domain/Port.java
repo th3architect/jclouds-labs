@@ -23,9 +23,6 @@ import java.beans.ConstructorProperties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * @author Andrea Turli
- */
 public class Port {
 
    @SerializedName("PrivatePort")

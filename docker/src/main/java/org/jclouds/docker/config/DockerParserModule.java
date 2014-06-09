@@ -16,6 +16,15 @@
  */
 package org.jclouds.docker.config;
 
+import java.lang.reflect.Type;
+import java.util.Map;
+
+import javax.inject.Singleton;
+
+import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.Image;
+import org.jclouds.json.config.GsonModule;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,17 +36,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.Image;
-import org.jclouds.json.config.GsonModule;
 
-import javax.inject.Singleton;
-import java.lang.reflect.Type;
-import java.util.Map;
-
-/**
- * @author Andrea Turli
- */
 public class DockerParserModule extends AbstractModule {
 
    @Override

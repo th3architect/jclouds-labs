@@ -33,9 +33,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
-/**
- * @author Andrea Turli
- */
 public class ImageToImage implements Function<org.jclouds.docker.domain.Image, org.jclouds.compute.domain.Image> {
 
    private static final String CENTOS = "centos";

@@ -20,8 +20,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * Options to customize image commit.
- * 
- * @author Andrea Turli
  */
 public class CommitOptions extends BaseHttpRequestOptions {
 

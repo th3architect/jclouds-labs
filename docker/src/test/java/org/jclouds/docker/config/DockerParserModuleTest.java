@@ -31,8 +31,6 @@ import com.google.gson.GsonBuilder;
 
 /**
  * Unit tests for the {@link org.jclouds.docker.config.DockerParserModule} class.
- *
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "DockerParserModuleTest")
 public class DockerParserModuleTest {

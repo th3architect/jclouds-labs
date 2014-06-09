@@ -43,8 +43,6 @@ import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 /**
  * Mock tests for the {@link org.jclouds.docker.DockerApi} class.
- * 
- * @author Andrea Turli
  */
 @Test(groups = "unit", testName = "RemoteApiMockTest")
 public class RemoteApiMockTest extends BaseDockerMockTest {

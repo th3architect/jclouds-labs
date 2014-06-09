@@ -20,8 +20,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * Options to customize image builder.
- * 
- * @author Andrea Turli
  */
 public class BuildOptions extends BaseHttpRequestOptions {
 

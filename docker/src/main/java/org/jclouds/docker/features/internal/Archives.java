@@ -28,9 +28,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 
-/**
- * @author Andrea Turli
- */
 public class Archives {
 
    public static File tar(File baseDir, String archivePath) throws IOException {

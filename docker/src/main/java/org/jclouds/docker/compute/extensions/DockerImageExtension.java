@@ -50,8 +50,6 @@ import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * Docker implementation of {@link org.jclouds.compute.extensions.ImageExtension}
- *
- * @author Andrea Turli
  */
 @Singleton
 public class DockerImageExtension implements ImageExtension {

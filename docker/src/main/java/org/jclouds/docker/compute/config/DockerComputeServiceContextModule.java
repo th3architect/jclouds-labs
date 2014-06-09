@@ -16,10 +16,6 @@
  */
 package org.jclouds.docker.compute.config;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.inject.Injector;
-import com.google.inject.TypeLiteral;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
 import org.jclouds.compute.domain.Hardware;
@@ -38,9 +34,11 @@ import org.jclouds.docker.domain.State;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 
-/**
- * @author Andrea Turli
- */
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
+
 public class DockerComputeServiceContextModule extends
         ComputeServiceAdapterContextModule<Container, Hardware, Image, Location> {
 

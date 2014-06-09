@@ -20,8 +20,6 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 /**
  * Options to customize image deletion.
- * 
- * @author Andrea Turli
  */
 public class DeleteImageOptions extends BaseHttpRequestOptions {
 

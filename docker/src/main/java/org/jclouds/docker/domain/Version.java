@@ -22,9 +22,6 @@ import java.beans.ConstructorProperties;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Andrea Turli
- */
 public class Version {
    @SerializedName("Arch")
    private final String arch;

@@ -30,9 +30,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Andrea Turli
- */
 public class HostConfig {
 
    @SerializedName("ContainerIDFile")
