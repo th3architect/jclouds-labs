@@ -16,16 +16,29 @@
  */
 package org.jclouds.docker.binders;
 
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
+import org.jclouds.http.HttpRequest;
 import org.testng.annotations.Test;
+
+import com.google.common.io.CharStreams;
 
 @Test(groups = "unit", testName = "BindInputStreamToRequestTest")
 public class BindInputStreamToRequestTest {
 
    @Test
-   public void test() {
-      fail();
-   }
+   public void testBindInputStreamToRequest() throws IOException {
+      BindInputStreamToRequest binder = new BindInputStreamToRequest();
 
+      HttpRequest request = HttpRequest.builder().method("GET").endpoint("http://test").build();
+      request = binder.bindToRequest(request, File.createTempFile("dockerfile", ""));
+      String rawContent = CharStreams.toString(new InputStreamReader((FileInputStream) request.getPayload().getRawContent(), "UTF-8"));
+      assertTrue(rawContent.startsWith("Dockerfile"));
+      assertEquals(request.getPayload().getContentMetadata().getContentType(), "application/tar");
+   }
 }
