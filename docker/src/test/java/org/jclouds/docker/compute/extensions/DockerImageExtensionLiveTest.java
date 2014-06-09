@@ -25,4 +25,5 @@ public class DockerImageExtensionLiveTest extends BaseSecurityGroupExtensionLive
    public DockerImageExtensionLiveTest() {
       provider = "docker";
    }
+
 }

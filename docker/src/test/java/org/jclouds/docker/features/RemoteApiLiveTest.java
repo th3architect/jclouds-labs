@@ -28,8 +28,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 
 import org.jclouds.docker.compute.BaseDockerApiLiveTest;
-import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Config;
+import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CreateImageOptions;
@@ -62,7 +62,7 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test
    public void testVersion() {
-      assertEquals(api().getVersion().getVersion(), "0.10.0");
+      assertEquals(api().getVersion().getVersion(), "0.11.1");
    }
 
    @Test(dependsOnMethods = "testVersion")
@@ -118,7 +118,6 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
       assertNull(api().inspectImage(image.getId()));
    }
 
-   @Test(dependsOnMethods = "testDeleteImage")
    public void testBuildImage() throws IOException, InterruptedException, URISyntaxException {
       BuildOptions options = BuildOptions.Builder.tag("testBuildImage").verbose(false).nocache(false);
       InputStream buildImageStream = api().build(new File(Resources.getResource("centos/Dockerfile").toURI()), options);
@@ -128,8 +127,7 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
       String rawImageId = Iterables.getLast(Splitter.on("Successfully built ").split(lastStreamedLine));
       String imageId = rawImageId.substring(0, 11);
       Image image = api().inspectImage(imageId);
-      api().removeContainer(image.getContainer());
-      api().deleteImage(imageId, DeleteImageOptions.Builder.force(true));
+      api().deleteImage(image.getId(), DeleteImageOptions.Builder.force(true));
    }
 
    private RemoteApi api() {

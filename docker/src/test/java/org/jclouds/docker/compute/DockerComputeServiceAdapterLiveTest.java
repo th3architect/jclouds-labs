@@ -16,11 +16,15 @@
  */
 package org.jclouds.docker.compute;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.net.HostAndPort;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+
 import org.jclouds.compute.ComputeServiceAdapter.NodeAndInitialCredentials;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.Hardware;
@@ -39,15 +43,11 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.Test;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.net.HostAndPort;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 @Test(groups = "live", singleThreaded = true, testName = "DockerComputeServiceAdapterLiveTest")
 public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
@@ -82,7 +82,7 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
       String name = "container-" + new Random().nextInt();
 
       Template template = templateBuilder.smallest().osFamily(OsFamily.UBUNTU).os64Bit(true)
-              .osDescriptionMatches("jclouds/ubuntu:latest").build();
+              .osDescriptionMatches("brooklyn/ubuntu:latest").build();
 
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
       assertEquals(guest.getNodeId(), guest.getNode().getId() + "");
