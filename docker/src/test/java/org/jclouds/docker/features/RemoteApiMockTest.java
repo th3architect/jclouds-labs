@@ -75,7 +75,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
 
       try {
          Set<Container> containers = remoteApi.listContainers();
-         //assertRequestHasCommonFields(server.takeRequest(), "/containers/json");
+         assertRequestHasCommonFields(server.takeRequest(), "/containers/json");
          assertTrue(containers.isEmpty());
       } finally {
          api.close();
