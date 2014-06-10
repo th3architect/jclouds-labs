@@ -59,7 +59,7 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test
    public void testVersion() {
-      assertEquals(api().getVersion().getVersion(), "0.11.1");
+      assertEquals(api().getVersion().getVersion(), "1.0.0");
    }
 
    @Test(dependsOnMethods = "testVersion")

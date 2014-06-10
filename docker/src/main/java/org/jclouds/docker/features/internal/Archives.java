@@ -38,9 +38,7 @@ public class Archives {
       // Check that the directory is a directory, and get its contents
       checkArgument(baseDir.isDirectory(), "%s is not a directory", baseDir);
       File[] files = baseDir.listFiles();
-
       String token = getLast(Splitter.on("/").split(baseDir.getAbsolutePath()));
-
       TarArchiveOutputStream tos = new TarArchiveOutputStream(new FileOutputStream(tarFile));
       tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
       try {
