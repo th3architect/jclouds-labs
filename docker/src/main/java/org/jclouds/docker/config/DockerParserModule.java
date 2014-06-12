@@ -16,19 +16,9 @@
  */
 package org.jclouds.docker.config;
 
-import java.lang.reflect.Type;
-import java.util.Map;
-
-import javax.inject.Singleton;
-
-import org.jclouds.docker.domain.Container;
-import org.jclouds.docker.domain.Image;
-import org.jclouds.json.config.GsonModule;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -36,6 +26,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import org.jclouds.docker.domain.Container;
+import org.jclouds.json.config.GsonModule;
+
+import javax.inject.Singleton;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 public class DockerParserModule extends AbstractModule {
 
@@ -49,7 +45,6 @@ public class DockerParserModule extends AbstractModule {
    public Map<Type, Object> provideCustomAdapterBindings() {
       return new ImmutableMap.Builder<Type, Object>()
               .put(Container.class, new ContainerTypeAdapter())
-              .put(Image.class, new ImageTypeAdapter())
               .build();
    }
 
@@ -60,41 +55,8 @@ public class DockerParserModule extends AbstractModule {
               JsonParseException {
          Gson gson = new GsonBuilder().serializeNulls().create();
          final JsonObject jsonObject = json.getAsJsonObject();
-
-         // container:inspect returns ID instead of Id as listContainers
-         if (jsonObject.has("ID")) {
-            JsonElement id = jsonObject.get("ID");
-            jsonObject.remove("ID");
-            jsonObject.add("Id", id);
-         }
-         // container:inspect returns Name instead of Names as listContainers
-         if (jsonObject.has("Names")) {
-            final JsonArray jsonNamesArray = jsonObject.getAsJsonArray("Names");
-            jsonObject.remove("Names");
-            jsonObject.add("Name", jsonNamesArray.get(0));
-         }
          return gson.fromJson(jsonObject, Container.class);
       }
-
-   }
-
-   protected static class ImageTypeAdapter implements JsonDeserializer<Image> {
-
-      @Override
-      public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws
-              JsonParseException {
-         Gson gson = new GsonBuilder().serializeNulls().create();
-         final JsonObject jsonObject = json.getAsJsonObject();
-
-         // image:inspect returns id instead of Id as listImages
-         if (jsonObject.has("Id")) {
-            JsonElement id = jsonObject.get("Id");
-            jsonObject.remove("Id");
-            jsonObject.add("id", id);
-         }
-         return gson.fromJson(jsonObject, Image.class);
-      }
-
    }
 
 }

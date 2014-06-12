@@ -16,31 +16,31 @@
  */
 package org.jclouds.docker.domain;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import java.beans.ConstructorProperties;
-import java.util.List;
-
-import org.jclouds.javax.annotation.Nullable;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+
+import java.beans.ConstructorProperties;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Image {
 
-   @SerializedName("id")
+   @SerializedName("Id")
    private final String id;
-   @SerializedName("parent")
+   @SerializedName("Parent")
    private final String parent;
    @SerializedName("Created")
    private final String created;
-   @SerializedName("container")
+   @SerializedName("Container")
    private final String container;
-   @SerializedName("docker_version")
+   @SerializedName("DockerVersion")
    private final String dockerVersion;
-   @SerializedName("architecture")
+   @SerializedName("Architecture")
    private final String architecture;
-   @SerializedName("os")
+   @SerializedName("Os")
    private final String os;
    @SerializedName("Size")
    private final long size;
@@ -49,8 +49,8 @@ public class Image {
    @SerializedName("RepoTags")
    private final List<String> repoTags;
 
-   @ConstructorProperties({ "id", "parent", "created", "container", "docker_version", "architecture", "os", "Size",
-           "VirtualSize", "RepoTags" })
+   @ConstructorProperties({ "Id", "Parent", "Created", "Container", "DockerVersion", "Architecture", "Os", "Size",
+           "VirtualSize", "RepoTags", "Architecture" })
    protected Image(String id, @Nullable String parent, @Nullable String created, @Nullable String container,
                 @Nullable String dockerVersion, @Nullable String architecture, @Nullable String os, long size,
                 @Nullable long virtualSize, @Nullable List<String> repoTags) {

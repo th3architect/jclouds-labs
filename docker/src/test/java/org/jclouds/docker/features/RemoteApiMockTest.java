@@ -16,14 +16,10 @@
  */
 package org.jclouds.docker.features;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
@@ -36,10 +32,14 @@ import org.jclouds.io.Payloads;
 import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Set;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Mock tests for the {@link org.jclouds.docker.DockerApi} class.
@@ -102,7 +102,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
       server.enqueue(new MockResponse().setBody(payloadFromResource("/container.json")));
       DockerApi api = api(server.getUrl("/"));
       RemoteApi remoteApi = api.getRemoteApi();
-      String containerId = "6d35806c1bd2b25cd92bba2d2c2c5169dc2156f53ab45c2b62d76e2d2fee14a9";
+      String containerId = "b03d4cd15b76f8876110615cdeed15eadf77c9beb408d62f1687dcc69192cd6d";
       try {
          Container container = remoteApi.inspectContainer(containerId);
          assertRequestHasCommonFields(server.takeRequest(), "/containers/" + containerId + "/json");
@@ -110,7 +110,7 @@ public class RemoteApiMockTest extends BaseDockerMockTest {
          assertNotNull(container.getId(), containerId);
          assertNotNull(container.getContainerConfig());
          assertNotNull(container.getHostConfig());
-         assertEquals(container.getName(), "/hopeful_mclean");
+         assertEquals(container.getName(), "/jclouds-72d");
          assertEquals(container.getState().isRunning(), true);
       } finally {
          api.close();

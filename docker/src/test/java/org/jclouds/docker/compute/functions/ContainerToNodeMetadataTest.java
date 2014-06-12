@@ -16,14 +16,11 @@
  */
 package org.jclouds.docker.compute.functions;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.assertEquals;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Function;
+import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Guice;
 import org.easymock.EasyMock;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.ImageBuilder;
@@ -31,8 +28,8 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.functions.GroupNamingConvention;
-import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.Config;
+import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.NetworkSettings;
 import org.jclouds.docker.domain.Port;
@@ -41,11 +38,14 @@ import org.jclouds.providers.ProviderMetadata;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Guice;
+import java.util.List;
+import java.util.Map;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit tests for the {@link org.jclouds.docker.compute.functions.ContainerToNodeMetadata} class.
@@ -111,7 +111,7 @@ public class ContainerToNodeMetadataTest {
               .driver("aufs")
               .execDriver("native-0.1")
               .volumes(ImmutableMap.<String, String>of())
-              .volumesRw(ImmutableMap.<String, Boolean>of())
+              .volumesRW(ImmutableMap.<String, Boolean>of())
               .command("")
               .status("")
               .hostConfig(HostConfig.builder().publishAllPorts(true).build())

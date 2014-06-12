@@ -17,6 +17,8 @@
 package org.jclouds.docker.compute.strategy;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.find;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +43,7 @@ import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -129,7 +132,7 @@ public class DockerComputeServiceAdapter implements
 
       api.getRemoteApi().startContainer(container.getId(), hostConfig);
       container = api.getRemoteApi().inspectContainer(container.getId());
-      if (!container.getState().isRunning()) {
+      if (container.getState().getExitCode() != 0) {
          destroyNode(container.getId());
          throw new IllegalStateException(String.format("Container %s has not started correctly", container.getId()));
       }
@@ -152,9 +155,9 @@ public class DockerComputeServiceAdapter implements
    public Set<Image> listImages() {
       Set<Image> images = Sets.newHashSet();
       for (Image image : api.getRemoteApi().listImages()) {
-         // less efficient than just listNodes but returns richer json that needs repoTags coming from listImages
+         // less efficient than just listImages but returns richer json that needs repoTags coming from listImages
          Image inspected = api.getRemoteApi().inspectImage(image.getId());
-         if (image.getRepoTags() != null) {
+         if (inspected.getRepoTags().isEmpty()) {
             inspected = Image.builder().fromImage(inspected).repoTags(image.getRepoTags()).build();
          }
          images.add(inspected);
@@ -164,7 +167,14 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Image getImage(final String imageId) {
-      return api.getRemoteApi().inspectImage(imageId);
+      // less efficient than just inspectImage but listImages return repoTags
+      return find(listImages(), new Predicate<Image>() {
+
+         @Override
+         public boolean apply(Image input) {
+            return input.getId().equals(imageId);
+         }
+      }, null);
    }
 
    @Override

@@ -34,7 +34,7 @@ public class Port {
    @SerializedName("IP")
    private final String ip;
 
-   @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "Ip" })
+   @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "IP" })
    protected Port(int privatePort, int publicPort, String type, String ip) {
       this.privatePort = checkNotNull(privatePort, "privatePort");
       this.publicPort = checkNotNull(publicPort, "publicPort");

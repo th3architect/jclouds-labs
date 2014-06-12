@@ -16,15 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import java.beans.ConstructorProperties;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+
+import java.beans.ConstructorProperties;
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Container {
 
@@ -55,7 +57,7 @@ public class Container {
    @SerializedName("Volumes")
    private final Map<String, String> volumes;
    @SerializedName("VolumesRW")
-   private final Map<String, Boolean> volumesRw;
+   private final Map<String, Boolean> volumesRW;
    @SerializedName("Command")
    private final String command;
    @SerializedName("Status")
@@ -64,32 +66,36 @@ public class Container {
    private final HostConfig hostConfig;
    @SerializedName("Ports")
    private final List<Port> ports;
+   @SerializedName("HostnamePath")
+   private final String hostnamePath;
 
    @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
-           "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports" })
-   protected Container(String id, String name, String created, String path, String[] args,
-                       Config containerConfig, State state, String image,  NetworkSettings networkSettings,
-                    String resolvConfPath, String driver, String execDriver, Map<String, String> volumes,
-                    Map<String, Boolean> volumesRW, String command, String status, HostConfig hostConfig,
-                    List<Port> ports) {
+           "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig",
+           "Ports", "HostnamePath" })
+   protected Container(String id, @Nullable String name, @Nullable String created, @Nullable String path, @Nullable String[] args,
+                       @Nullable Config containerConfig, @Nullable State state, @Nullable String image, @Nullable NetworkSettings networkSettings,
+                       @Nullable String resolvConfPath, @Nullable String driver, @Nullable String execDriver, @Nullable Map<String, String> volumes,
+                       @Nullable Map<String, Boolean> volumesRW, @Nullable String command, @Nullable String status,
+                       @Nullable HostConfig hostConfig, @Nullable List<Port> ports, @Nullable String hostnamePath) {
       this.id = checkNotNull(id, "id");
-      this.name = checkNotNull(name, "name");
-      this.created = checkNotNull(created, "created");
-      this.path = checkNotNull(path, "path");
-      this.args = checkNotNull(args, "args");
-      this.containerConfig = checkNotNull(containerConfig, "containerConfig");
-      this.state = checkNotNull(state, "state");
-      this.image = checkNotNull(image, "image");
-      this.networkSettings = checkNotNull(networkSettings, "networkSettings");
-      this.resolvConfPath = checkNotNull(resolvConfPath, "resolvConfPath");
-      this.driver = checkNotNull(driver, "driver");
-      this.execDriver = checkNotNull(execDriver, "execDriver");
-      this.volumes = checkNotNull(ImmutableMap.copyOf(volumes), "volumes");
-      this.volumesRw = checkNotNull(ImmutableMap.copyOf(volumesRW), "volumesRW");
-      this.command = checkNotNull(command, "command");
-      this.status = checkNotNull(status, "status");
-      this.hostConfig = checkNotNull(hostConfig, "hostConfig");
-      this.ports = checkNotNull(ImmutableList.copyOf(ports), "ports");
+      this.name = name;
+      this.created = created;
+      this.path = path;
+      this.args = args;
+      this.containerConfig = containerConfig;
+      this.state = state;
+      this.image = image;
+      this.networkSettings = networkSettings;
+      this.resolvConfPath = resolvConfPath;
+      this.driver = driver;
+      this.execDriver = execDriver;
+      this.volumes = volumes != null ? ImmutableMap.copyOf(volumes) : ImmutableMap.<String, String>of();
+      this.volumesRW = volumesRW != null ? ImmutableMap.copyOf(volumesRW) : ImmutableMap.<String, Boolean>of();
+      this.command = command;
+      this.status = status;
+      this.hostConfig = hostConfig;
+      this.ports = ports != null ? ImmutableList.copyOf(ports) : ImmutableList.<Port>of();
+      this.hostnamePath = hostnamePath;
    }
 
    public String getId() {
@@ -144,8 +150,8 @@ public class Container {
       return volumes;
    }
 
-   public Map<String, Boolean> getVolumesRw() {
-      return volumesRw;
+   public Map<String, Boolean> getvolumesRW() {
+      return volumesRW;
    }
 
    public String getCommand() {
@@ -162,6 +168,10 @@ public class Container {
 
    public List<Port> getPorts() {
       return ports;
+   }
+
+   public String getHostnamePath() {
+      return hostnamePath;
    }
 
    @Override
@@ -184,17 +194,18 @@ public class Container {
               Objects.equal(this.driver, that.driver) &&
               Objects.equal(this.execDriver, that.execDriver) &&
               Objects.equal(this.volumes, that.volumes) &&
-              Objects.equal(this.volumesRw, that.volumesRw) &&
+              Objects.equal(this.volumesRW, that.volumesRW) &&
               Objects.equal(this.command, that.command) &&
               Objects.equal(this.status, that.status) &&
               Objects.equal(this.hostConfig, that.hostConfig) &&
-              Objects.equal(this.ports, that.ports);
+              Objects.equal(this.ports, that.ports) &&
+              Objects.equal(this.hostnamePath, that.hostnamePath);
    }
 
    @Override
    public int hashCode() {
       return Objects.hashCode(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
-              driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
+              driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
    }
 
    @Override
@@ -213,11 +224,12 @@ public class Container {
               .add("driver", driver)
               .add("execDriver", execDriver)
               .add("volumes", volumes)
-              .add("volumesRw", volumesRw)
+              .add("volumesRW", volumesRW)
               .add("command", command)
               .add("status", status)
               .add("hostConfig", hostConfig)
               .add("ports", ports)
+              .add("hostnamePath", hostnamePath)
               .toString();
    }
 
@@ -244,11 +256,12 @@ public class Container {
       private String driver;
       private String execDriver;
       private Map<String, String> volumes = ImmutableMap.of();
-      private Map<String, Boolean> volumesRw = ImmutableMap.of();
+      private Map<String, Boolean> volumesRW = ImmutableMap.of();
       private String command;
       private String status;
       private HostConfig hostConfig;
       private List<Port> ports = ImmutableList.of();
+      private String hostnamePath;
 
       public Builder id(String id) {
          this.id = id;
@@ -315,8 +328,8 @@ public class Container {
          return this;
       }
 
-      public Builder volumesRw(Map<String, Boolean> volumesRw) {
-         this.volumesRw = volumesRw;
+      public Builder volumesRW(Map<String, Boolean> volumesRW) {
+         this.volumesRW = volumesRW;
          return this;
       }
 
@@ -340,9 +353,14 @@ public class Container {
          return this;
       }
 
+      public Builder hostnamePath(String hostnamePath) {
+         this.hostnamePath = hostnamePath;
+         return this;
+      }
+
       public Container build() {
          return new Container(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
-                 driver, execDriver, volumes, volumesRw, command, status, hostConfig, ports);
+                 driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
       }
 
       public Builder fromContainer(Container in) {
@@ -360,11 +378,12 @@ public class Container {
                  .driver(in.getDriver())
                  .execDriver(in.getExecDriver())
                  .volumes(in.getVolumes())
-                 .volumesRw(in.getVolumesRw())
+                 .volumesRW(in.getvolumesRW())
                  .command(in.getCommand())
                  .status(in.getStatus())
                  .hostConfig(in.getHostConfig())
-                 .ports(in.getPorts());
+                 .ports(in.getPorts())
+                 .hostnamePath(in.getHostnamePath());
       }
    }
 }

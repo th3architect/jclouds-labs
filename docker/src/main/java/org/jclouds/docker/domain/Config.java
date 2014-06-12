@@ -16,17 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import java.beans.ConstructorProperties;
-import java.util.List;
-import java.util.Map;
-
-import org.jclouds.javax.annotation.Nullable;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+
+import java.beans.ConstructorProperties;
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Config {
 
@@ -79,7 +79,7 @@ public class Config {
 
 
    @ConstructorProperties({ "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",
-           "AttachStdout", "AttachStderr", "PortSpecs", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd",
+           "AttachStdout", "AttachStderr", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd",
            "Dns", "Image", "Volumes", "VolumesFrom", "WorkingDir", "Entrypoint", "NetworkDisabled", "OnBuild" })
    protected Config(@Nullable String hostname, @Nullable String domainName, @Nullable String user,
                              int memory, int memorySwap, int cpuShares, boolean attachStdin, boolean attachStdout,
