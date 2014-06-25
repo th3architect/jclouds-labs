@@ -16,11 +16,8 @@
  */
 package org.jclouds.docker;
 
-import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
-import static org.jclouds.reflect.Reflection2.typeToken;
-import java.net.URI;
-import java.util.Properties;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Module;
 import org.jclouds.Constants;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
@@ -30,8 +27,11 @@ import org.jclouds.docker.config.DockerHttpApiModule;
 import org.jclouds.docker.config.DockerParserModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Module;
+import java.net.URI;
+import java.util.Properties;
+
+import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
+import static org.jclouds.reflect.Reflection2.typeToken;
 
 /**
  * Implementation of {@link BaseHttpApiMetadata} for the Docker API
@@ -69,9 +69,9 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
                  .name("Docker API")
                  .identityName("user")
                  .credentialName("password")
-                 .documentation(URI.create("http://docs.docker.io/en/latest/api/docker_remote_api/"))
+                 .documentation(URI.create("https://docs.docker.com/reference/api/docker_remote_api/"))
                  .version("1.11")
-                 .defaultEndpoint("http://127.0.0.1:4243")
+                 .defaultEndpoint("http://127.0.0.1:2375")
                  .defaultProperties(DockerApiMetadata.defaultProperties())
                  .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(

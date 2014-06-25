@@ -16,18 +16,12 @@
  */
 package org.jclouds.docker.compute.extensions;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_AVAILABLE;
-import java.util.NoSuchElementException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Atomics;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.jclouds.Constants;
 import org.jclouds.compute.domain.CloneImageTemplate;
 import org.jclouds.compute.domain.Image;
@@ -41,12 +35,17 @@ import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.options.CommitOptions;
 import org.jclouds.logging.Logger;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.Atomics;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.NoSuchElementException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_AVAILABLE;
 
 /**
  * Docker implementation of {@link org.jclouds.compute.extensions.ImageExtension}
@@ -68,7 +67,7 @@ public class DockerImageExtension implements ImageExtension {
       this.api = checkNotNull(api, "api");
       this.userExecutor = checkNotNull(userExecutor, "userExecutor");
       this.imageAvailablePredicate = checkNotNull(imageAvailablePredicate, "imageAvailablePredicate");
-      this.imageToImage = imageToImage;
+      this.imageToImage = checkNotNull(imageToImage, "imageToImage");
    }
 
    @Override

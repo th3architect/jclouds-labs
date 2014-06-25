@@ -16,16 +16,8 @@
  */
 package org.jclouds.docker.binders;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import javax.annotation.Resource;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.google.common.base.Throwables;
+import com.google.common.io.Files;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.docker.features.internal.Archives;
 import org.jclouds.http.HttpRequest;
@@ -34,8 +26,15 @@ import org.jclouds.io.Payloads;
 import org.jclouds.logging.Logger;
 import org.jclouds.rest.Binder;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
+import javax.annotation.Resource;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class BindInputStreamToRequest implements Binder {
@@ -44,7 +43,6 @@ public class BindInputStreamToRequest implements Binder {
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
    protected Logger logger = Logger.NULL;
 
-   @SuppressWarnings("unchecked")
    @Override
    public <R extends HttpRequest> R bindToRequest(R request, Object input) {
       checkArgument(checkNotNull(input, "input") instanceof File, "this binder is only valid for File!");

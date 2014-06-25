@@ -6,10 +6,7 @@ providers, it supports the same portable abstractions offered by jclouds.
 
 Please follow these steps to configure your workstation for jclouds-docker:
 
-- install the latest Docker release (please visit http://www.docker.io/gettingstarted/)
-
-If you are on OS X, please consider [boot2docker](http://docs.docker.io/en/latest/installation/mac/) as simplified
-way to install docker locally.
+- install the latest Docker release (please visit https://docs.docker.com/installation/)
 
 #How it works
 
@@ -31,13 +28,12 @@ way to install docker locally.
 ## Assumptions
 
 - jclouds-docker assumes that the images specified using the template are ssh'able.
-- jclouds-docker will mount ${user.home} to /root of the container
 
 --------------
 
 #Notes:
-- jclouds-docker is still at alpha stage please report any issues you find at [jclouds issues](https://github.com/jclouds/jclouds/issues?state=open)
-- jclouds-docker has been tested on Mac OSX, it might work on Linux iff vbox is running and set up correctly. However, it will not currently run on Windows.
+- jclouds-docker is still at alpha stage please report any issues you find at [jclouds issues](https://issues.apache.org/jira/browse/JCLOUDS)
+- jclouds-docker has been tested on Mac OSX, it might work on Linux iff vbox is running and set up correctly. However, it has never been tried on Windows.
 
 --------------
 

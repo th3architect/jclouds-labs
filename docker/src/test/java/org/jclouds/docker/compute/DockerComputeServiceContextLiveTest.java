@@ -49,8 +49,8 @@ import java.util.Set;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-@Test(groups = "live", singleThreaded = true, testName = "DockerExperimentLiveTest")
-public class DockerExperimentLiveTest extends BaseDockerApiLiveTest {
+@Test(groups = "live", singleThreaded = true, testName = "DockerComputeServiceContextLiveTest")
+public class DockerComputeServiceContextLiveTest extends BaseDockerApiLiveTest {
 
    public static final String TEST_LAUNCH_CLUSTER = "jclouds";
    @Resource

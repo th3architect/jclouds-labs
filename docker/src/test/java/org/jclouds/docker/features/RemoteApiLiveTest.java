@@ -16,17 +16,10 @@
  */
 package org.jclouds.docker.features;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.io.Resources;
 import org.jclouds.docker.compute.BaseDockerApiLiveTest;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
@@ -38,10 +31,17 @@ import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.io.Resources;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
@@ -117,7 +117,7 @@ public class RemoteApiLiveTest extends BaseDockerApiLiveTest {
 
    public void testBuildImage() throws IOException, InterruptedException, URISyntaxException {
       BuildOptions options = BuildOptions.Builder.tag("testBuildImage").verbose(false).nocache(false);
-      InputStream buildImageStream = api().build(new File(Resources.getResource("centos/Dockerfile").toURI()), options);
+      InputStream buildImageStream = api().build(new File(Resources.getResource("Dockerfile").toURI()), options);
       String buildStream = consumeStream(buildImageStream, false);
       Iterable<String> splitted = Splitter.on("\n").split(buildStream.replace("\r", "").trim());
       String lastStreamedLine = Iterables.getLast(splitted).trim();
