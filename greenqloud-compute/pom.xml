@@ -22,44 +22,43 @@
   <parent>
     <groupId>org.apache.jclouds.labs</groupId>
     <artifactId>jclouds-labs</artifactId>
-<<<<<<< HEAD
-    <version>1.8.2-SNAPSHOT</version>
-=======
     <version>2.0.0-SNAPSHOT</version>
->>>>>>> Updating subproject versions to 2.0.0-SNAPSHOT
   </parent>
 
   <!-- TODO: when out of labs, switch to org.jclouds.provider -->
   <groupId>org.apache.jclouds.labs</groupId>
-  <artifactId>joyentcloud</artifactId>
-  <name>jclouds joyentcloud provider</name>
-  <description>jclouds components to access the Joyent Cloud</description>
+  <artifactId>greenqloud-compute</artifactId>
+  <name>jclouds Greenqloud compute provider</name>
+  <description>Compute implementation targeted to Greenqloud Web Services</description>
   <packaging>bundle</packaging>
 
   <properties>
-    <test.joyentcloud.endpoint>https://api.joyentcloud.com</test.joyentcloud.endpoint>
-    <test.joyentcloud.api-version>~6.5</test.joyentcloud.api-version>
-    <test.joyentcloud.build-version />
-    <test.joyentcloud.identity>FIXME_IDENTITY</test.joyentcloud.identity>
-    <test.joyentcloud.credential>FIXME_CREDENTIALS</test.joyentcloud.credential>
-    <jclouds.osgi.export>org.jclouds.joyent.joyentcloud*;version="${project.version}"</jclouds.osgi.export>
+    <test.greenqloud-compute.endpoint>https://api.greenqloud.com</test.greenqloud-compute.endpoint>
+    <test.greenqloud-compute.api-version>2010-06-15</test.greenqloud-compute.api-version>
+    <test.greenqloud-compute.build-version />
+    <test.greenqloud-compute.identity>${test.greenqloud.identity}</test.greenqloud-compute.identity>
+    <test.greenqloud-compute.credential>${test.greenqloud.credential}</test.greenqloud-compute.credential>
+    <test.greenqloud-compute.template />
+    <test.greenqloud-compute.ebs-template>imageId=is-1/qmi-9ac92558</test.greenqloud-compute.ebs-template>
+
+    <jclouds.osgi.export>org.jclouds.greenqloud.compute*;version="${project.version}"</jclouds.osgi.export>
     <jclouds.osgi.import>
-      org.jclouds.rest.internal;version="${jclouds.version}",
-      org.jclouds.labs*;version="${project.version}",
-      org.jclouds*;version="${jclouds.version}",
+      org.jclouds.compute.internal;version="${project.version}",
+      org.jclouds.rest.internal;version="${project.version}",
+      org.jclouds*;version="${project.version}",
       *
     </jclouds.osgi.import>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>joyent-cloudapi</artifactId>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>ec2</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>joyent-cloudapi</artifactId>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>ec2</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
@@ -67,36 +66,31 @@
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-slf4j</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <artifactId>jclouds-log4j</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     <profile>
       <id>live</id>
@@ -113,12 +107,15 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <threadCount>1</threadCount>
                   <systemPropertyVariables>
-                    <test.joyentcloud.endpoint>${test.joyentcloud.endpoint}</test.joyentcloud.endpoint>
-                    <test.joyentcloud.api-version>${test.joyentcloud.api-version}</test.joyentcloud.api-version>
-                    <test.joyentcloud.build-version>${test.joyentcloud.build-version}</test.joyentcloud.build-version>
-                    <test.joyentcloud.identity>${test.joyentcloud.identity}</test.joyentcloud.identity>
-                    <test.joyentcloud.credential>${test.joyentcloud.credential}</test.joyentcloud.credential>
+                    <test.greenqloud-compute.endpoint>${test.greenqloud-compute.endpoint}</test.greenqloud-compute.endpoint>
+                    <test.greenqloud-compute.api-version>${test.greenqloud-compute.api-version}</test.greenqloud-compute.api-version>
+                    <test.greenqloud-compute.build-version>${test.greenqloud-compute.build-version}</test.greenqloud-compute.build-version>
+                    <test.greenqloud-compute.identity>${test.greenqloud-compute.identity}</test.greenqloud-compute.identity>
+                    <test.greenqloud-compute.credential>${test.greenqloud-compute.credential}</test.greenqloud-compute.credential>
+                    <test.greenqloud-compute.template>${test.greenqloud-compute.template}</test.greenqloud-compute.template>
+                    <test.greenqloud-compute.ebs-template>${test.greenqloud-compute.ebs-template}</test.greenqloud-compute.ebs-template>
                   </systemPropertyVariables>
                 </configuration>
               </execution>
@@ -130,3 +127,4 @@
   </profiles>
 
 </project>
+

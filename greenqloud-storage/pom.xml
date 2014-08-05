@@ -22,81 +22,69 @@
   <parent>
     <groupId>org.apache.jclouds.labs</groupId>
     <artifactId>jclouds-labs</artifactId>
-<<<<<<< HEAD
-    <version>1.8.2-SNAPSHOT</version>
-=======
     <version>2.0.0-SNAPSHOT</version>
->>>>>>> Updating subproject versions to 2.0.0-SNAPSHOT
   </parent>
 
   <!-- TODO: when out of labs, switch to org.jclouds.provider -->
   <groupId>org.apache.jclouds.labs</groupId>
-  <artifactId>joyentcloud</artifactId>
-  <name>jclouds joyentcloud provider</name>
-  <description>jclouds components to access the Joyent Cloud</description>
+  <artifactId>greenqloud-storage</artifactId>
+  <name>jclouds GreenQloud Simple Storage Service (S3) provider</name>
+  <description>Simple Storage Service (S3) implementation targeted to GreenQloud Web Services</description>
   <packaging>bundle</packaging>
 
   <properties>
-    <test.joyentcloud.endpoint>https://api.joyentcloud.com</test.joyentcloud.endpoint>
-    <test.joyentcloud.api-version>~6.5</test.joyentcloud.api-version>
-    <test.joyentcloud.build-version />
-    <test.joyentcloud.identity>FIXME_IDENTITY</test.joyentcloud.identity>
-    <test.joyentcloud.credential>FIXME_CREDENTIALS</test.joyentcloud.credential>
-    <jclouds.osgi.export>org.jclouds.joyent.joyentcloud*;version="${project.version}"</jclouds.osgi.export>
+    <test.greenqloud-storage.endpoint>https://s.greenqloud.com</test.greenqloud-storage.endpoint>
+    <test.greenqloud-storage.api-version>2006-03-01</test.greenqloud-storage.api-version>
+    <test.greenqloud-storage.build-version />
+    <test.greenqloud-storage.identity>${test.greenqloud.identity}</test.greenqloud-storage.identity>
+    <test.greenqloud-storage.credential>${test.greenqloud.credential}</test.greenqloud-storage.credential>
+    <jclouds.osgi.export>org.jclouds.greenqloud.storage*;version="${project.version}"</jclouds.osgi.export>
     <jclouds.osgi.import>
-      org.jclouds.rest.internal;version="${jclouds.version}",
-      org.jclouds.labs*;version="${project.version}",
-      org.jclouds*;version="${jclouds.version}",
+      org.jclouds*;version="${project.version}",
       *
     </jclouds.osgi.import>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>joyent-cloudapi</artifactId>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>s3</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>joyent-cloudapi</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds</groupId>
-      <artifactId>jclouds-compute</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
-      <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds</groupId>
+      <artifactId>jclouds-blobstore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>s3</artifactId>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-slf4j</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <artifactId>jclouds-log4j</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-sshj</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     <profile>
       <id>live</id>
@@ -114,11 +102,13 @@
                 </goals>
                 <configuration>
                   <systemPropertyVariables>
-                    <test.joyentcloud.endpoint>${test.joyentcloud.endpoint}</test.joyentcloud.endpoint>
-                    <test.joyentcloud.api-version>${test.joyentcloud.api-version}</test.joyentcloud.api-version>
-                    <test.joyentcloud.build-version>${test.joyentcloud.build-version}</test.joyentcloud.build-version>
-                    <test.joyentcloud.identity>${test.joyentcloud.identity}</test.joyentcloud.identity>
-                    <test.joyentcloud.credential>${test.joyentcloud.credential}</test.joyentcloud.credential>
+                    <test.greenqloud-storage.endpoint>${test.greenqloud-storage.endpoint}</test.greenqloud-storage.endpoint>
+                    <test.greenqloud-storage.api-version>${test.greenqloud-storage.api-version}</test.greenqloud-storage.api-version>
+                    <test.greenqloud-storage.build-version>${test.greenqloud-storage.build-version}</test.greenqloud-storage.build-version>
+                    <test.greenqloud-storage.identity>${test.greenqloud-storage.identity}</test.greenqloud-storage.identity>
+                    <test.greenqloud-storage.credential>${test.greenqloud-storage.credential}</test.greenqloud-storage.credential>
+                    <jclouds.blobstore.httpstream.url>${jclouds.blobstore.httpstream.url}</jclouds.blobstore.httpstream.url>
+                    <jclouds.blobstore.httpstream.md5>${jclouds.blobstore.httpstream.md5}</jclouds.blobstore.httpstream.md5>
                   </systemPropertyVariables>
                 </configuration>
               </execution>

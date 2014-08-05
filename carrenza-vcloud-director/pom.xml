@@ -27,21 +27,26 @@
 
   <!-- TODO: when out of labs, switch to org.jclouds.provider -->
   <groupId>org.apache.jclouds.labs</groupId>
-  <artifactId>cloudsigma2-zrh</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
-  <name>jclouds CloudSigma v2 Zurich Provider</name>
-  <description>ComputeService binding to the CloudSigma datacenter in Zürich</description>
+  <artifactId>carrenza-vcloud-director</artifactId>
+  <name>jclouds Carrenza vCloud Director provider</name>
+  <description>vCloud Director implementation targeted to Carrenza</description>
   <packaging>bundle</packaging>
 
   <properties>
-    <test.cloudsigma2-zrh.endpoint>https://zrh.cloudsigma.com/api/2.0/</test.cloudsigma2-zrh.endpoint>
-    <test.cloudsigma2-zrh.api-version>2.0</test.cloudsigma2-zrh.api-version>
-    <test.cloudsigma2-zrh.build-version />
-    <test.cloudsigma2-zrh.identity>FIXME</test.cloudsigma2-zrh.identity>
-    <test.cloudsigma2-zrh.credential>FIXME</test.cloudsigma2-zrh.credential>
-    <!-- Ubuntu 14.04 Cloud Image -->
-    <test.cloudsigma2-zrh.template>imageId=473adb38-3b64-43b2-93bd-f1a3443c19ea,loginUser=ubuntu</test.cloudsigma2-zrh.template>
-    <jclouds.osgi.export>org.jclouds.cloudsigma2*;version="${project.version}"</jclouds.osgi.export>
+    <test.carrenza-vcloud-director.endpoint>https://myvdc.carrenza.net/api</test.carrenza-vcloud-director.endpoint>
+    <test.carrenza-vcloud-director.api-version>1.5</test.carrenza-vcloud-director.api-version>
+    <test.carrenza-vcloud-director.build-version>464915</test.carrenza-vcloud-director.build-version>
+    <test.carrenza-vcloud-director.identity>FIXME_IDENTITY</test.carrenza-vcloud-director.identity>
+    <test.carrenza-vcloud-director.credential>FIXME_CREDENTIAL</test.carrenza-vcloud-director.credential>
+    <test.carrenza-vcloud-director.template />
+    <test.carrenza-vcloud-director.catalog-id />
+    <test.carrenza-vcloud-director.media-id />
+    <test.carrenza-vcloud-director.vapptemplate-id />
+    <test.carrenza-vcloud-director.network-name />
+    <test.carrenza-vcloud-director.network-id />
+    <test.carrenza-vcloud-director.vdc-id />
+
+    <jclouds.osgi.export>org.jclouds.carrenza.vcloud.director*;version="${project.version}"</jclouds.osgi.export>
     <jclouds.osgi.import>
       org.jclouds.compute.internal;version="${project.version}",
       org.jclouds.rest.internal;version="${project.version}",
@@ -53,12 +58,12 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>cloudsigma2</artifactId>
+      <artifactId>vcloud-director</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>cloudsigma2</artifactId>
+      <artifactId>vcloud-director</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
@@ -66,27 +71,27 @@
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-log4j</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -108,12 +113,18 @@
                 </goals>
                 <configuration>
                   <systemPropertyVariables>
-                    <test.cloudsigma2-zrh.endpoint>${test.cloudsigma2-zrh.endpoint}</test.cloudsigma2-zrh.endpoint>
-                    <test.cloudsigma2-zrh.api-version>${test.cloudsigma2-zrh.api-version}</test.cloudsigma2-zrh.api-version>
-                    <test.cloudsigma2-zrh.build-version>${test.cloudsigma2-zrh.build-version}</test.cloudsigma2-zrh.build-version>
-                    <test.cloudsigma2-zrh.identity>${test.cloudsigma2-zrh.identity}</test.cloudsigma2-zrh.identity>
-                    <test.cloudsigma2-zrh.credential>${test.cloudsigma2-zrh.credential}</test.cloudsigma2-zrh.credential>
-                    <test.cloudsigma2-zrh.template>${test.cloudsigma2-zrh.template}</test.cloudsigma2-zrh.template>
+                    <test.carrenza-vcloud-director.endpoint>${test.carrenza-vcloud-director.endpoint}</test.carrenza-vcloud-director.endpoint>
+                    <test.carrenza-vcloud-director.api-version>${test.carrenza-vcloud-director.api-version}</test.carrenza-vcloud-director.api-version>
+                    <test.carrenza-vcloud-director.build-version>${test.carrenza-vcloud-director.build-version}</test.carrenza-vcloud-director.build-version>
+                    <test.carrenza-vcloud-director.identity>${test.carrenza-vcloud-director.identity}</test.carrenza-vcloud-director.identity>
+                    <test.carrenza-vcloud-director.credential>${test.carrenza-vcloud-director.credential}</test.carrenza-vcloud-director.credential>
+                    <test.carrenza-vcloud-director.template>${test.carrenza-vcloud-director.template}</test.carrenza-vcloud-director.template>
+                    <test.carrenza-vcloud-director.catalog-id>${test.carrenza-vcloud-director.catalog-id}</test.carrenza-vcloud-director.catalog-id>
+                    <test.carrenza-vcloud-director.media-id>${test.carrenza-vcloud-director.media-id}</test.carrenza-vcloud-director.media-id>
+                    <test.carrenza-vcloud-director.vapptemplate-id>${test.carrenza-vcloud-director.vapptemplate-id}</test.carrenza-vcloud-director.vapptemplate-id>
+                    <test.carrenza-vcloud-director.network-id>${test.carrenza-vcloud-director.network-id}</test.carrenza-vcloud-director.network-id>
+                    <test.carrenza-vcloud-director.vdc-id>${test.carrenza-vcloud-director.vdc-id}</test.carrenza-vcloud-director.vdc-id>
+                    <test.carrenza-vcloud-director.user-id>${test.carrenza-vcloud-director.user-id}</test.carrenza-vcloud-director.user-id>
                   </systemPropertyVariables>
                 </configuration>
               </execution>
@@ -125,3 +136,4 @@
   </profiles>
 
 </project>
+

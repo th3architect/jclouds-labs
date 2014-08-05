@@ -25,66 +25,62 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
 
-  <!-- TODO: when out of labs, switch to org.apache.jclouds.provider -->
+  <!-- TODO: when out of labs, switch to org.jclouds.api -->
   <groupId>org.apache.jclouds.labs</groupId>
-  <artifactId>digitalocean</artifactId>
-  <name>jclouds DigitalOcean Provider</name>
-  <description>ComputeService binding to the DigitalOcean API</description>
+  <artifactId>smartos-ssh</artifactId>
+  <name>smartos ssh api</name>
+  <description>jclouds components to access SmartOS over SSH</description>
   <packaging>bundle</packaging>
 
   <properties>
-    <test.digitalocean.endpoint>https://api.digitalocean.com/</test.digitalocean.endpoint>
-    <test.digitalocean.api-version />
-    <test.digitalocean.identity>FIXME</test.digitalocean.identity>
-    <test.digitalocean.credential>FIXME</test.digitalocean.credential>
-    <!-- CentOS 6.5 x64 -->
-    <test.digitalocean.template>imageId=centos-6-5-x64</test.digitalocean.template>
-    <jclouds.osgi.export>org.jclouds.digitalocean*;version="${jclouds.version}"</jclouds.osgi.export>
+    <test.smartos-ssh.endpoint>https://api.joyentcloud.com</test.smartos-ssh.endpoint>
+    <test.smartos-ssh.api-version>~6.5</test.smartos-ssh.api-version>
+    <test.smartos-ssh.build-version />
+    <test.smartos-ssh.identity>FIXME_IDENTITY</test.smartos-ssh.identity>
+    <test.smartos-ssh.credential>FIXME_CREDENTIALS</test.smartos-ssh.credential>
+    <jclouds.osgi.export>org.jclouds.joyent.cloudapi.v6_5*;version="${project.version}"</jclouds.osgi.export>
     <jclouds.osgi.import>
-      org.jclouds.compute.internal;version="${jclouds.version}",
-      org.jclouds.rest.internal;version="${jclouds.version}",
-      org.jclouds*;version="${jclouds.version}",
+      org.jclouds.rest.internal;version="${project.version}",
+      org.jclouds*;version="${project.version}",
       *
     </jclouds.osgi.import>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.jclouds.driver</groupId>
-      <artifactId>jclouds-sshj</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <groupId>org.apache.jclouds</groupId>
+      <artifactId>jclouds-compute</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.jclouds</groupId>
-      <artifactId>jclouds-compute</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
-      <type>test-jar</type>
+      <groupId>org.apache.jclouds.driver</groupId>
+      <artifactId>jclouds-slf4j</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.squareup.okhttp</groupId>
-      <artifactId>mockwebserver</artifactId>
+      <groupId>org.apache.jclouds.driver</groupId>
+      <artifactId>jclouds-sshj</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Already provided by jclouds-sshj -->
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcprov-jdk15on</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -104,13 +100,12 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <threadCount>1</threadCount>
                   <systemPropertyVariables>
-                    <test.digitalocean.endpoint>${test.digitalocean.endpoint}</test.digitalocean.endpoint>
-                    <test.digitalocean.api-version>${test.digitalocean.api-version}</test.digitalocean.api-version>
-                    <test.digitalocean.build-version>${test.digitalocean.build-version}</test.digitalocean.build-version>
-                    <test.digitalocean.credential>${test.digitalocean.credential}</test.digitalocean.credential>
-                    <test.digitalocean.template>${test.digitalocean.template}</test.digitalocean.template>
+                    <test.smartos-ssh.endpoint>${test.smartos-ssh.endpoint}</test.smartos-ssh.endpoint>
+                    <test.smartos-ssh.api-version>${test.smartos-ssh.api-version}</test.smartos-ssh.api-version>
+                    <test.smartos-ssh.build-version>${test.smartos-ssh.build-version}</test.smartos-ssh.build-version>
+                    <test.smartos-ssh.identity>${test.smartos-ssh.identity}</test.smartos-ssh.identity>
+                    <test.smartos-ssh.credential>${test.smartos-ssh.credential}</test.smartos-ssh.credential>
                   </systemPropertyVariables>
                 </configuration>
               </execution>
