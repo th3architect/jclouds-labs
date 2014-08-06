@@ -44,7 +44,7 @@ public final class ErrorHandler extends ParseSax.HandlerForGeneratedRequestWithR
       } else if (qName.equals("Message")) {
          message = currentOrNull(currentText);
       }
-      currentText = new StringBuilder();
+      currentText.setLength(0);
    }
 
    @Override public void characters(char ch[], int start, int length) {
