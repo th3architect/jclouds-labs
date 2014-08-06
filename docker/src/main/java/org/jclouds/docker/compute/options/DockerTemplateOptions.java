@@ -16,6 +16,7 @@
  */
 package org.jclouds.docker.compute.options;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -114,7 +115,7 @@ public class DockerTemplateOptions extends TemplateOptions implements Cloneable 
 
    @Override
    public String toString() {
-      return Objects.toStringHelper(this)
+      return MoreObjects.toStringHelper(this)
               .add("dns", dns)
               .add("hostname", hostname)
               .add("memory", memory)

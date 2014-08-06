@@ -16,8 +16,17 @@
  */
 package org.jclouds.docker.domain;
 
+<<<<<<< HEAD
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
 import java.util.List;
 import java.util.Map;
@@ -77,6 +86,7 @@ public abstract class Config {
 
    public abstract List<String> onBuild();
 
+<<<<<<< HEAD
    @SerializedNames(
          { "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin", "AttachStdout",
                "AttachStderr", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd", "Dns", "Image", "Volumes",
@@ -89,6 +99,35 @@ public abstract class Config {
       return new AutoValue_Config(hostname, domainname, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
             attachStderr, copyOf(exposedPorts), tty, openStdin, stdinOnce, copyOf(env), copyOf(cmd), copyOf(dns), image,
             copyOf(volumes), volumesFrom, workingDir, copyOf(entrypoint), networkDisabled, copyOf(onBuild));
+=======
+   @Override
+   public String toString() {
+      return MoreObjects.toStringHelper(this)
+              .add("hostname", hostname)
+              .add("domainName", domainName)
+              .add("user", user)
+              .add("memory", memory)
+              .add("memorySwap", memorySwap)
+              .add("cpuShares", cpuShares)
+              .add("attachStdin", attachStdin)
+              .add("attachStdout", attachStdout)
+              .add("attachStderr", attachStderr)
+              .add("exposedPorts", exposedPorts)
+              .add("tty", tty)
+              .add("openStdin", openStdin)
+              .add("stdinOnce", stdinOnce)
+              .add("env", env)
+              .add("cmd", cmd)
+              .add("dns", dns)
+              .add("imageId", imageId)
+              .add("volumes", volumes)
+              .add("volumesFrom", volumesFrom)
+              .add("workingDir", workingDir)
+              .add("entrypoint", entrypoint)
+              .add("networkDisabled", networkDisabled)
+              .add("onBuild", onBuild)
+              .toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
    }
 
    public static Builder builder() {

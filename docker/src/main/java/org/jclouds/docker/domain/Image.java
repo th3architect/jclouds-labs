@@ -16,7 +16,15 @@
  */
 package org.jclouds.docker.domain;
 
+<<<<<<< HEAD
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
 import java.util.List;
 
@@ -45,7 +53,25 @@ public abstract class Image {
 
    @Nullable public abstract long virtualSize();
 
+<<<<<<< HEAD
    public abstract List<String> repoTags();
+=======
+   @Override
+   public String toString() {
+      return MoreObjects.toStringHelper(this)
+              .add("id", id)
+              .add("parent", parent)
+              .add("created", created)
+              .add("container", container)
+              .add("dockerVersion", dockerVersion)
+              .add("architecture", architecture)
+              .add("os", os)
+              .add("size", size)
+              .add("virtualSize", virtualSize)
+              .add("repoTags", repoTags)
+              .toString();
+   }
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
    @SerializedNames({ "Id", "Parent", "Created", "Container", "DockerVersion", "Architecture", "Os", "Size",
          "VirtualSize", "RepoTags" })

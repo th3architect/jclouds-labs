@@ -19,7 +19,12 @@ package org.jclouds.cloudsigma2.domain;
 import java.util.Iterator;
 import java.util.List;
 
+<<<<<<< HEAD:cloudsigma2/src/main/java/org/jclouds/cloudsigma2/domain/ServerAvailabilityGroup.java
 public class ServerAvailabilityGroup {
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:opsource-servers/src/main/java/org/jclouds/opsource/servers/domain/BaseServer.java
 
    private final List<String> uuids;
 
@@ -50,12 +55,17 @@ public class ServerAvailabilityGroup {
 
    @Override
    public String toString() {
+<<<<<<< HEAD:cloudsigma2/src/main/java/org/jclouds/cloudsigma2/domain/ServerAvailabilityGroup.java
       String returnString = "";
 
       Iterator<String> iterator = uuids.iterator();
 
       while (iterator.hasNext()) {
          returnString += iterator.next();
+=======
+      return MoreObjects.toStringHelper("").toString();
+   }
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:opsource-servers/src/main/java/org/jclouds/opsource/servers/domain/BaseServer.java
 
          if (iterator.hasNext()) {
             returnString += ",";

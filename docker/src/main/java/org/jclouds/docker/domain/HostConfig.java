@@ -25,7 +25,14 @@ import java.util.Map;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 
+<<<<<<< HEAD
 import com.google.auto.value.AutoValue;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -51,6 +58,7 @@ public abstract class HostConfig {
 
    public abstract List<String> volumesFrom();
 
+<<<<<<< HEAD
    @SerializedNames({ "ContainerIDFile", "Binds", "LxcConf", "Privileged", "Dns", "DnsSearch", "PortBindings",
            "Links", "PublishAllPorts", "VolumesFrom" })
    public static HostConfig create(String containerIDFile, List<String> binds, List<Map<String, String>> lxcConf,
@@ -58,6 +66,22 @@ public abstract class HostConfig {
          List<String> links, boolean publishAllPorts, List<String> volumesFrom) {
       return new AutoValue_HostConfig(containerIDFile, copyOf(binds), copyOf(lxcConf), privileged, dns, dnsSearch,
             copyOf(portBindings), copyOf(links), publishAllPorts, copyOf(volumesFrom));
+=======
+   @Override
+   public String toString() {
+      return MoreObjects.toStringHelper(this)
+              .add("containerIDFile", containerIDFile)
+              .add("binds", binds)
+              .add("lxcConf", lxcConf)
+              .add("privileged", privileged)
+              .add("dns", dns)
+              .add("dnsSearch", dnsSearch)
+              .add("portBindings", portBindings)
+              .add("links", links)
+              .add("publishAllPorts", publishAllPorts)
+              .add("volumesFrom", volumesFrom)
+              .toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
    }
 
    public static Builder builder() {

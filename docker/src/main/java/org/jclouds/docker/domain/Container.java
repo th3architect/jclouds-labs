@@ -16,7 +16,16 @@
  */
 package org.jclouds.docker.domain;
 
+<<<<<<< HEAD
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
+import org.jclouds.javax.annotation.Nullable;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
 import java.util.List;
 import java.util.Map;
@@ -68,6 +77,7 @@ public abstract class Container {
 
    @Nullable public abstract String hostnamePath();
 
+<<<<<<< HEAD
    @SerializedNames(
          { "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings", "ResolvConfPath",
                "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig", "Ports",
@@ -79,6 +89,31 @@ public abstract class Container {
       return new AutoValue_Container(id, name, created, path, copyOf(args), config, state, image, networkSettings,
             resolvConfPath, driver, execDriver, copyOf(volumes), copyOf(volumesRW), command, status, hostConfig,
             copyOf(ports), hostnamePath);
+=======
+   @Override
+   public String toString() {
+      return MoreObjects.toStringHelper(this)
+              .add("id", id)
+              .add("name", name)
+              .add("created", created)
+              .add("path", path)
+              .add("args", args)
+              .add("containerConfig", containerConfig)
+              .add("state", state)
+              .add("image", image)
+              .add("networkSettings", networkSettings)
+              .add("resolvConfPath", resolvConfPath)
+              .add("driver", driver)
+              .add("execDriver", execDriver)
+              .add("volumes", volumes)
+              .add("volumesRW", volumesRW)
+              .add("command", command)
+              .add("status", status)
+              .add("hostConfig", hostConfig)
+              .add("ports", ports)
+              .add("hostnamePath", hostnamePath)
+              .toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
    }
 
    public static Builder builder() {

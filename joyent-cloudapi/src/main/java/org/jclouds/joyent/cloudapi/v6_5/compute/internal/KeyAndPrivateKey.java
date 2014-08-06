@@ -18,7 +18,19 @@ package org.jclouds.joyent.cloudapi.v6_5.compute.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+<<<<<<< HEAD:joyent-cloudapi/src/main/java/org/jclouds/joyent/cloudapi/v6_5/compute/internal/KeyAndPrivateKey.java
 import org.jclouds.joyent.cloudapi.v6_5.domain.Key;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+
+/**
+ * Represents a virtual network interface card (NIC).
+ */
+@XmlRootElement(name = "vnic")
+public class VNIC {
+   private String networkId;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:fgcp/src/main/java/org/jclouds/fujitsu/fgcp/domain/VNIC.java
 
 import com.google.common.base.Objects;
 
@@ -63,7 +75,13 @@ public class KeyAndPrivateKey {
 
    @Override
    public String toString() {
+<<<<<<< HEAD:joyent-cloudapi/src/main/java/org/jclouds/joyent/cloudapi/v6_5/compute/internal/KeyAndPrivateKey.java
       return "[key=" + key + ", privateKey=" + privateKey + "]";
+=======
+      return MoreObjects.toStringHelper(this).omitNullValues()
+            .add("networkId", networkId).add("privateIp", privateIp)
+            .add("nicNo", nicNo).toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:fgcp/src/main/java/org/jclouds/fujitsu/fgcp/domain/VNIC.java
    }
 
 }

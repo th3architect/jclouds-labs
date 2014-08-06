@@ -16,7 +16,13 @@
  */
 package org.jclouds.docker.domain;
 
+<<<<<<< HEAD
 import org.jclouds.json.SerializedNames;
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
 import com.google.auto.value.AutoValue;
 
@@ -30,8 +36,19 @@ public abstract class Port {
 
    public abstract String type();
 
+<<<<<<< HEAD
    @SerializedNames({ "IP", "PrivatePort", "PublicPort", "Type" })
    public static Port create(String ip, int privatePort, int publicPort, String type) {
       return new AutoValue_Port(ip, privatePort, publicPort, type);
+=======
+   @Override
+   public String toString() {
+      return MoreObjects.toStringHelper(this)
+              .add("privatePort", privatePort)
+              .add("publicPort", publicPort)
+              .add("type", type)
+              .add("ip", ip)
+              .toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
    }
 }

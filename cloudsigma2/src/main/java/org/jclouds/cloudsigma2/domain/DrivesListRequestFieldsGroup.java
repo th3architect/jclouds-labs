@@ -21,9 +21,21 @@ import java.util.Iterator;
 public class DrivesListRequestFieldsGroup {
    private final Iterable<String> fields;
 
+<<<<<<< HEAD:cloudsigma2/src/main/java/org/jclouds/cloudsigma2/domain/DrivesListRequestFieldsGroup.java
    public DrivesListRequestFieldsGroup(Iterable<String> fields) {
       this.fields = fields;
    }
+=======
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+
+public class VServerWithVNICs extends VServer {
+
+   @XmlElementWrapper(name = "vnics")
+   @XmlElement(name = "vnic")
+   protected Set<VNIC> vnics = Sets.newLinkedHashSet();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:fgcp/src/main/java/org/jclouds/fujitsu/fgcp/domain/VServerWithVNICs.java
 
    public Iterable<String> getFields() {
       return fields;
@@ -31,6 +43,7 @@ public class DrivesListRequestFieldsGroup {
 
    @Override
    public String toString() {
+<<<<<<< HEAD:cloudsigma2/src/main/java/org/jclouds/cloudsigma2/domain/DrivesListRequestFieldsGroup.java
       String returnString = "";
 
       Iterator<String> iterator = fields.iterator();
@@ -44,5 +57,10 @@ public class DrivesListRequestFieldsGroup {
       }
 
       return returnString;
+=======
+      return MoreObjects.toStringHelper(this).omitNullValues().add("id", id)
+            .add("name", name).add("type", type).add("creator", creator)
+            .add("diskimageId", diskimageId).add("vnics", vnics).toString();
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations:fgcp/src/main/java/org/jclouds/fujitsu/fgcp/domain/VServerWithVNICs.java
    }
 }

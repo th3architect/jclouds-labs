@@ -23,8 +23,12 @@ import java.util.Set;
 
 import org.jclouds.compute.options.TemplateOptions;
 
+<<<<<<< HEAD
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Objects;
+=======
+import com.google.common.base.MoreObjects.ToStringHelper;
+>>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 import com.google.common.collect.ImmutableSet;
 
 /**
