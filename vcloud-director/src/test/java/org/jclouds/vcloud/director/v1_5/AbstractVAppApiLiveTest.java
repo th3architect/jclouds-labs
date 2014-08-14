@@ -35,6 +35,7 @@ import org.jclouds.dmtf.cim.CimBoolean;
 import org.jclouds.dmtf.cim.CimString;
 import org.jclouds.dmtf.cim.CimUnsignedInt;
 import org.jclouds.dmtf.cim.CimUnsignedLong;
+import org.jclouds.dmtf.ovf.MsgType;
 import org.jclouds.vcloud.director.v1_5.domain.AbstractVAppType;
 import org.jclouds.vcloud.director.v1_5.domain.RasdItemsList;
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
@@ -113,14 +114,14 @@ public abstract class AbstractVAppApiLiveTest extends BaseVCloudDirectorApiLiveT
     */
    @Override
    protected void setupRequiredApis() {
-      assertNotNull(context.getApi());
+      assertNotNull(api);
 
-      catalogApi = context.getApi().getCatalogApi();
-      queryApi = context.getApi().getQueryApi();
-      vAppApi = context.getApi().getVAppApi();
-      vAppTemplateApi = context.getApi().getVAppTemplateApi();
-      vdcApi = context.getApi().getVdcApi();
-      vmApi = context.getApi().getVmApi();
+      catalogApi = api.getCatalogApi();
+      queryApi = api.getQueryApi();
+      vAppApi = api.getVAppApi();
+      vAppTemplateApi = api.getVAppTemplateApi();
+      vdcApi = api.getVdcApi();
+      vmApi = api.getVmApi();
    }
    
    /**
@@ -196,7 +197,7 @@ public abstract class AbstractVAppApiLiveTest extends BaseVCloudDirectorApiLiveT
       // If we found any references, remove the VApp they point to
       if (!Iterables.isEmpty(vApps)) {
          for (Reference ref : vApps) {
-            cleanUpVApp(context.getApi().getVAppApi().get(ref.getHref())); // NOTE may fail, but should continue deleting
+            cleanUpVApp(api.getVAppApi().get(ref.getHref())); // NOTE may fail, but should continue deleting
          }
       } else {
          logger.warn("No VApps in list found in Vdc %s (%s)", vdc.getName(), Iterables.toString(vAppNames));
@@ -398,7 +399,7 @@ public abstract class AbstractVAppApiLiveTest extends BaseVCloudDirectorApiLiveT
                .getNetworkConnections();
 
       NetworkConnectionSection section = NetworkConnectionSection.builder()
-               .info("info")
+               .info(MsgType.builder().value("info").build())
                .primaryNetworkConnectionIndex(0)
                .build();
       

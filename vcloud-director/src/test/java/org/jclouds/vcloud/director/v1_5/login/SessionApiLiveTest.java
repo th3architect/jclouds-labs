@@ -23,6 +23,7 @@ import static org.testng.Assert.assertTrue;
 import java.net.URI;
 
 import org.jclouds.ContextBuilder;
+import org.jclouds.apis.BaseApiLiveTest;
 import org.jclouds.apis.BaseContextLiveTest;
 import org.jclouds.providers.AnonymousProviderMetadata;
 import org.jclouds.providers.ProviderMetadata;
@@ -42,12 +43,13 @@ import com.google.common.reflect.TypeToken;
  */
 @Listeners(FormatApiResultsListener.class)
 @Test(groups = { "live", "user" }, testName = "SessionApiLiveTest")
-public class SessionApiLiveTest extends BaseContextLiveTest<RestContext<SessionApi, SessionAsyncApi>> {
+public class SessionApiLiveTest extends BaseApiLiveTest<SessionApi> {
 
    public SessionApiLiveTest() {
       provider = "vcloud-director";
    }
 
+   /*
    @Override
    @BeforeGroups(groups = { "live" })
    public void setupContext() {
@@ -57,6 +59,7 @@ public class SessionApiLiveTest extends BaseContextLiveTest<RestContext<SessionA
    }
 
    private SessionApi api;
+   */
    private SessionWithToken sessionWithToken;
    
    @Test(description = "POST /sessions")
@@ -84,13 +87,8 @@ public class SessionApiLiveTest extends BaseContextLiveTest<RestContext<SessionA
    }
 
    @Override
-   protected TypeToken<RestContext<SessionApi, SessionAsyncApi>> contextType() {
-      return VCloudDirectorConstants.SESSION_CONTEXT_TYPE;
-   }
-
-   @Override
    protected ProviderMetadata createProviderMetadata() {
-      return AnonymousProviderMetadata.forClientMappedToAsyncClientOnEndpoint(SessionApi.class, SessionAsyncApi.class, endpoint);
+      return AnonymousProviderMetadata.forApiOnEndpoint(SessionApi.class, endpoint);
    }
 
    @Override

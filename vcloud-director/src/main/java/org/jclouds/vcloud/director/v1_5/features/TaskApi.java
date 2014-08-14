@@ -17,51 +17,90 @@
 package org.jclouds.vcloud.director.v1_5.features;
 
 import java.net.URI;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.vcloud.director.v1_5.domain.Task;
 import org.jclouds.vcloud.director.v1_5.domain.TasksList;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
 /**
- * Provides synchronous access to {@link Task} objects.
- * 
- * @see TaskAsyncApi
+ * Provides access to {@link Task} objects.
  */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface TaskApi {
 
    /**
     * Retrieves a list of tasks.
-    * 
+    *
     * <pre>
     * GET /tasksList/{id}
     * </pre>
-    * 
-    * @param tasksListUrn
+    *
+    * @param tasksListHref
     *           from {@link Org#getLinks()} where {@link Link#getType} is
     *           {@link VCloudDirectorMediaType#TASKS_LIST}
     * @return a list of tasks
     */
-   TasksList getTasksList(URI tasksListHref);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   TasksList getTasksList(@EndpointParam URI tasksListHref);
 
    /**
     * Retrieves a task.
-    * 
+    *
     * <pre>
     * GET /task/{id}
     * </pre>
-    * 
+    *
     * @return the task or null if not found
     */
-   Task get(String taskUrn);
-
-   Task get(URI taskHref);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Task get(@EndpointParam(parser = URNToHref.class) String taskUrn);
+   
+   /**
+    * @see TaskApi#get(URI)
+    */
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Task get(@EndpointParam URI taskURI);
 
    /**
     * Cancels a task.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /task/{id}/action/cancel
     * </pre>
     */
-   void cancel(String taskUrn);
-
-   void cancel(URI taskHref);
+   @POST
+   @Path("/action/cancel")
+   @Consumes
+   @JAXBResponseParser
+   void cancel(@EndpointParam(parser = URNToHref.class) String taskUrn);
+   
+   /**
+    * @see TaskApi#cancel(URI)
+    */
+   @POST
+   @Path("/action/cancel")
+   @Consumes
+   @JAXBResponseParser
+   void cancel(@EndpointParam URI taskURI);
 }

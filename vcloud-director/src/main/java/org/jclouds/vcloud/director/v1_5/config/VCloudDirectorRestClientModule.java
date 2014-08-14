@@ -16,91 +16,10 @@
  */
 package org.jclouds.vcloud.director.v1_5.config;
 
-import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
-import static org.jclouds.rest.config.BinderUtils.bindSyncToAsyncHttpApi;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.jclouds.domain.Credentials;
-import org.jclouds.http.HttpErrorHandler;
-import org.jclouds.http.HttpRetryHandler;
-import org.jclouds.http.annotation.ClientError;
-import org.jclouds.http.annotation.Redirection;
-import org.jclouds.http.annotation.ServerError;
-import org.jclouds.location.Provider;
-import org.jclouds.rest.ConfiguresRestClient;
-import org.jclouds.rest.RestContext;
-import org.jclouds.rest.config.RestClientModule;
-import org.jclouds.rest.internal.RestContextImpl;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminAsyncApi;
-import org.jclouds.vcloud.director.v1_5.annotations.Login;
-import org.jclouds.vcloud.director.v1_5.domain.Entity;
-import org.jclouds.vcloud.director.v1_5.domain.Session;
-import org.jclouds.vcloud.director.v1_5.domain.SessionWithToken;
-import org.jclouds.vcloud.director.v1_5.features.CatalogApi;
-import org.jclouds.vcloud.director.v1_5.features.CatalogAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.MediaApi;
-import org.jclouds.vcloud.director.v1_5.features.MediaAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.MetadataApi;
-import org.jclouds.vcloud.director.v1_5.features.MetadataAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.NetworkApi;
-import org.jclouds.vcloud.director.v1_5.features.NetworkAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.OrgApi;
-import org.jclouds.vcloud.director.v1_5.features.OrgAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.QueryApi;
-import org.jclouds.vcloud.director.v1_5.features.QueryAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.TaskApi;
-import org.jclouds.vcloud.director.v1_5.features.TaskAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.UploadApi;
-import org.jclouds.vcloud.director.v1_5.features.UploadAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.VAppApi;
-import org.jclouds.vcloud.director.v1_5.features.VAppAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.VAppTemplateApi;
-import org.jclouds.vcloud.director.v1_5.features.VAppTemplateAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.VdcApi;
-import org.jclouds.vcloud.director.v1_5.features.VdcAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.VmApi;
-import org.jclouds.vcloud.director.v1_5.features.VmAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminCatalogApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminCatalogAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminNetworkApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminNetworkAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminOrgApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminOrgAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminQueryApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminQueryAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminVdcApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.AdminVdcAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.GroupApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.GroupAsyncApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.UserApi;
-import org.jclouds.vcloud.director.v1_5.features.admin.UserAsyncApi;
-import org.jclouds.vcloud.director.v1_5.handlers.InvalidateSessionAndRetryOn401AndLogoutOnClose;
-import org.jclouds.vcloud.director.v1_5.handlers.VCloudDirectorErrorHandler;
-import org.jclouds.vcloud.director.v1_5.loaders.LoginUserInOrgWithPassword;
-import org.jclouds.vcloud.director.v1_5.loaders.ResolveEntity;
-import org.jclouds.vcloud.director.v1_5.login.SessionApi;
-import org.jclouds.vcloud.director.v1_5.login.SessionAsyncApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorAsyncApi;
-
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Named;
-
 /**
  * Configures the cloudstack connection.
  */
+/*
 @ConfiguresRestClient
 public class VCloudDirectorRestClientModule extends RestClientModule<VCloudDirectorApi, VCloudDirectorAsyncApi> {
    
@@ -230,3 +149,4 @@ public class VCloudDirectorRestClientModule extends RestClientModule<VCloudDirec
       };
    }
 }
+*/

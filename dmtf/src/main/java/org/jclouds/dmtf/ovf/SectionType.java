@@ -35,7 +35,7 @@ import com.google.common.base.Objects;
 public abstract class SectionType {
 
    public abstract static class Builder<B extends Builder<B>> {
-      private String info;
+      private MsgType info;
       private Boolean required;
 
       @SuppressWarnings("unchecked")
@@ -48,7 +48,7 @@ public abstract class SectionType {
       /**
        * @see SectionType#getInfo()
        */
-      public B info(String info) {
+      public B info(MsgType info) {
          this.info = info;
          return self();
       }
@@ -83,7 +83,7 @@ public abstract class SectionType {
    }
 
    @XmlElement(name = "Info", required = true)
-   private String info;
+   private MsgType info;
    @XmlAttribute(namespace = OVF_NS)
    private Boolean required;
 
@@ -101,11 +101,11 @@ public abstract class SectionType {
     * 
     * @return ovf info
     */
-   public String getInfo() {
+   public MsgType getInfo() {
       return info;
    }
 
-   public void setInfo(String info) {
+   public void setInfo(MsgType info) {
       this.info = info;
    }
 

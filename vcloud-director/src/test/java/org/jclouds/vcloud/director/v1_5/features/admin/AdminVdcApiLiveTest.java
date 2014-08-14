@@ -54,8 +54,8 @@ public class AdminVdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      vdcApi = adminContext.getApi().getVdcApi();
-      metadataApi = context.getApi().getMetadataApi(vdcUrn);
+      vdcApi = api.getAdminVdcApi();
+      metadataApi = api.getMetadataApi(vdcUrn);
    }
 
    @AfterClass(alwaysRun = true)

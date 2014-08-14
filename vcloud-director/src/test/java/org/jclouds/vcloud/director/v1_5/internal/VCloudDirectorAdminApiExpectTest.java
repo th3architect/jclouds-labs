@@ -17,7 +17,7 @@
 package org.jclouds.vcloud.director.v1_5.internal;
 
 import java.util.Properties;
-
+/*
 import org.jclouds.http.HttpRequest;
 import org.jclouds.http.HttpResponse;
 import org.jclouds.vcloud.director.v1_5.VCloudDirectorContext;
@@ -45,3 +45,4 @@ public abstract class VCloudDirectorAdminApiExpectTest extends
       return createInjector(fn, module, props).getInstance(VCloudDirectorContext.class);
    }
 }
+*/

@@ -17,15 +17,34 @@
 package org.jclouds.vcloud.director.v1_5.features.admin;
 
 import java.net.URI;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
+import org.jclouds.rest.annotations.BinderParam;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.binders.BindToXMLPayload;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
 import org.jclouds.vcloud.director.v1_5.domain.Group;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
+import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
 /**
- * Provides synchronous access to {@link Group} objects.
- * 
- * @see GroupAsyncApi
+ * Provides access to {@link Group} objects.
  */
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface GroupApi {
-   
+
    /**
     * Imports a group in an organization.
     *
@@ -36,46 +55,87 @@ public interface GroupApi {
     * @param orgUrn the admin org to add the group in
     * @return the addd group
     */
-   Group addGroupToOrg(Group group, String orgUrn);
-   
-   Group addGroupToOrg(Group group, URI orgHref);
+   @POST
+   @Path("/groups")
+   @Consumes(VCloudDirectorMediaType.GROUP)
+   @Produces(VCloudDirectorMediaType.GROUP)
+   @JAXBResponseParser
+   Group addGroupToOrg(@BinderParam(BindToXMLPayload.class) Group group,
+            @EndpointParam(parser = URNToAdminHref.class) String adminUrn);
 
    /**
     * Retrieves a group.
     *
-    * <pre>
-    * GET /admin/group/{id}
-    * </pre>
-    *
     * @param groupString the reference for the group
     * @return a group
     */
-   Group get(String groupUrn);
-
-   Group get(URI groupHref);
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Group get(@EndpointParam(parser = URNToHref.class) String groupUri);
 
    /**
     * Modifies a group.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /admin/group/{id}
-    * </pre>
-    * 
+    * </pre
+    *
     * @return the edited group
     */
-   Group edit(String groupUrn, Group group);
-
-   Group edit(URI groupHref, Group group);
+   @PUT
+   @Consumes(VCloudDirectorMediaType.GROUP)
+   @Produces(VCloudDirectorMediaType.GROUP)
+   @JAXBResponseParser
+   Group edit(@EndpointParam(parser = URNToHref.class) String groupUrn,
+            @BinderParam(BindToXMLPayload.class) Group group);
 
    /**
     * Deletes a group.
-    * 
-    * <pre>
+    *
+    * <pre
     * DELETE /admin/group/{id}
-    * </pre>
+    * </pre
     */
-   void remove(String groupUrn);
+   @DELETE
+   @Consumes
+   @JAXBResponseParser
+   Void remove(@EndpointParam(parser = URNToHref.class) String groupUrn);
 
-   void remove(URI groupHref);
+   /**
+    * @see GroupApi#addGroupToOrg(Group, URI)
+    */
+   @POST
+   @Path("/groups")
+   @Consumes(VCloudDirectorMediaType.GROUP)
+   @Produces(VCloudDirectorMediaType.GROUP)
+   @JAXBResponseParser
+   Group addGroupToOrg(@BinderParam(BindToXMLPayload.class) Group group, @EndpointParam URI adminUrn);
 
+   /**
+    * @see GroupApi#get(URI)
+    */
+   @GET
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Group get(@EndpointParam URI groupUri);
+
+   /**
+    * @see GroupApi#edit(URI, Group)
+    */
+   @PUT
+   @Consumes(VCloudDirectorMediaType.GROUP)
+   @Produces(VCloudDirectorMediaType.GROUP)
+   @JAXBResponseParser
+   Group edit(@EndpointParam URI groupUrn, @BinderParam(BindToXMLPayload.class) Group group);
+
+   /**
+    * @see GroupApi#remove(URI)
+    */
+   @DELETE
+   @Consumes
+   @JAXBResponseParser
+   Void remove(@EndpointParam URI groupUrn);
 }

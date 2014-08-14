@@ -41,6 +41,7 @@ public class IpScope {
    public static class Builder {
 
       private boolean isInherited;
+      private boolean isEnabled;
       private String gateway;
       private String netmask;
       private String dns1;
@@ -54,6 +55,14 @@ public class IpScope {
        */
       public Builder isInherited(boolean isInherited) {
          this.isInherited = isInherited;
+         return this;
+      }
+
+      /**
+       * @see IpScope#isEnabled()
+       */
+      public Builder isEnabled(boolean isEnabled) {
+         this.isEnabled = isEnabled;
          return this;
       }
 
@@ -114,11 +123,14 @@ public class IpScope {
       }
 
       public IpScope build() {
-         return new IpScope(isInherited, gateway, netmask, dns1, dns2, dnsSuffix, ipRanges, allocatedIpAddresses);
+         return new IpScope(isInherited, isEnabled, gateway, netmask, dns1, dns2, dnsSuffix, ipRanges,
+                 allocatedIpAddresses);
       }
 
       public Builder fromIpScope(IpScope in) {
-         return isInherited(in.isInherited()).gateway(in.getGateway())
+         return isInherited(in.isInherited())
+                 .isEnabled(in.isEnabled())
+                 .gateway(in.getGateway())
                .netmask(in.getNetmask())
                .dns1(in.getDns1())
                .dns2(in.getDns2())
@@ -132,9 +144,10 @@ public class IpScope {
       // For JAXB
    }
 
-   public IpScope(boolean inherited, String gateway, String netmask, String dns1, String dns2, String dnsSuffix,
-                  IpRanges ipRanges, IpAddresses allocatedIpAddresses) {
+   public IpScope(boolean inherited, boolean isEnabled, String gateway, String netmask, String dns1, String dns2,
+                  String dnsSuffix, IpRanges ipRanges, IpAddresses allocatedIpAddresses) {
       this.isInherited = inherited;
+      this.isEnabled = isEnabled;
       this.gateway = gateway;
       this.netmask = netmask;
       this.dns1 = dns1;
@@ -147,6 +160,8 @@ public class IpScope {
 
    @XmlElement(name = "IsInherited")
    private boolean isInherited;
+   @XmlElement(name = "IsEnabled")
+   private boolean isEnabled;
    @XmlElement(name = "Gateway")
    private String gateway;
    @XmlElement(name = "Netmask")
@@ -167,6 +182,13 @@ public class IpScope {
     */
    public boolean isInherited() {
       return isInherited;
+   }
+
+   /**
+    * @return True if the IP scope is enabled.
+    */
+   public boolean isEnabled() {
+      return isEnabled;
    }
 
    /**
@@ -225,7 +247,9 @@ public class IpScope {
       if (o == null || getClass() != o.getClass())
          return false;
       IpScope that = IpScope.class.cast(o);
-      return equal(isInherited, that.isInherited) && equal(gateway, that.gateway) &&
+      return equal(isInherited, that.isInherited) &&
+              equal(isEnabled, that.isEnabled) &&
+              equal(gateway, that.gateway) &&
             equal(netmask, that.netmask) &&
             equal(dns1, that.dns1) &&
             equal(dns2, that.dns2) &&
@@ -242,7 +266,9 @@ public class IpScope {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("").add("isInherited", isInherited)
+      return MoreObjects.toStringHelper("")
+              .add("isInherited", isInherited)
+              .add("isEnabled", isEnabled)
             .add("gateway", gateway)
             .add("netmask", netmask)
             .add("dns1", dns1)

@@ -19,8 +19,10 @@ package org.jclouds.dmtf.ovf;
 import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -129,6 +131,9 @@ public class VirtualHardwareSection extends SectionType {
    protected String transport;
    @XmlElement(name = "Item")
    protected Set<? extends ResourceAllocationSettingData> items = Sets.newLinkedHashSet();
+
+   @XmlAnyElement(lax=true)
+   protected List<Object> any;
 
    protected VirtualHardwareSection(Builder<?> builder) {
       super(builder);

@@ -31,7 +31,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Allows us to test the {@link VAppApi} allowed to system administrators
+ * Allows us to test the {@link org.jclouds.vcloud.director.v1_5.features.VAppApi} allowed to system administrators
  */
 @Test(singleThreaded = true, testName = "SystemAdminVAppApiLiveTest")
 public class SystemAdminVAppApiLiveTest extends AbstractVAppApiLiveTest {
@@ -40,18 +40,15 @@ public class SystemAdminVAppApiLiveTest extends AbstractVAppApiLiveTest {
 
    @BeforeClass(alwaysRun = true)
    protected void setupRequiredEntities() {
-
-      if (adminContext != null) {
-         userUrn = adminContext.getApi().getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
-                  .getId();
-      }
+      userUrn = api.getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
+              .getId();
    }
 
    @AfterClass(alwaysRun = true, dependsOnMethods = { "cleanUpEnvironment" })
    public void cleanUp() {
-      if (adminContext != null && testUserCreated && userUrn != null) {
+      if (testUserCreated && userUrn != null) {
          try {
-            adminContext.getApi().getUserApi().remove(userUrn);
+            api.getUserApi().remove(userUrn);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting user");
          }

@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jclouds.vcloud.director.v1_5.domain.Entity;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
 
 import com.google.common.cache.CacheLoader;
 

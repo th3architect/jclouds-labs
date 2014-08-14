@@ -14,20 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.vcloud.director.v1_5;
+package org.jclouds.vcloud.director.v1_5.compute.functions;
 
-import org.jclouds.View;
-import org.jclouds.rest.internal.BaseRestApiMetadataTest;
-import org.testng.annotations.Test;
+import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.TypeToken;
+import org.jclouds.compute.domain.Image.Status;
+import org.jclouds.vcloud.director.v1_5.domain.ResourceEntity;
 
-@Test(groups = "unit", testName = "VCloudDirectorApiMetadataTest")
-//TODO: BaseComputeServiceApiMetadataTest
-public class VCloudDirectorApiMetadataTest extends BaseRestApiMetadataTest {
+import com.google.common.base.Function;
 
-   public VCloudDirectorApiMetadataTest() {
-      super(new VCloudDirectorApiMetadata(), ImmutableSet.<TypeToken<? extends View>>of());
+/**
+ * Transforms an {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntity.Status} to the jclouds portable model.
+ */
+@Singleton
+public class ImageStateForStatus implements Function<ResourceEntity.Status, Status> {
+
+   @Override
+   public Status apply(final ResourceEntity.Status status) {
+      if (status == null) return Status.UNRECOGNIZED;
+      return status.isVApp() ? Status.AVAILABLE : Status.DELETED;
    }
+
 }

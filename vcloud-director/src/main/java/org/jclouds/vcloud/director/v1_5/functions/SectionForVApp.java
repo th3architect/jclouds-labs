@@ -16,16 +16,21 @@
  */
 package org.jclouds.vcloud.director.v1_5.functions;
 
+import javax.inject.Inject;
+
 import org.jclouds.dmtf.ovf.SectionType;
 import org.jclouds.vcloud.director.v1_5.domain.AbstractVAppType;
 
 import com.google.common.base.Function;
+import com.google.inject.Singleton;
 
+@Singleton
 public class SectionForVApp<S extends SectionType> implements Function<AbstractVAppType, S> {
-   
+
    private final Class<? extends SectionType> sectionType;
 
-   public SectionForVApp(Class<S> sectionType) {
+   @Inject
+   public SectionForVApp(Class<? extends SectionType> sectionType) {
       this.sectionType = sectionType;
    }
 

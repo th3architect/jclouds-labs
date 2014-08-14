@@ -43,18 +43,18 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
     * Convenience references to API apis.
     */
 
-   private AdminQueryApi queryApi;
+   private AdminQueryApi adminQueryApi;
 
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      queryApi = adminContext.getApi().getQueryApi();
+      adminQueryApi = api.getAdminQueryApi();
    }
 
    @Test(description = "GET /admin/groups/query")
    public void testQueryAllGroups() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.groupsQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.groupsQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
@@ -64,7 +64,7 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/orgs/query")
    public void testQueryAllOrgs() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.orgsQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.orgsQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
@@ -74,7 +74,7 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/rights/query")
    public void testQueryAllRights() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.rightsQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.rightsQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
@@ -85,14 +85,14 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/roles/query")
    public void testQueryAllRoles() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.rolesQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.rolesQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
          assertEquals(record.getClass(), QueryResultRoleRecord.class, "incorrect record type admin query");
       }
       
-      RoleReferences roleRefs = queryApi.roleReferencesQueryAll();
+      RoleReferences roleRefs = adminQueryApi.roleReferencesQueryAll();
       
       for (Reference ref : roleRefs.getReferences()) {
          Checks.checkReferenceType(ref);
@@ -102,7 +102,7 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/strandedUsers/query")
    public void testQueryAllStrandedUsers() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.strandedUsersQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.strandedUsersQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
@@ -113,7 +113,7 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/users/query")
    public void testQueryAllUsers() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.usersQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.usersQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);
@@ -124,7 +124,7 @@ public class AdminQueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /admin/vdcs/query")
    public void testQueryAllVdc() {
       // TODO Ensure there will be at least one record, for asserting result
-      QueryResultRecords resultRecords = queryApi.vdcsQueryAll();
+      QueryResultRecords resultRecords = adminQueryApi.vdcsQueryAll();
       
       for (QueryResultRecordType record : resultRecords.getRecords()) {
          Checks.checkQueryResultRecord(record);

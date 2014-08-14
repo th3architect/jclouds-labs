@@ -19,6 +19,8 @@ package org.jclouds.vcloud.director.v1_5.domain.network;
 import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Set;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -28,6 +30,7 @@ import org.jclouds.vcloud.director.v1_5.domain.network.Network.FenceMode;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
 /**
  * Returns a network configuration
@@ -45,7 +48,7 @@ public class NetworkConfiguration {
    }
 
    public static class Builder {
-      private IpScope ipScope;
+      private IpScopes ipScopes;
       private Reference parentNetwork;
       private FenceMode fenceMode;
       private Boolean retainNetInfoAcrossDeployments;
@@ -54,10 +57,10 @@ public class NetworkConfiguration {
       private RouterInfo routerInfo;
 
       /**
-       * @see NetworkConfiguration#getIpScope()
+       * @see NetworkConfiguration#getIpScopes()
        */
-      public Builder ipScope(IpScope ipScope) {
-         this.ipScope = ipScope;
+      public Builder ipScopes(IpScopes ipScopes) {
+         this.ipScopes = ipScopes;
          return this;
       }
 
@@ -110,11 +113,12 @@ public class NetworkConfiguration {
       }
 
       public NetworkConfiguration build() {
-         return new NetworkConfiguration(ipScope, parentNetwork, fenceMode, retainNetInfoAcrossDeployments, features, syslogServerSettings, routerInfo);
+         return new NetworkConfiguration(ipScopes, parentNetwork, fenceMode, retainNetInfoAcrossDeployments,
+                 features, syslogServerSettings, routerInfo);
       }
 
       public Builder fromConfiguration(NetworkConfiguration in) {
-         return ipScope(in.getIpScope()).parentNetwork(in.getParentNetwork()).fenceMode(in.getFenceMode())
+         return ipScopes(in.getIpScopes()).parentNetwork(in.getParentNetwork()).fenceMode(in.getFenceMode())
                .retainNetInfoAcrossDeployments(in.retainNetInfoAcrossDeployments())
                .features(in.getNetworkFeatures())
                .syslogServerSettings(in.getSyslogServerSettings())
@@ -122,9 +126,10 @@ public class NetworkConfiguration {
       }
    }
 
-   public NetworkConfiguration(IpScope ipScope, Reference parentNetwork, FenceMode fenceMode, Boolean retainNetInfoAcrossDeployments,
+   public NetworkConfiguration(IpScopes ipScopes, Reference parentNetwork, FenceMode fenceMode,
+                               Boolean retainNetInfoAcrossDeployments,
                                NetworkFeatures features, SyslogServerSettings syslogServerSettings, RouterInfo routerInfo) {
-      this.ipScope = ipScope;
+      this.ipScopes = ipScopes;
       this.parentNetwork = parentNetwork;
       this.fenceMode = checkNotNull(fenceMode, "fenceMode");
       this.retainNetInfoAcrossDeployments = retainNetInfoAcrossDeployments;
@@ -137,8 +142,8 @@ public class NetworkConfiguration {
       // for JAXB
    }
 
-   @XmlElement(name = "IpScope")
-   private IpScope ipScope;
+   @XmlElement(name = "IpScopes")
+   private IpScopes ipScopes;
    @XmlElement(name = "ParentNetwork")
    private Reference parentNetwork;
    @XmlElement(name = "FenceMode")
@@ -157,8 +162,8 @@ public class NetworkConfiguration {
     *         IP address pool to be used for allocation. Note that the pool of IP addresses
     *         needs to fall within the subnet/mask of the IpScope.
     */
-   public IpScope getIpScope() {
-      return ipScope;
+   public IpScopes getIpScopes() {
+      return ipScopes;
    }
 
    /**
@@ -214,7 +219,7 @@ public class NetworkConfiguration {
       if (o == null || getClass() != o.getClass())
          return false;
       NetworkConfiguration that = NetworkConfiguration.class.cast(o);
-      return equal(ipScope, that.ipScope) && 
+      return equal(ipScopes, that.ipScopes) &&
             equal(parentNetwork, that.parentNetwork) &&
             equal(fenceMode, that.fenceMode) &&
             equal(retainNetInfoAcrossDeployments, that.retainNetInfoAcrossDeployments) &&
@@ -225,13 +230,13 @@ public class NetworkConfiguration {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(ipScope, parentNetwork, fenceMode, retainNetInfoAcrossDeployments,
+      return Objects.hashCode(ipScopes, parentNetwork, fenceMode, retainNetInfoAcrossDeployments,
             features, syslogServerSettings, routerInfo);
    }
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("").add("ipScope", ipScope).add("parentNetwork", parentNetwork)
+      return MoreObjects.toStringHelper("").add("ipScopes", ipScopes).add("parentNetwork", parentNetwork)
             .add("fenceMode", fenceMode)
             .add("retainNetInfoAcrossDeployments", retainNetInfoAcrossDeployments)
             .add("features", features)

@@ -17,43 +17,70 @@
 package org.jclouds.vcloud.director.v1_5.domain.dmtf;
 
 import static org.jclouds.dmtf.DMTFConstants.OVF_NS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.VCLOUD_1_5_NS;
 
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.jclouds.dmtf.ovf.internal.BaseEnvelope;
+import org.jclouds.dmtf.ovf.DiskSection;
+import org.jclouds.dmtf.ovf.NetworkSection;
+import org.jclouds.dmtf.ovf.ReferencesType;
+import org.jclouds.vcloud.director.v1_5.domain.section.CustomizationSection;
+import org.jclouds.vcloud.director.v1_5.domain.section.LeaseSettingsSection;
+import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
+
+import com.google.common.collect.Sets;
 
 @XmlRootElement(name = "Envelope", namespace = OVF_NS)
-public class Envelope extends BaseEnvelope<VirtualSystem, Envelope> {
+public class Envelope { //extends BaseEnvelope<VirtualSystem, Envelope> {
 
-   @SuppressWarnings("rawtypes")
-   public static Builder<?> builder() {
-      return new Builder();
-   }
+   @XmlElement(name = "References", namespace = OVF_NS)
+   protected ReferencesType references;
+   @XmlElement(name = "NetworkSection", namespace = OVF_NS)
+   protected Set<NetworkSection> networkSections = Sets.newLinkedHashSet();
+   @XmlElement(name = "CustomizationSection", namespace = VCLOUD_1_5_NS)
+   protected Set<CustomizationSection> customizationSections = Sets.newLinkedHashSet();
+   @XmlElement(name = "NetworkConfigSection", namespace = VCLOUD_1_5_NS)
+   protected Set<NetworkConfigSection> networkConfigSections = Sets.newLinkedHashSet();
+   @XmlElement(name = "LeaseSettingsSection", namespace = VCLOUD_1_5_NS)
+   protected Set<LeaseSettingsSection> leaseSettingsSections = Sets.newLinkedHashSet();
+   @XmlElement(name = "VirtualSystem", namespace = OVF_NS)
+   protected VirtualSystem virtualSystem;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Builder<?> toBuilder() {
-      return builder().fromEnvelope(this);
-   }
-
-   public static class Builder<B extends Builder<B>> extends BaseEnvelope.Builder<B, VirtualSystem, Envelope> {
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public Envelope build() {
-         return new Envelope(this);
-      }
-   }
-
-   protected Envelope(Builder<?> builder) {
-      super(builder);
-   }
+   @XmlElement(name = "DiskSection", namespace = OVF_NS)
+   protected Set<DiskSection> diskSections = Sets.newLinkedHashSet();
    
    protected Envelope() {
       // For JaxB
+   }
+
+   public ReferencesType getReferences() {
+      return references;
+   }
+
+   public Set<NetworkSection> getNetworkSections() {
+      return networkSections;
+   }
+
+   public Set<CustomizationSection> getCustomizationSections() {
+      return customizationSections;
+   }
+
+   public Set<DiskSection> getDiskSections() {
+      return diskSections;
+   }
+
+   public Set<NetworkConfigSection> getNetworkConfigSections() {
+      return networkConfigSections;
+   }
+
+   public Set<LeaseSettingsSection> getLeaseSettingsSections() {
+      return leaseSettingsSections;
+   }
+
+   public VirtualSystem getVirtualSystem() {
+      return virtualSystem;
    }
 }

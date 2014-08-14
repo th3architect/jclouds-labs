@@ -58,7 +58,7 @@ public class AdminCatalog extends Catalog {
       }
 
       public B fromAdminCatalog(AdminCatalog in) {
-         return fromCatalogType(in);
+         return fromCatalog(in);
       }
    }
 

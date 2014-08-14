@@ -99,18 +99,15 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
 
    @BeforeClass(alwaysRun = true)
    protected void setupRequiredEntities() {
-
-      if (adminContext != null) {
-         userUrn = adminContext.getApi().getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
-                  .getId();
-      }
+      userUrn = api.getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
+              .getId();
    }
 
    @AfterClass(alwaysRun = true, dependsOnMethods = { "cleanUpEnvironment" })
    public void cleanUp() {
-      if (adminContext != null && testUserCreated && userUrn != null) {
+      if (testUserCreated && userUrn != null) {
          try {
-            adminContext.getApi().getUserApi().remove(userUrn);
+            api.getUserApi().remove(userUrn);
          } catch (Exception e) {
             logger.warn("Error when deleting user: %s", e.getMessage());
          }
@@ -131,7 +128,7 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
       // Check the required fields are set
       assertEquals(vm.isDeployed(), Boolean.FALSE,
                String.format(OBJ_FIELD_EQ, VM, "deployed", "FALSE", vm.isDeployed().toString()));
-      String vAppNetworkName = context.getApi().getNetworkApi().get(networkUrn).getName();
+      String vAppNetworkName = api.getNetworkApi().get(networkUrn).getName();
       attachVmToVAppNetwork(vm, vAppNetworkName);
 
       // Check status
@@ -465,9 +462,8 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
             "testEditVirtualHardwareSection" })
    public void testEditOperatingSystemSection() {
       // Create new OperatingSystemSection
-      OperatingSystemSection newSection = OperatingSystemSection.builder().info("") // NOTE Required
-                                                                                    // OVF field,
-                                                                                    // ignored
+      OperatingSystemSection newSection = OperatingSystemSection.builder().info(MsgType.builder().value("").build())
+      // NOTE Required OVF field, ignored
                .id(OSType.RHEL_64.getCode()).osType("rhel5_64Guest").build();
 
       // The method under test
@@ -502,7 +498,8 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
       ProductSectionList newSections = oldSections
                .toBuilder()
                .productSection(
-                        ProductSection.builder().info("Information about the installed software")
+                        ProductSection.builder()
+                                .info(MsgType.builder().value("Information about the installed software").build())
                                  // Default ovf:Info text
                                  .required().product(MsgType.builder().value("jclouds").build())
                                  .vendor(MsgType.builder().value("jclouds Inc.").build())
@@ -843,10 +840,10 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
       key = name("key-");
       metadataValue = name("value-");
       //TODO: block!!
-      context.getApi().getMetadataApi(vmUrn).put(key, metadataValue);
+      api.getMetadataApi(vmUrn).put(key, metadataValue);
 
       // Retrieve the value, and assert it was set correctly
-      String newMetadataValue = context.getApi().getMetadataApi(vmUrn).get(key);
+      String newMetadataValue = api.getMetadataApi(vmUrn).get(key);
 
       // Check the retrieved object is well formed
       assertEquals(newMetadataValue, metadataValue,
@@ -859,9 +856,9 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
 		key = name("key-");
 		metadataValue = name("value-");
 
-		context.getApi().getMetadataApi(vmUrn).put(key, metadataValue);
+		api.getMetadataApi(vmUrn).put(key, metadataValue);
 		// Call the method being tested
-		Metadata metadata = context.getApi().getMetadataApi(vmUrn).get();
+		Metadata metadata = api.getMetadataApi(vmUrn).get();
 
 		checkMetadata(metadata);
 		
@@ -875,10 +872,10 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
       metadataValue = name("value-");
 
       //TODO: block!!
-      context.getApi().getMetadataApi(vmUrn).put(key, metadataValue);
+      api.getMetadataApi(vmUrn).put(key, metadataValue);
 
       // Call the method being tested
-      String newMetadataValue = context.getApi().getMetadataApi(vmUrn).get(key);
+      String newMetadataValue = api.getMetadataApi(vmUrn).get(key);
       
       assertEquals(newMetadataValue, metadataValue,
             String.format(CORRECT_VALUE_OBJECT_FMT, "Value", "MetadataValue", metadataValue, newMetadataValue));
@@ -887,11 +884,11 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
    @Test(description = "DELETE /vApp/{id}/metadata/{key}", dependsOnMethods = { "testSetMetadataValue" })
    public void testRemoveMetadataEntry() {
       // Delete the entry
-      Task task = context.getApi().getMetadataApi(vmUrn).remove(key);
+      Task task = api.getMetadataApi(vmUrn).remove(key);
       retryTaskSuccess.apply(task);
 
       // Confirm the entry has been removed
-      Metadata newMetadata = context.getApi().getMetadataApi(vmUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vmUrn).get();
 
       // Check the retrieved object is well formed
       checkMetadataKeyAbsentFor(VM, newMetadata, key);
@@ -899,17 +896,17 @@ public class VmApiLiveTest extends AbstractVAppApiLiveTest {
 
    @Test(description = "POST /vApp/{id}/metadata", dependsOnMethods = { "testGetMetadata" })
    public void testMergeMetadata() {
-      Metadata oldMetadata = context.getApi().getMetadataApi(vmUrn).get();
+      Metadata oldMetadata = api.getMetadataApi(vmUrn).get();
       Map<String, String> oldMetadataMap = Checks.metadataToMap(oldMetadata);
 
       // Store a value, to be removed
       String key = name("key-");
       String value = name("value-");
-      Task task = context.getApi().getMetadataApi(vmUrn).putAll(ImmutableMap.of(key, value));
+      Task task = api.getMetadataApi(vmUrn).putAll(ImmutableMap.of(key, value));
       retryTaskSuccess.apply(task);
 
       // Confirm the entry contains everything that was there, and everything that was being added
-      Metadata newMetadata = context.getApi().getMetadataApi(vmUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vmUrn).get();
       Map<String, String> expectedMetadataMap = ImmutableMap.<String, String> builder().putAll(oldMetadataMap)
                .put(key, value).build();
 

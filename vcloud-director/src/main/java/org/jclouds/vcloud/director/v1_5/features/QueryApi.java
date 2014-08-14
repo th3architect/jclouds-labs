@@ -16,27 +16,38 @@
  */
 package org.jclouds.vcloud.director.v1_5.features;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.QueryParams;
+import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.vcloud.director.v1_5.domain.query.CatalogReferences;
 import org.jclouds.vcloud.director.v1_5.domain.query.QueryList;
 import org.jclouds.vcloud.director.v1_5.domain.query.QueryResultRecords;
 import org.jclouds.vcloud.director.v1_5.domain.query.VAppReferences;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 
 /**
- * Provides synchronous access to the REST API query interface.
- * 
- * @see QueryAsyncApi
+ * Provides access to the REST API query interface.
  */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface QueryApi {
 
    // TODO Add a typed object for filter syntax, or at least a fluent builder
-   
+
    /**
-    * REST API query {@link Link} list.
-    *
     * <pre>
     * GET /query
     * </pre>
     */
+   @GET
+   @Path("/query")
+   @Consumes
+   @JAXBResponseParser
    QueryList queryList();
 
    /**
@@ -54,16 +65,29 @@ public interface QueryApi {
     * @see #query(String, String)
     * @see #query(Integer, Integer, String, String, String)
     */
-   QueryResultRecords queryAll(String type);
+   @GET
+   @Path("/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords queryAll(@QueryParam("type") String type);
 
-   /** @see #queryAll() */
-   QueryResultRecords query(String type, String filter);
+   /** @see #queryAll(String) */
+   @GET
+   @Path("/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords query(@QueryParam("type") String type, @QueryParam("filter") String filter);
 
-   /** @see #queryAll() */
-   QueryResultRecords query(Integer page, Integer pageSize, String format, String type, String filter);
+   /** @see #queryAll(String) */
+   @GET
+   @Path("/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords query(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
+         @QueryParam("format") String format, @QueryParam("type") String type, @QueryParam("filter") String filter);
 
    /**
-    * Retrieves a list of {@link Catalog}s by using REST API general QueryHandler.
+    * Retrieves a list of {@link org.jclouds.vcloud.director.v1_5.endpoints.Catalog}s by using REST API general QueryHandler.
     *
     * <pre>
     * GET /catalogs/query
@@ -71,14 +95,26 @@ public interface QueryApi {
     *
     * @see #queryAll(String)
     */
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @JAXBResponseParser
    QueryResultRecords catalogsQueryAll();
 
-   /** @see #queryAll() */
-   QueryResultRecords catalogsQuery(String filter);
+   /** @see #catalogsQueryAll()  */
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords catalogsQuery(@QueryParam("filter") String filter);
 
-   /** @see #queryAll() */
-   QueryResultRecords catalogsQuery(Integer page, Integer pageSize, String filter);
-
+   /** @see #catalogsQueryAll()  */
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords catalogsQuery(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
+         @QueryParam("filter") String filter);
 
    /**
     * Retrieves a list of {@link CatalogReference}s by using REST API general QueryHandler.
@@ -89,16 +125,32 @@ public interface QueryApi {
     *
     * @see #queryAll(String)
     */
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
    CatalogReferences catalogReferencesQueryAll();
 
    /** @see #catalogReferencesQueryAll() */
-   CatalogReferences catalogReferencesQuery(String filter);
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
+   CatalogReferences catalogReferencesQuery(@QueryParam("filter") String filter);
 
    /** @see #catalogReferencesQueryAll() */
-   CatalogReferences catalogReferencesQuery(Integer page, Integer pageSize, String filter);
+   @GET
+   @Path("/catalogs/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
+   CatalogReferences catalogReferencesQuery(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
+         @QueryParam("filter") String filter);
 
    /**
-    * Retrieves a list of {@link VAppTemplate}s by using REST API general QueryHandler.
+    * Retrieves a list of {@link org.jclouds.vcloud.director.v1_5.domain.VAppTemplate}s by using REST API general QueryHandler.
     *
     * <pre>
     * GET /vAppTemplates/query
@@ -106,27 +158,42 @@ public interface QueryApi {
     *
     * @see #queryAll(String)
     */
+   @GET
+   @Path("/vAppTemplates/query")
+   @Consumes
+   @JAXBResponseParser
    QueryResultRecords vAppTemplatesQueryAll();
 
-   /** @see #queryAll() */
-   QueryResultRecords vAppTemplatesQuery(String filter);
+   /**
+    * @see #vAppReferencesQueryAll
+    */
+   @GET
+   @Path("/vAppTemplates/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords vAppTemplatesQuery(@QueryParam("filter") String filter);
 
    /**
     * Retrieves a list of {@link VApp}s by using REST API general QueryHandler.
-    *
-    * <pre>
-    * GET /vApps/query
-    * </pre>
-    *
-    * @see #queryAll(String)
     */
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @JAXBResponseParser
    QueryResultRecords vAppsQueryAll();
 
-   /** @see #queryAll() */
-   QueryResultRecords vAppsQuery(String filter);
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords vAppsQuery(@QueryParam("filter") String filter);
 
-   /** @see #queryAll() */
-   QueryResultRecords vAppsQuery(Integer page, Integer pageSize, String filter);
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords vAppsQuery(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
+         @QueryParam("filter") String filter);
 
    /**
     * Retrieves a list of {@link VAppReference}s by using REST API general QueryHandler.
@@ -137,17 +204,30 @@ public interface QueryApi {
     *
     * @see #queryAll(String)
     */
-   /** @see #queryAll() */
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
    VAppReferences vAppReferencesQueryAll();
 
-   /** @see #queryAll() */
-   VAppReferences vAppReferencesQuery(String filter);
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
+   VAppReferences vAppReferencesQuery(@QueryParam("filter") String filter);
 
-   /** @see #queryAll() */
-   VAppReferences vAppReferencesQuery(Integer page, Integer pageSize, String filter);
+   @GET
+   @Path("/vApps/query")
+   @Consumes
+   @QueryParams(keys = { "format" }, values = { "references" })
+   @JAXBResponseParser
+   VAppReferences vAppReferencesQuery(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
+         @QueryParam("filter") String filter);
 
    /**
-    * Retrieves a list of {@link Vm}s by using REST API general QueryHandler.
+    * Retrieves a list of {@link org.jclouds.vcloud.director.v1_5.domain.Vm}s by using REST API general QueryHandler.
     *
     * <pre>
     * GET /vms/query
@@ -155,23 +235,27 @@ public interface QueryApi {
     *
     * @see #queryAll(String)
     */
+   @GET
+   @Path("/vms/query")
+   @Consumes
+   @JAXBResponseParser
    QueryResultRecords vmsQueryAll();
 
-   /** @see #queryAll() */
-   QueryResultRecords vmsQuery(String filter);
-
-   /**
-    * Retrieves a list of {@link Media}s by using REST API general QueryHandler.
-    *
-    * <pre>
-    * GET /mediaList/query
-    * </pre>
-    *
-    * @see #queryAll(String)
-    */
+   @GET
+   @Path("/vms/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords vmsQuery(@QueryParam("filter") String filter);
+   
+   @GET
+   @Path("/mediaList/query")
+   @Consumes
+   @JAXBResponseParser
    QueryResultRecords mediaListQueryAll();
 
-   /** @see #queryAll() */
-   QueryResultRecords mediaListQuery(String filter);
-   
+   @GET
+   @Path("/mediaList/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords mediaListQuery(@QueryParam("filter") String filter);
 }

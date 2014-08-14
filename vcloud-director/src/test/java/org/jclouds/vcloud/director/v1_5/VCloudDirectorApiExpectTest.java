@@ -17,11 +17,8 @@
 package org.jclouds.vcloud.director.v1_5;
 
 import static org.testng.Assert.assertEquals;
-
+/*
 import org.jclouds.vcloud.director.v1_5.internal.VCloudDirectorAdminApiExpectTest;
-import org.jclouds.vcloud.director.v1_5.login.SessionApiExpectTest;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
-import org.testng.annotations.Test;
 
 @Test(groups = "unit", testName = "VCloudDirectorApi")
 public class VCloudDirectorApiExpectTest extends VCloudDirectorAdminApiExpectTest {
@@ -35,3 +32,4 @@ public class VCloudDirectorApiExpectTest extends VCloudDirectorAdminApiExpectTes
       assertEquals(apiWhenSessionsExist.getCurrentSession(), SessionApiExpectTest.SESSION);
    }
 }
+*/

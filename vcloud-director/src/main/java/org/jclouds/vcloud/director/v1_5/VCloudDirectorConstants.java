@@ -16,12 +16,6 @@
  */
 package org.jclouds.vcloud.director.v1_5;
 
-import org.jclouds.rest.RestContext;
-import org.jclouds.vcloud.director.v1_5.login.SessionAsyncApi;
-import org.jclouds.vcloud.director.v1_5.login.SessionApi;
-
-import com.google.common.reflect.TypeToken;
-
 /**
  * Constants used by VCloudDirector apis
  */
@@ -67,10 +61,11 @@ public final class VCloudDirectorConstants {
    public static final String PROPERTY_NS_NAME_LEN_MAX = "jclouds.dns_name_length_max";
 
    /** TODO javadoc */
+   /*
    public static final TypeToken<RestContext<SessionApi, SessionAsyncApi>> SESSION_CONTEXT_TYPE =
          new TypeToken<RestContext<SessionApi, SessionAsyncApi>>() {
 		   };
-
+*/
    private VCloudDirectorConstants() {
       throw new AssertionError("intentionally unimplemented");
    }

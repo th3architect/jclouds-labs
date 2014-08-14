@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -78,14 +79,15 @@ public class NetworkSection extends SectionType {
       }
    }
 
-   private Set<Network> networks;
+   @XmlElement(name = "Network")
+   protected Set<Network> networks;
 
-   private NetworkSection(Builder<?> builder) {
+   protected NetworkSection(Builder<?> builder) {
       super(builder);
       this.networks = ImmutableSet.copyOf(checkNotNull(networks, "networks"));
    }
-   
-   private NetworkSection() {
+
+   protected NetworkSection() {
       // for JAXB
    }
 

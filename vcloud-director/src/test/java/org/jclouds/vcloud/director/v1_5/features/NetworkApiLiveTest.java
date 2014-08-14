@@ -60,14 +60,14 @@ public class NetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      networkApi = context.getApi().getNetworkApi();
+      networkApi = api.getNetworkApi();
    }
 
    @AfterClass(alwaysRun = true)
    public void cleanUp() {
       if (metadataSet) {
          try {
-            Task remove = adminContext.getApi().getMetadataApi(networkUrn).remove("key");
+            Task remove = api.getMetadataApi(networkUrn).remove("key");
             taskDoneEventually(remove);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting metadata");
@@ -92,17 +92,15 @@ public class NetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
    private void setupMetadata() {
       //TODO: block until complete
-      adminContext.getApi().getMetadataApi(networkUrn).put("key", "value");
+      api.getMetadataApi(networkUrn).put("key", "value");
       metadataSet = true;
    }
 
    @Test(description = "GET /network/{id}/metadata", dependsOnMethods = { "testGetNetwork" })
    public void testGetMetadata() {
-      if (adminContext != null) {
-         setupMetadata();
-      }
+      setupMetadata();
 
-      Metadata metadata = context.getApi().getMetadataApi(networkUrn).get();
+      Metadata metadata = api.getMetadataApi(networkUrn).get();
       // required for testing
       assertFalse(Iterables.isEmpty(metadata.getMetadataEntries()),
                String.format(OBJ_FIELD_REQ_LIVE, NETWORK, "metadata.entries"));
@@ -124,7 +122,7 @@ public class NetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
    @Test(description = "GET /network/{id}/metadata/{key}", dependsOnMethods = { "testGetMetadata" })
    public void testGetMetadataValue() {
-      String metadataValue = context.getApi().getMetadataApi(networkUrn).get("key");
+      String metadataValue = api.getMetadataApi(networkUrn).get("key");
 
       assertEquals(metadataValue, "value", String.format(OBJ_FIELD_EQ, NETWORK, "metadataEntry.value", "value", metadataValue));
    }

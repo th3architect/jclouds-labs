@@ -54,7 +54,7 @@ public class VCloudDirectorComputeUtils {
       return vApp.getChildren().getVms().size() > 0 ? toComputeOs(Iterables.get(vApp.getChildren().getVms(), 0)) : null;
    }
    
-   private static SectionForVApp<OperatingSystemSection> findOperatingSystemSectionForVApp = 
+   private static SectionForVApp<OperatingSystemSection> findOperatingSystemSectionForVApp =
          new SectionForVApp<OperatingSystemSection>(OperatingSystemSection.class);
    
    public static CIMOperatingSystem toComputeOs(Vm vm) {

@@ -67,8 +67,8 @@ public class TaskApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      orgApi = context.getApi().getOrgApi();
-      taskApi = context.getApi().getTaskApi();
+      orgApi = api.getOrgApi();
+      taskApi = api.getTaskApi();
    }
 
    @AfterClass(alwaysRun = true)

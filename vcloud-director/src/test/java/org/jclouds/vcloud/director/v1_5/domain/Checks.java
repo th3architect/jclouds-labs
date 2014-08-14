@@ -54,6 +54,7 @@ import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.dmtf.ovf.ProductSection;
 import org.jclouds.dmtf.ovf.SectionType;
 import org.jclouds.dmtf.ovf.StartupSection;
+import org.jclouds.dmtf.ovf.VirtualHardwareSection;
 import org.jclouds.dmtf.ovf.environment.EnvironmentType;
 import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
 import org.jclouds.vcloud.director.v1_5.domain.dmtf.Envelope;
@@ -64,6 +65,7 @@ import org.jclouds.vcloud.director.v1_5.domain.network.IpAddresses;
 import org.jclouds.vcloud.director.v1_5.domain.network.IpRange;
 import org.jclouds.vcloud.director.v1_5.domain.network.IpRanges;
 import org.jclouds.vcloud.director.v1_5.domain.network.IpScope;
+import org.jclouds.vcloud.director.v1_5.domain.network.IpScopes;
 import org.jclouds.vcloud.director.v1_5.domain.network.Network;
 import org.jclouds.vcloud.director.v1_5.domain.network.NetworkConfiguration;
 import org.jclouds.vcloud.director.v1_5.domain.network.NetworkConnection;
@@ -98,7 +100,6 @@ import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConnectionSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.OperatingSystemSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.RuntimeInfoSection;
-import org.jclouds.vcloud.director.v1_5.domain.section.VirtualHardwareSection;
 
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Splitter;
@@ -402,8 +403,8 @@ public class Checks {
       
       // Check optional fields
       // NOTE retainNetInfoAcrossDeployments cannot be checked
-      if (config.getIpScope() != null) {
-         checkIpScope(config.getIpScope());
+      if (config.getIpScopes() != null) {
+         checkIpScopes(config.getIpScopes());
       }
       if (config.getParentNetwork() != null) {
          checkReferenceType(config.getParentNetwork());
@@ -418,7 +419,13 @@ public class Checks {
          checkRouterInfo(config.getRouterInfo());
       }
    }
-   
+
+   public static void checkIpScopes(IpScopes ipScopes) {
+      for (IpScope ipScope : ipScopes.getIpsScopes()) {
+         checkIpScope(ipScope);
+      }
+   }
+
    public static void checkIpScope(IpScope ipScope) {
       // Check required fields
       assertNotNull(ipScope.isInherited(), "isInherited attribute of IpScope must be set");
@@ -1290,9 +1297,9 @@ public class Checks {
             checkOvfDiskSection(diskSection);
          }
       }
-      if (val.getNetworkSections() != null) {
-         for (NetworkSection networkSection : val.getNetworkSections()) {
-            checkOvfNetworkSection(networkSection);
+      if (val.getNetworkConfigSections() != null) {
+         for (NetworkConfigSection networkConfigSection : val.getNetworkConfigSections()) {
+            checkOvfNetworkConfigSection(networkConfigSection);
          }
       }
       if (val.getVirtualSystem() != null) {
@@ -1300,14 +1307,13 @@ public class Checks {
       }
    }
 
+   private static void checkOvfNetworkConfigSection(NetworkConfigSection networkConfigSection) {
+      //todo
+   }
+
    private static void checkOvfVirtualSystem(VirtualSystem val) {
       assertNotNull(val, String.format(NOT_NULL_OBJ_FMT, "VirtualSystem"));
       
-      if (val.getProductSections() != null) {
-         for (ProductSection productSection : val.getProductSections()) {
-            checkOvfProductSection(productSection);
-         }
-      }
       if (val.getVirtualHardwareSections() != null) {
          for (VirtualHardwareSection virtualHardwareSection : val.getVirtualHardwareSections()) {
             checkOvfVirtualHardwareSection(virtualHardwareSection);

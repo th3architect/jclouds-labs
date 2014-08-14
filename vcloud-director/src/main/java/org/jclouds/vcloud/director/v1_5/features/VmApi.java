@@ -16,8 +16,40 @@
  */
 package org.jclouds.vcloud.director.v1_5.features;
 
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.ANY_IMAGE;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.DEPLOY_VAPP_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.GUEST_CUSTOMIZATION_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.MEDIA_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.NETWORK_CONNECTION_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.OPERATING_SYSTEM_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.OVF_RASD_ITEM;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.OVF_RASD_ITEMS_LIST;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.PRODUCT_SECTION_LIST;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.RELOCATE_VM_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.TASK;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.UNDEPLOY_VAPP_PARAMS;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VIRTUAL_HARDWARE_SECTION;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VM;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VM_PENDING_ANSWER;
+
 import java.net.URI;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
+import org.jclouds.rest.annotations.BinderParam;
+import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.JAXBResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.annotations.ResponseParser;
+import org.jclouds.rest.binders.BindToXMLPayload;
 import org.jclouds.vcloud.director.v1_5.domain.ProductSectionList;
 import org.jclouds.vcloud.director.v1_5.domain.RasdItemsList;
 import org.jclouds.vcloud.director.v1_5.domain.ScreenTicket;
@@ -35,562 +67,1148 @@ import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConnectionSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.OperatingSystemSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.RuntimeInfoSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.VirtualHardwareSection;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
+import org.jclouds.vcloud.director.v1_5.functions.ReturnPayloadBytes;
+import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
 /**
- * Provides synchronous access to {@link Vm} objects.
- * 
- * @see VmAsyncApi
- * @version 1.5
+ * Provides access to {@link Vm} objects.
  */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface VmApi {
 
    /**
     * Retrieves a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#get(String)
     */
-   Vm get(String vmUrn);
-
-   Vm get(URI vmHref);
+   @GET
+   @Consumes(VM)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Vm get(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the name/description of a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#edit(String, VApp)
     */
-   Task edit(String vmUrn, Vm vm);
-
-   Task edit(URI vmHref, Vm vm);
+   @PUT
+   @Produces(VM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task edit(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) Vm vApp);
 
    /**
     * Deletes a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#remove(String)
     */
-   Task remove(String vmUrn);
-
-   Task remove(URI vmHref);
+   @DELETE
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Consolidates a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /vApp/{id}/action/consolidate
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   Task consolidate(String vmUrn);
-
-   Task consolidate(URI vmHref);
+   @POST
+   @Path("/action/consolidate")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task consolidate(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Deploys a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#deploy(String, DeployVAppParams)
     */
-   Task deploy(String vmUrn, DeployVAppParams params);
-
-   Task deploy(URI vmHref, DeployVAppParams params);
+   @POST
+   @Path("/action/deploy")
+   @Produces(DEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task deploy(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
 
    /**
     * Discard suspended state of a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#discardSuspendedState(String)
     */
-   Task discardSuspendedState(String vmUrn);
-
-   Task discardSuspendedState(URI vmHref);
+   @POST
+   @Path("/action/discardSuspendedState")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task discardSuspendedState(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Installs VMware tools to the virtual machine.
-    * 
+    *
     * It should be running in order for them to be installed.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /vApp/{id}/action/installVMwareTools
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   Task installVMwareTools(String vmUrn);
-
-   Task installVMwareTools(URI vmHref);
+   @POST
+   @Path("/action/installVMwareTools")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task installVMwareTools(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Relocates a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /vApp/{id}/action/relocate
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   Task relocate(String vmUrn, RelocateParams params);
-
-   Task relocate(URI vmHref, RelocateParams params);
+   @POST
+   @Path("/action/relocate")
+   @Produces(RELOCATE_VM_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task relocate(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RelocateParams params);
 
    /**
     * Undeploy a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#undeploy(String, UndeployVAppParams)
     */
-   Task undeploy(String vmUrn, UndeployVAppParams params);
-
-   Task undeploy(URI vmHref, UndeployVAppParams params);
+   @POST
+   @Path("/action/undeploy")
+   @Produces(UNDEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task undeploy(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
 
    /**
     * Upgrade virtual hardware version of a VM to the highest supported virtual hardware version of
     * provider vDC where the VM locates.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /vApp/{id}/action/upgradeHardwareVersion
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   Task upgradeHardwareVersion(String vmUrn);
-
-   Task upgradeHardwareVersion(URI vmHref);
+   @POST
+   @Path("/action/upgradeHardwareVersion")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task upgradeHardwareVersion(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Powers off a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#powerOff(String)
     */
-   Task powerOff(String vmUrn);
-
-   Task powerOff(URI vmHref);
+   @POST
+   @Path("/power/action/powerOff")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOff(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Powers on a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#powerOn(String)
     */
-   Task powerOn(String vmUrn);
-
-   Task powerOn(URI vmHref);
+   @POST
+   @Path("/power/action/powerOn")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOn(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Reboots a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#reboot(String)
     */
-   Task reboot(String vmUrn);
-
-   Task reboot(URI vmHref);
+   @POST
+   @Path("/power/action/reboot")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reboot(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Resets a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#reset(String)
     */
-   Task reset(String vmUrn);
-
-   Task reset(URI vmHref);
+   @POST
+   @Path("/power/action/reset")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reset(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Shuts down a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#shutdown(String)
     */
-   Task shutdown(String vmUrn);
-
-   Task shutdown(URI vmHref);
+   @POST
+   @Path("/power/action/shutdown")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task shutdown(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Suspends a {@link Vm}.
-    * 
+    *
     * @since 0.9
     * @see VAppApi#suspend(String)
     */
-   Task suspend(String vmUrn);
-
-   Task suspend(URI vmHref);
+   @POST
+   @Path("/power/action/suspend")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task suspend(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Retrieves the guest customization section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/guestCustomizationSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.0
     */
-   GuestCustomizationSection getGuestCustomizationSection(String vmUrn);
-
-   GuestCustomizationSection getGuestCustomizationSection(URI vmHref);
+   @GET
+   @Path("/guestCustomizationSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   GuestCustomizationSection getGuestCustomizationSection(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the guest customization section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/guestCustomizationSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.0
     */
-   Task editGuestCustomizationSection(String vmUrn, GuestCustomizationSection section);
-
-   Task editGuestCustomizationSection(URI vmHref, GuestCustomizationSection section);
+   @PUT
+   @Path("/guestCustomizationSection")
+   @Produces(GUEST_CUSTOMIZATION_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editGuestCustomizationSection(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) GuestCustomizationSection section);
 
    /**
     * Ejects media from a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/media/action/ejectMedia
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task ejectMedia(String vmUrn, MediaInsertOrEjectParams mediaParams);
-
-   Task ejectMedia(URI vmHref, MediaInsertOrEjectParams mediaParams);
+   @POST
+   @Path("/media/action/ejectMedia")
+   @Produces(MEDIA_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task ejectMedia(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) MediaInsertOrEjectParams mediaParams);
 
    /**
     * Insert media into a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/media/action/insertMedia
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task insertMedia(String vmUrn, MediaInsertOrEjectParams mediaParams);
-
-   Task insertMedia(URI vmHref, MediaInsertOrEjectParams mediaParams);
+   @POST
+   @Path("/media/action/insertMedia")
+   @Produces(MEDIA_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task insertMedia(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) MediaInsertOrEjectParams mediaParams);
 
    /**
     * Retrieves the network connection section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/networkConnectionSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   NetworkConnectionSection getNetworkConnectionSection(String vmUrn);
-
-   NetworkConnectionSection getNetworkConnectionSection(URI vmHref);
+   @GET
+   @Path("/networkConnectionSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkConnectionSection getNetworkConnectionSection(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the network connection section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/networkConnectionSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editNetworkConnectionSection(String vmUrn, NetworkConnectionSection section);
-
-   Task editNetworkConnectionSection(URI vmHref, NetworkConnectionSection section);
+   @PUT
+   @Path("/networkConnectionSection")
+   @Produces(NETWORK_CONNECTION_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editNetworkConnectionSection(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) NetworkConnectionSection section);
 
    /**
     * Retrieves the operating system section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/operatingSystemSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   OperatingSystemSection getOperatingSystemSection(String vmUrn);
-
-   OperatingSystemSection getOperatingSystemSection(URI vmHref);
+   @GET
+   @Path("/operatingSystemSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OperatingSystemSection getOperatingSystemSection(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the operating system section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/operatingSystemSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editOperatingSystemSection(String vmUrn, OperatingSystemSection section);
-
-   Task editOperatingSystemSection(URI vmHref, OperatingSystemSection section);
+   @PUT
+   @Path("/operatingSystemSection")
+   @Produces(OPERATING_SYSTEM_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editOperatingSystemSection(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) OperatingSystemSection section);
 
    /**
     * Retrieves {@link Vm} product sections.
-    * 
+    *
     * @since 1.5
     * @see VAppApi#getProductSections(String)
     */
-   ProductSectionList getProductSections(String vmUrn);
-
-   ProductSectionList getProductSections(URI vmHref);
+   @GET
+   @Path("/productSections")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ProductSectionList getProductSections(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the product section information of a {@link Vm}.
-    * 
+    *
     * @since 1.5
     * @see VAppApi#editProductSections(String, ProductSectionList)
     */
-   Task editProductSections(String vmUrn, ProductSectionList sectionList);
-
-   Task editProductSections(URI vmHref, ProductSectionList sectionList);
+   @PUT
+   @Path("/productSections")
+   @Produces(PRODUCT_SECTION_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editProductSections(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
 
    /**
     * Retrieves a pending question for a {@link Vm}.
-    * 
+    *
     * The user should answer to the question by operation
     * {@link #answerQuestion(String, VmQuestionAnswer)}. Usually questions will be asked when the VM
     * is powering on.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/question
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   VmPendingQuestion getPendingQuestion(String vmUrn);
-
-   VmPendingQuestion getPendingQuestion(URI vmHref);
+   @GET
+   @Path("/question")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VmPendingQuestion getPendingQuestion(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Answer a pending question on a {@link Vm}.
-    * 
+    *
     * The answer IDs of choice and question should match the ones returned from operation
     * {@link #getPendingQuestion(String)}.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /vApp/{id}/question/action/answer
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   void answerQuestion(String vmUrn, VmQuestionAnswer answer);
-
-   void answerQuestion(URI vmHref, VmQuestionAnswer answer);
+   @POST
+   @Path("/question/action/answer")
+   @Produces(VM_PENDING_ANSWER)
+   @Consumes
+   @JAXBResponseParser
+   Void answerQuestion(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) VmQuestionAnswer answer);
 
    /**
     * Retrieves the runtime info section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/runtimeInfoSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   RuntimeInfoSection getRuntimeInfoSection(String vmUrn);
-
-   RuntimeInfoSection getRuntimeInfoSection(URI vmHref);
+   @GET
+   @Path("/runtimeInfoSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RuntimeInfoSection getRuntimeInfoSection(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Retrieves the thumbnail of the screen of a {@link Vm}.
-    * 
+    *
     * The content type of the response may vary (e.g. {@code image/png}, {@code image/gif}).
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/screen
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   byte[] getScreenImage(String vmUrn);
-
-   byte[] getScreenImage(URI vmHref);
+   @GET
+   @Path("/screen")
+   @Consumes(ANY_IMAGE)
+   @Fallback(NullOnNotFoundOr404.class)
+   @ResponseParser(ReturnPayloadBytes.class)
+   byte[] getScreenImage(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Retrieve a screen ticket for remote console connection to a {@link Vm}.
-    * 
+    *
     * A screen ticket is a string that includes the virtual machine's IP address, its managed object
     * reference, and a string that has been encoded as described in RFC 2396. Each VM element in a
     * vApp includes a link where rel="screen:acquireTicket". You can use that link to request a
     * screen ticket that you can use with the vmware-vmrc utility to open a VMware Remote Console
     * for the virtual machine represented by that VM element. The vApp should be running to get a
     * valid screen ticket.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/screen/action/acquireTicket
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   ScreenTicket getScreenTicket(String vmUrn);
-
-   ScreenTicket getScreenTicket(URI vmHref);
+   @POST
+   @Path("/screen/action/acquireTicket")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ScreenTicket getScreenTicket(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Retrieves the virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   VirtualHardwareSection getVirtualHardwareSection(String vmUrn);
-
-   VirtualHardwareSection getVirtualHardwareSection(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VirtualHardwareSection getVirtualHardwareSection(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editVirtualHardwareSection(String vmUrn, VirtualHardwareSection section);
-
-   Task editVirtualHardwareSection(URI vmHref, VirtualHardwareSection section);
+   @PUT
+   @Path("/virtualHardwareSection")
+   @Produces(VIRTUAL_HARDWARE_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSection(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) VirtualHardwareSection section);
 
    /**
     * Retrieves the CPU properties in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/cpu
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   RasdItem getVirtualHardwareSectionCpu(String vmUrn);
-
-   RasdItem getVirtualHardwareSectionCpu(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection/cpu")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItem getVirtualHardwareSectionCpu(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the CPU properties in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection/cpu
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editVirtualHardwareSectionCpu(String vmUrn, RasdItem rasd);
-
-   Task editVirtualHardwareSectionCpu(URI vmHref, RasdItem rasd);
+   @PUT
+   @Path("/virtualHardwareSection/cpu")
+   @Produces(OVF_RASD_ITEM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionCpu(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RasdItem rasd);
 
    /**
     * Retrieves a list of items for disks from virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/disks
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   RasdItemsList getVirtualHardwareSectionDisks(String vmUrn);
-
-   RasdItemsList getVirtualHardwareSectionDisks(URI vmHref);
-
+   @GET
+   @Path("/virtualHardwareSection/disks")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionDisks(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
    /**
     * Modifies the disks list in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection/disks
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editVirtualHardwareSectionDisks(String vmUrn, RasdItemsList rasdItemsList);
-
-   Task editVirtualHardwareSectionDisks(URI vmHref, RasdItemsList rasdItemsList);
+   @PUT
+   @Path("/virtualHardwareSection/disks")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionDisks(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
 
    /**
     * Retrieves the list of items that represents the floppies and CD/DVD drives in a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/media
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   RasdItemsList getVirtualHardwareSectionMedia(String vmUrn);
-
-   RasdItemsList getVirtualHardwareSectionMedia(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection/media")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionMedia(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Retrieves the item that contains memory information from virtual hardware section of a
     * {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/memory
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   RasdItem getVirtualHardwareSectionMemory(String vmUrn);
-
-   RasdItem getVirtualHardwareSectionMemory(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection/memory")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItem getVirtualHardwareSectionMemory(@EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the memory properties in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection/memory
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editVirtualHardwareSectionMemory(String vmUrn, RasdItem rasd);
-
-   Task editVirtualHardwareSectionMemory(URI vmHref, RasdItem rasd);
+   @PUT
+   @Path("/virtualHardwareSection/memory")
+   @Produces(OVF_RASD_ITEM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionMemory(@EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RasdItem rasd);
 
    /**
     * Retrieves a list of items for network cards from virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/networkCards
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   RasdItemsList getVirtualHardwareSectionNetworkCards(String vmUrn);
-
-   RasdItemsList getVirtualHardwareSectionNetworkCards(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection/networkCards")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionNetworkCards(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the network cards list in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection/networkCards
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 0.9
     */
-   Task editVirtualHardwareSectionNetworkCards(String vmUrn, RasdItemsList rasdItemsList);
-
-   Task editVirtualHardwareSectionNetworkCards(URI vmHref, RasdItemsList rasdItemsList);
+   @PUT
+   @Path("/virtualHardwareSection/networkCards")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionNetworkCards(
+            @EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
 
    /**
     * Retrieves a list of items for serial ports from virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /vApp/{id}/virtualHardwareSection/serialPorts
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   RasdItemsList getVirtualHardwareSectionSerialPorts(String vmUrn);
-
-   RasdItemsList getVirtualHardwareSectionSerialPorts(URI vmHref);
+   @GET
+   @Path("/virtualHardwareSection/serialPorts")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionSerialPorts(
+            @EndpointParam(parser = URNToHref.class) String vmUrn);
 
    /**
     * Modifies the serial ports list in virtual hardware section of a {@link Vm}.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /vApp/{id}/virtualHardwareSection/serialPorts
-    * </pre>
-    * 
+    * </pre
+    *
     * @since 1.5
     */
-   Task editVirtualHardwareSectionSerialPorts(String vmUrn, RasdItemsList rasdItemsList);
+   @PUT
+   @Path("/virtualHardwareSection/serialPorts")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionSerialPorts(
+            @EndpointParam(parser = URNToHref.class) String vmUrn,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
 
-   Task editVirtualHardwareSectionSerialPorts(URI vmHref, RasdItemsList rasdItemsList);
+   /**
+    * @see VmApi#get(URI)
+    */
+   @GET
+   @Consumes(VM)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Vm get(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#edit(URI, Vm)
+    */
+   @PUT
+   @Produces(VM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task edit(@EndpointParam URI vmHref, @BinderParam(BindToXMLPayload.class) Vm vApp);
+
+   /**
+    * @see VmApi#remove(URI)
+    */
+   @DELETE
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#consolidate(URI)
+    */
+   @POST
+   @Path("/action/consolidate")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task consolidate(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#deploy(URI, DeployVAppParams)
+    */
+   @POST
+   @Path("/action/deploy")
+   @Produces(DEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task deploy(@EndpointParam URI vmHref, @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
+
+   /**
+    * @see VmApi#discardSuspendedState(URI)
+    */
+   @POST
+   @Path("/action/discardSuspendedState")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task discardSuspendedState(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#installVMwareTools(URI)
+    */
+   @POST
+   @Path("/action/installVMwareTools")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task installVMwareTools(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#relocate(URI, RelocateParams)
+    */
+   @POST
+   @Path("/action/relocate")
+   @Produces(RELOCATE_VM_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task relocate(@EndpointParam URI vmHref, @BinderParam(BindToXMLPayload.class) RelocateParams params);
+
+   /**
+    * @see VmApi#undeploy(URI, UndeployVAppParams)
+    */
+   @POST
+   @Path("/action/undeploy")
+   @Produces(UNDEPLOY_VAPP_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task undeploy(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
+
+   /**
+    * @see VmApi#upgradeHardwareVersion(URI)
+    */
+   @POST
+   @Path("/action/upgradeHardwareVersion")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task upgradeHardwareVersion(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#powerOff(URI)
+    */
+   @POST
+   @Path("/power/action/powerOff")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOff(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#powerOn(URI)
+    */
+   @POST
+   @Path("/power/action/powerOn")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task powerOn(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#reboot(URI)
+    */
+   @POST
+   @Path("/power/action/reboot")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reboot(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#reset(URI)
+    */
+   @POST
+   @Path("/power/action/reset")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task reset(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#shutdown(URI)
+    */
+   @POST
+   @Path("/power/action/shutdown")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task shutdown(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#suspend(URI)
+    */
+   @POST
+   @Path("/power/action/suspend")
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task suspend(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#getGuestCustomizationSection(URI)
+    */
+   @GET
+   @Path("/guestCustomizationSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   GuestCustomizationSection getGuestCustomizationSection(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editGuestCustomizationSection(URI, GuestCustomizationSection)
+    */
+   @PUT
+   @Path("/guestCustomizationSection")
+   @Produces(GUEST_CUSTOMIZATION_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editGuestCustomizationSection(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) GuestCustomizationSection section);
+
+   /**
+    * @see VmApi#ejectMedia(URI, MediaInsertOrEjectParams)
+    */
+   @POST
+   @Path("/media/action/ejectMedia")
+   @Produces(MEDIA_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task ejectMedia(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) MediaInsertOrEjectParams mediaParams);
+
+   /**
+    * @see VmApi#insertMedia(URI, MediaInsertOrEjectParams)
+    */
+   @POST
+   @Path("/media/action/insertMedia")
+   @Produces(MEDIA_PARAMS)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task insertMedia(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) MediaInsertOrEjectParams mediaParams);
+
+   /**
+    * @see VmApi#getNetworkConnectionSection(URI)
+    */
+   @GET
+   @Path("/networkConnectionSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkConnectionSection getNetworkConnectionSection(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editNetworkConnectionSection(URI, NetworkConnectionSection)
+    */
+   @PUT
+   @Path("/networkConnectionSection")
+   @Produces(NETWORK_CONNECTION_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editNetworkConnectionSection(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) NetworkConnectionSection section);
+
+   /**
+    * @see VmApi#getOperatingSystemSection(URI)
+    */
+   @GET
+   @Path("/operatingSystemSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   OperatingSystemSection getOperatingSystemSection(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editOperatingSystemSection(URI, OperatingSystemSection)
+    */
+   @PUT
+   @Path("/operatingSystemSection")
+   @Produces(OPERATING_SYSTEM_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editOperatingSystemSection(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) OperatingSystemSection section);
+
+   /**
+    * @see VmApi#getProductSections(URI)
+    */
+   @GET
+   @Path("/productSections")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ProductSectionList getProductSections(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editProductSections(URI, ProductSectionList)
+    */
+   @PUT
+   @Path("/productSections")
+   @Produces(PRODUCT_SECTION_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editProductSections(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
+
+   /**
+    * @see VmApi#getPendingQuestion(URI)
+    */
+   @GET
+   @Path("/question")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VmPendingQuestion getPendingQuestion(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#answerQuestion(URI, VmQuestionAnswer)
+    */
+   @POST
+   @Path("/question/action/answer")
+   @Produces(VM_PENDING_ANSWER)
+   @Consumes
+   @JAXBResponseParser
+   Void answerQuestion(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) VmQuestionAnswer answer);
+
+   /**
+    * @see VmApi#getRuntimeInfoSection(URI)
+    */
+   @GET
+   @Path("/runtimeInfoSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RuntimeInfoSection getRuntimeInfoSection(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#getScreenImage(URI)
+    */
+   @GET
+   @Path("/screen")
+   @Consumes(ANY_IMAGE)
+   @Fallback(NullOnNotFoundOr404.class)
+   @ResponseParser(ReturnPayloadBytes.class)
+   byte[] getScreenImage(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#getScreenTicket(URI)
+    */
+   @POST
+   @Path("/screen/action/acquireTicket")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ScreenTicket getScreenTicket(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#getVirtualHardwareSection(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VirtualHardwareSection getVirtualHardwareSection(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSection(URI, VirtualHardwareSection)
+    */
+   @PUT
+   @Path("/virtualHardwareSection")
+   @Produces(VIRTUAL_HARDWARE_SECTION)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSection(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) VirtualHardwareSection section);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionCpu(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/cpu")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItem getVirtualHardwareSectionCpu(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSectionCpu(URI, ResourceAllocationSettingData)
+    */
+   @PUT
+   @Path("/virtualHardwareSection/cpu")
+   @Produces(OVF_RASD_ITEM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionCpu(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) RasdItem rasd);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionDisks(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/disks")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionDisks(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSectionDisks(URI, RasdItemsList)
+    */
+   @PUT
+   @Path("/virtualHardwareSection/disks")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionDisks(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionMedia(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/media")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionMedia(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionMemory(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/memory")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItem getVirtualHardwareSectionMemory(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSectionMemory(URI, ResourceAllocationSettingData)
+    */
+   @PUT
+   @Path("/virtualHardwareSection/memory")
+   @Produces(OVF_RASD_ITEM)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionMemory(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) RasdItem rasd);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionNetworkCards(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/networkCards")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionNetworkCards(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSectionNetworkCards(URI, RasdItemsList)
+    */
+   @PUT
+   @Path("/virtualHardwareSection/networkCards")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionNetworkCards(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
+
+   /**
+    * @see VmApi#getVirtualHardwareSectionSerialPorts(URI)
+    */
+   @GET
+   @Path("/virtualHardwareSection/serialPorts")
+   @Consumes
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   RasdItemsList getVirtualHardwareSectionSerialPorts(@EndpointParam URI vmHref);
+
+   /**
+    * @see VmApi#editVirtualHardwareSectionSerialPorts(URI, RasdItemsList)
+    */
+   @PUT
+   @Path("/virtualHardwareSection/serialPorts")
+   @Produces(OVF_RASD_ITEMS_LIST)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task editVirtualHardwareSectionSerialPorts(@EndpointParam URI vmHref,
+            @BinderParam(BindToXMLPayload.class) RasdItemsList rasdItemsList);
 }

@@ -16,30 +16,22 @@
  */
 package org.jclouds.vcloud.director.v1_5.functions;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jclouds.dmtf.ovf.SectionType;
+import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
-
 import com.google.common.base.Function;
 
 @Singleton
-public class SectionForVAppTemplate<S extends SectionType> implements Function<VAppTemplate, S> {
-   
-   private final Class<? extends SectionType> sectionType;
-
-   @Inject
-   SectionForVAppTemplate(Class<S> sectionType) {
-      this.sectionType = sectionType;
-   }
+public class NetworkSectionForVAppTemplate implements Function<VAppTemplate, NetworkSection> {
 
    @SuppressWarnings("unchecked")
    @Override
-   public S apply(VAppTemplate from) {
+   public NetworkSection apply(VAppTemplate from) {
       for (SectionType section : from.getSections()) {
-         if (sectionType.isAssignableFrom(section.getClass())) {
-            return (S)section;
+         if (section instanceof NetworkSection) {
+            return (NetworkSection) section;
          }
       }
       return null;

@@ -52,12 +52,12 @@ public class VmToNodeMetadata implements Function<Vm, NodeMetadata> {
 
    protected final FindLocationForResource findLocationForResourceInVDC;
    protected final Function<Vm, Hardware> hardwareForVm;
-   protected final Map<Status, NodeMetadata.Status> vAppStatusToNodeStatus;
+   protected final Function<Status, NodeMetadata.Status> vAppStatusToNodeStatus;
    protected final Map<String, Credentials> credentialStore;
    protected final GroupNamingConvention nodeNamingConvention;
 
    @Inject
-   protected VmToNodeMetadata(Map<Status, NodeMetadata.Status> vAppStatusToNodeStatus, Map<String, Credentials> credentialStore,
+   protected VmToNodeMetadata(Function<Status, NodeMetadata.Status> vAppStatusToNodeStatus, Map<String, Credentials> credentialStore,
          FindLocationForResource findLocationForResourceInVDC, Function<Vm, Hardware> hardwareForVm,
          GroupNamingConvention.Factory namingConvention) {
       this.nodeNamingConvention = checkNotNull(namingConvention, "namingConvention").createWithoutPrefix();
@@ -78,7 +78,7 @@ public class VmToNodeMetadata implements Function<Vm, NodeMetadata> {
       builder.group(nodeNamingConvention.groupInUniqueNameOrNull(from.getName()));
       builder.operatingSystem(toComputeOs(from));
       builder.hardware(hardwareForVm.apply(from));
-      builder.status(vAppStatusToNodeStatus.get(from.getStatus()));
+      builder.status(vAppStatusToNodeStatus.apply(from.getStatus()));
       Set<String> addresses = getIpsFromVm(from);
       builder.publicAddresses(filter(addresses, not(IsPrivateIPAddress.INSTANCE)));
       builder.privateAddresses(filter(addresses, IsPrivateIPAddress.INSTANCE));

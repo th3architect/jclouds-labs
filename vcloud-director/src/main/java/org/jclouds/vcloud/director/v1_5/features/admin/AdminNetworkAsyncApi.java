@@ -36,27 +36,34 @@ import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
 import org.jclouds.vcloud.director.v1_5.domain.Task;
 import org.jclouds.vcloud.director.v1_5.domain.network.Network;
 import org.jclouds.vcloud.director.v1_5.domain.org.OrgNetwork;
-import org.jclouds.vcloud.director.v1_5.features.NetworkAsyncApi;
+import org.jclouds.vcloud.director.v1_5.features.NetworkApi;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 /**
- * @see AdminNetworkApi
+ * Provides synchronous access to admin {@link Network} objects.
  */
 @RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
-public interface AdminNetworkAsyncApi extends NetworkAsyncApi {
+public interface AdminNetworkAsyncApi extends NetworkApi {
 
    /**
-    * @see AdminNetworkApi#get(String)
+    * Gets admin representation of network. This operation could return admin representation of
+    * organization network or external network. vApp networks do not have admin representation.
+    *
+    * <pre>
+    * GET /admin/network/{id}
+    * </pre>
+    *
+    * @param networkUrn
+    *           the reference for the network
+    * @return the network
     */
    @Override
    @GET
    @Consumes
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
-   ListenableFuture<? extends Network> get(@EndpointParam(parser = URNToAdminHref.class) String networkUrn);
+   Network get(@EndpointParam(parser = URNToAdminHref.class) String networkUrn);
 
    /**
     * @see AdminNetworkApi#get(URI)
@@ -66,16 +73,27 @@ public interface AdminNetworkAsyncApi extends NetworkAsyncApi {
    @Consumes
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
-   ListenableFuture<? extends Network> get(@EndpointParam URI networkAdminHref);
+   Network get(@EndpointParam URI networkAdminHref);
 
    /**
-    * @see AdminNetworkApi#edit(String, OrgNetwork)
+    * Modifies an org network
+    *
+    * <pre>
+    * PUT /admin/network/{id}
+    * </pre>
+    *
+    * @param networkUrn
+    *           the reference for the network
+    * @param network
+    *           the edited network
+    * @return a task. This operation is asynchronous and the user should monitor the returned task
+    *         status in order to check when it is completed.
     */
    @PUT
    @Consumes(VCloudDirectorMediaType.TASK)
    @Produces(VCloudDirectorMediaType.ADMIN_ORG_NETWORK)
    @JAXBResponseParser
-   ListenableFuture<Task> edit(@EndpointParam(parser = URNToAdminHref.class) String networkUrn,
+   Task edit(@EndpointParam(parser = URNToAdminHref.class) String networkUrn,
             @BinderParam(BindToXMLPayload.class) OrgNetwork network);
 
    /**
@@ -85,17 +103,28 @@ public interface AdminNetworkAsyncApi extends NetworkAsyncApi {
    @Consumes(VCloudDirectorMediaType.TASK)
    @Produces(VCloudDirectorMediaType.ADMIN_ORG_NETWORK)
    @JAXBResponseParser
-   ListenableFuture<Task> edit(@EndpointParam URI networkAdminHref,
+   Task edit(@EndpointParam URI networkAdminHref,
             @BinderParam(BindToXMLPayload.class) OrgNetwork network);
 
    /**
-    * @see AdminNetworkApi#reset(String)
+    * Reset(undeploy & redeploy) networking services on a logical network. The reset operation can
+    * be performed on: - external networks - organization networks - vApp networks The reset
+    * operation can be performed only on deployed networks.
+    *
+    * <pre>
+    * POST /admin/network/{id}/action/reset
+    * </pre>
+    *
+    * @param networkUrn
+    *           the reference for the network
+    * @return a task. This operation is asynchronous and the user should monitor the returned task
+    *         status in order to check when it is completed.
     */
    @POST
    @Path("/action/reset")
    @Consumes
    @JAXBResponseParser
-   ListenableFuture<Task> reset(@EndpointParam(parser = URNToAdminHref.class) String networkUrn);
+   Task reset(@EndpointParam(parser = URNToAdminHref.class) String networkUrn);
 
    /**
     * @see AdminNetworkApi#reset(URI)
@@ -104,5 +133,5 @@ public interface AdminNetworkAsyncApi extends NetworkAsyncApi {
    @Path("/action/reset")
    @Consumes
    @JAXBResponseParser
-   ListenableFuture<Task> reset(@EndpointParam URI networkAdminHref);
+   Task reset(@EndpointParam URI networkAdminHref);
 }

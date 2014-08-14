@@ -22,9 +22,11 @@ import static org.jclouds.dmtf.DMTFConstants.CIM_RASD_NS;
 import static org.jclouds.dmtf.DMTFConstants.OVF_NS;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
@@ -75,7 +77,8 @@ import com.google.common.collect.Sets;
       "resourceType",
       "virtualQuantity",
       "virtualQuantityUnits",
-      "weight"
+      "weight",
+      "any"
    }
 )
 public class ResourceAllocationSettingData {
@@ -557,6 +560,9 @@ public class ResourceAllocationSettingData {
    private Set<CimString> connections = Sets.newLinkedHashSet();
    @XmlElement(name = "HostResource", namespace = CIM_RASD_NS)
    private Set<CimString> hostResources = Sets.newLinkedHashSet();
+
+   @XmlAnyElement(lax=true)
+   private List<Object> any;
 
    protected ResourceAllocationSettingData(Builder<?> builder) {
       this.elementName = builder.elementName;

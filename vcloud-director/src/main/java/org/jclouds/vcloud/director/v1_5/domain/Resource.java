@@ -42,14 +42,14 @@ import com.google.common.collect.Sets;
  * Has an optional list of links and href and type attributes.
  *
  * <pre>
- * &lt;xs:complexType name="ResourceType" /&gt;
+ * &lt;xs:complexType name="Resource" /&gt;
  * </pre>
  *
  *
  * @since 0.9
  */
 @XmlRootElement(name = "Resource")
-@XmlType(name = "ResourceType")
+@XmlType(name = "Resource")
 public class Resource {
 
    @javax.annotation.Resource
@@ -77,7 +77,7 @@ public class Resource {
       }
       
       /**
-       * @see ResourceType#getHref()
+       * @see Resource#getHref()
        */
       public B href(URI href) {
          this.href = href;
@@ -85,7 +85,7 @@ public class Resource {
       }
 
       /**
-       * @see ResourceType#getType()
+       * @see Resource#getType()
        */
       public B type(String type) {
          this.type = type;
@@ -93,7 +93,7 @@ public class Resource {
       }
 
       /**
-       * @see ResourceType#getLinks()
+       * @see Resource#getLinks()
        */
       public B links(Set<Link> links) {
          this.links = Sets.newLinkedHashSet(checkNotNull(links, "links"));
@@ -101,7 +101,7 @@ public class Resource {
       }
 
       /**
-       * @see ResourceType#getLinks()
+       * @see Resource#getLinks()
        */
       public B link(Link link) {
          if (links == null)

@@ -20,6 +20,7 @@ import java.net.URI;
 
 import org.jclouds.rest.annotations.Delegate;
 import org.jclouds.rest.annotations.EndpointParam;
+import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.vcloud.director.v1_5.features.MetadataApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.AdminCatalogApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.AdminNetworkApi;
@@ -28,70 +29,64 @@ import org.jclouds.vcloud.director.v1_5.features.admin.AdminQueryApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.AdminVdcApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.GroupApi;
 import org.jclouds.vcloud.director.v1_5.features.admin.UserApi;
+import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
 
 /**
- * Provides synchronous access to VCloudDirector Admin.
- * 
- * @see VCloudDirectorAsyncApi
+ * Provides access to VCloudDirector Admin via their REST API.
  */
-public interface VCloudDirectorAdminApi extends VCloudDirectorApi {
+@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+public interface VCloudDirectorAdminApi {
    /**
-    * @return asynchronous access to admin query features
+    * @return access to admin query features
     */
-   @Override
    @Delegate
-   AdminQueryApi getQueryApi();
+   AdminQueryApi getAdminQueryApi();
+
    
    /**
-    * @return synchronous access to {@link Catalog} admin features
+    * @return access to {@link org.jclouds.vcloud.director.v1_5.features.admin.AdminCatalogApi} admin features
     */
-   @Override
    @Delegate
-   AdminCatalogApi getCatalogApi();
+   AdminCatalogApi getAdminCatalogApi();
    
    /**
-    * @return synchronous access to admin {@link Group} features
+    * @return access to admin {@link org.jclouds.vcloud.director.v1_5.features.admin.GroupApi} features
     */
    @Delegate
    GroupApi getGroupApi();
-
-   /**
-    * @return synchronous access to {@link AdminOrg} features
-    */
-   @Override
-   @Delegate
-   AdminOrgApi getOrgApi();
    
    /**
-    * @return synchronous access to {@link User} features
+    * @return access to {@link org.jclouds.vcloud.director.v1_5.features.admin.AdminOrgApi} features
+    */
+   @Delegate
+   AdminOrgApi getAdminOrgApi();
+   
+   /**
+    * @return access to {@link org.jclouds.vcloud.director.v1_5.features.admin.UserApi} features
     */
    @Delegate
    UserApi getUserApi();
    
    /**
-    * @return synchronous access to {@link AdminVdc} features
+    * @return access to {@link org.jclouds.vcloud.director.v1_5.features.admin.AdminVdcApi} features
     */
-   @Override
    @Delegate
-   AdminVdcApi getVdcApi();
+   AdminVdcApi getAdminVdcApi();
    
    /**
-    * @return synchronous access to admin {@link Network} features
+    * @return access to admin {@link org.jclouds.vcloud.director.v1_5.features.admin.AdminNetworkApi} features
     */
-   @Override
    @Delegate
-   AdminNetworkApi getNetworkApi();
+   AdminNetworkApi getAdminNetworkApi();
    
    /**
-    * @return synchronous access to {@link Metadata} features
+    * @return access to {@link org.jclouds.vcloud.director.v1_5.features.MetadataApi} features
     */
-   @Override
    @Delegate
    MetadataApi getMetadataApi(@EndpointParam(parser = URNToAdminHref.class) String urn);
 
-   @Override
    @Delegate
    MetadataApi getMetadataApi(@EndpointParam URI href);
 }

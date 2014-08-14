@@ -29,6 +29,7 @@ import static org.testng.Assert.fail;
 import java.util.Map;
 import java.util.Set;
 
+import org.jclouds.dmtf.ovf.MsgType;
 import org.jclouds.vcloud.director.v1_5.domain.Checks;
 import org.jclouds.vcloud.director.v1_5.domain.Metadata;
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
@@ -86,9 +87,9 @@ public class VdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      vdcApi = context.getApi().getVdcApi();
-      vappTemplateApi = context.getApi().getVAppTemplateApi();
-      vappApi = context.getApi().getVAppApi();
+      vdcApi = api.getVdcApi();
+      vappTemplateApi = api.getVAppTemplateApi();
+      vappApi = api.getVAppApi();
 
       assertNotNull(vdcUrn, String.format(URN_REQ_LIVE, VDC));
       network = lazyGetNetwork();
@@ -117,7 +118,7 @@ public class VdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
       if (metadataSet) {
          try {
-            Task remove = adminContext.getApi().getMetadataApi(vdcUrn).remove("key");
+            Task remove = api.getMetadataApi(vdcUrn).remove("key");
             taskDoneEventually(remove);
          } catch (Exception e) {
             logger.warn(e, "Error deleting metadata entry");
@@ -252,7 +253,7 @@ public class VdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
       NetworkConfigSection networkConfigSection = NetworkConfigSection
                .builder()
-               .info("Configuration parameters for logical networks")
+               .info(MsgType.builder().value("Configuration parameters for logical networks").build())
                .networkConfigs(
                         ImmutableSet.of(VAppNetworkConfiguration.builder().networkName("vAppNetwork")
                                  .configuration(networkConfiguration).build())).build();
@@ -304,7 +305,7 @@ public class VdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
    @Test(description = "GET /vdc/{id}/metadata", dependsOnMethods = { "testGetVdc" })
    public void testGetMetadata() {
-      Metadata metadata = context.getApi().getMetadataApi(vdcUrn).get();
+      Metadata metadata = api.getMetadataApi(vdcUrn).get();
 
       // required for testing
       assertTrue(Iterables.isEmpty(metadata.getMetadataEntries()),
@@ -317,12 +318,12 @@ public class VdcApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    public void testGetMetadataValue() {
       // setupMetadata();
       // First find a key
-      Metadata metadata = context.getApi().getMetadataApi(vdcUrn).get();
+      Metadata metadata = api.getMetadataApi(vdcUrn).get();
       Map<String, String> metadataMap = Checks.metadataToMap(metadata);
       String key = Iterables.getFirst(metadataMap.keySet(), "MadeUpKey!");
       String value = metadataMap.get(key);
 
-      String metadataValue = context.getApi().getMetadataApi(vdcUrn).get(key);
+      String metadataValue = api.getMetadataApi(vdcUrn).get(key);
 
       assertEquals(metadataValue, value);
    }
