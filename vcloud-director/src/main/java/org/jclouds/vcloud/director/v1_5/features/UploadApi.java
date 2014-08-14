@@ -23,10 +23,15 @@ import javax.ws.rs.PUT;
 import org.jclouds.io.Payload;
 import org.jclouds.rest.annotations.EndpointParam;
 import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 
-@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+/**
+ * Provides access to upload.
+ */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface UploadApi {
 
-   @PUT void upload(@EndpointParam URI location, Payload payload);
+   @PUT
+   void upload(@EndpointParam URI location, Payload payload);
 }

@@ -54,20 +54,20 @@ public class OrgApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      orgApi = context.getApi().getOrgApi();
+      orgApi = api.getOrgApi();
    }
 
    @AfterClass(alwaysRun = true)
    public void cleanUp() throws Exception {
       if (adminMembersSet) {
          try {
-            Task remove = adminContext.getApi().getMetadataApi(orgUrn).remove("KEY");
+            Task remove = api.getMetadataApi(orgUrn).remove("KEY");
             taskDoneEventually(remove);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting metadata entry");
          }
          try {
-            adminContext.getApi().getCatalogApi().remove(catalogUrn);
+            api.getCatalogApi().removeItem(catalogUrn);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting catalog'%s': %s", catalogUrn);
          }
@@ -110,9 +110,7 @@ public class OrgApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
       checkOrg(org);
 
-      if (adminContext != null) {
-         setupAdminMembers();
-      }
+      setupAdminMembers();
    }
 
    /**
@@ -121,11 +119,11 @@ public class OrgApiLiveTest extends BaseVCloudDirectorApiLiveTest {
     */
    private void setupAdminMembers() {
       //TODO: block until complete
-      adminContext.getApi().getMetadataApi(orgUrn).put("KEY", "VALUE");
+      api.getMetadataApi(orgUrn).put("KEY", "VALUE");
 
       AdminCatalog newCatalog = AdminCatalog.builder().name("Test Catalog " + getTestDateTimeStamp())
                .description("created by testOrg()").build();
-      newCatalog = adminContext.getApi().getCatalogApi().addCatalogToOrg(newCatalog, orgUrn);
+      newCatalog = api.getAdminCatalogApi().addCatalogToOrg(newCatalog, orgUrn);
 
       catalogUrn = newCatalog.getId();
 
@@ -136,7 +134,7 @@ public class OrgApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    public void testGetOrgMetadata() {
 
       // Call the method being tested
-      Metadata metadata = context.getApi().getMetadataApi(orgUrn).get();
+      Metadata metadata = api.getMetadataApi(orgUrn).get();
 
       // NOTE The environment MUST have at one metadata entry for the first organisation configured
 
@@ -150,7 +148,7 @@ public class OrgApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "GET /org/{id}/metadata/{key}", dependsOnMethods = { "testGetOrgMetadata" })
    public void testGetOrgMetadataValue() {
       // Call the method being tested
-      String value = context.getApi().getMetadataApi(orgUrn).get("KEY");
+      String value = api.getMetadataApi(orgUrn).get("KEY");
 
       // NOTE The environment MUST have configured the metadata entry as '{ key="KEY", value="VALUE"
       // )'

@@ -26,39 +26,40 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.logging.Logger;
-import org.jclouds.ovf.Envelope;
 import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
-import org.jclouds.vcloud.director.v1_5.functions.SectionForVAppTemplate;
+import org.jclouds.vcloud.director.v1_5.domain.dmtf.Envelope;
+import org.jclouds.vcloud.director.v1_5.functions.NetworkSectionForVAppTemplate;
 
 import com.google.common.base.Function;
 import com.google.common.cache.LoadingCache;
 
 @Singleton
 public class ValidateVAppTemplateAndReturnEnvelopeOrThrowIllegalArgumentException implements
-         Function<VAppTemplate, Envelope> {
+        Function<VAppTemplate, Envelope> {
 
    @Resource
    protected Logger logger = Logger.NULL;
 
    private final LoadingCache<URI, Envelope> envelopes;
-   private final SectionForVAppTemplate<NetworkSection> findNetworkSectionForVAppTemplate;
+   private final NetworkSectionForVAppTemplate findNetworkSectionForVAppTemplate;
 
    @Inject
    protected ValidateVAppTemplateAndReturnEnvelopeOrThrowIllegalArgumentException(LoadingCache<URI, Envelope> envelopes,
-         SectionForVAppTemplate<NetworkSection> findNetworkSectionForVAppTemplate) {
+                                                                                  NetworkSectionForVAppTemplate findNetworkSectionForVAppTemplate) {
       this.envelopes = checkNotNull(envelopes, "envelopes");
       this.findNetworkSectionForVAppTemplate = checkNotNull(findNetworkSectionForVAppTemplate, "findNetworkSectionForVAppTemplate");
    }
 
    @Override
    public Envelope apply(VAppTemplate from) {
-      checkArgument(from.getChildren().size() == 1, "multiple vms are not supported: %s", from);
+      //checkArgument(from.getChildren().size() == 1, "multiple vms are not supported: %s", from);
 
+      // TODO
+      /*
       checkArgument(findNetworkSectionForVAppTemplate.apply(from).getNetworks().size() == 1,
                "multiple network connections are not supported: %s", from);
-
+      */
       checkArgument(from.isOvfDescriptorUploaded(), "ovf descriptor is not uploaded: %s", from);
       Envelope ovf = getOVFForVAppTemplateAndValidate(from);
       return ovf;
@@ -68,8 +69,8 @@ public class ValidateVAppTemplateAndReturnEnvelopeOrThrowIllegalArgumentExceptio
       Envelope ovf;
       try {
          ovf = envelopes.get(from.getHref());
-         checkArgument(ovf.getVirtualSystem().getVirtualHardwareSections().size() > 0,
-                  "no hardware sections exist in ovf %s", ovf);
+         // TODO
+         //checkArgument(ovf.getVirtualSystem().getVirtualHardwareSections().size() > 0, "no hardware sections exist in ovf %s", ovf);
       } catch (ExecutionException e) {
          throw new IllegalArgumentException("no ovf envelope found for: " + from, e);
       }

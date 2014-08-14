@@ -36,7 +36,7 @@ public class UploadApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      uploadApi = context.getApi().getUploadApi();
+      uploadApi = api.getUploadApi();
    }
 
    @Test(description = "PUT ???", enabled = false)

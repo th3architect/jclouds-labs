@@ -57,12 +57,12 @@
 
     <logger name="jclouds.wire">
         <level value="DEBUG" />
-        <appender-ref ref="WIREFILE" />
+        <appender-ref ref="STDOUT" />
     </logger>
 
     <logger name="jclouds.headers">
         <level value="DEBUG" />
-        <appender-ref ref="WIREFILE" />
+        <appender-ref ref="STDOUT" />
     </logger>
 
     <logger name="jclouds.compute">

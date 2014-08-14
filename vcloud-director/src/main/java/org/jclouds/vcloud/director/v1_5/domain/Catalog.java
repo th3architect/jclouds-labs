@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 import com.google.common.base.Objects;
-import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -36,12 +36,12 @@ import com.google.common.collect.Sets;
  * Container for references to {@link VAppTemplate} and {@link Media} objects.
  *
  * <pre>
- * &lt;complexType name="CatalogType" /&gt;
+ * &lt;complexType name="Catalog" /&gt;
  * </pre>
  */
 @XmlSeeAlso({ AdminCatalog.class })
 @XmlRootElement(name = "Catalog")
-@XmlType(name = "CatalogType")
+@XmlType(name = "Catalog")
 public class Catalog extends Entity {
 
    public static Builder<?> builder() {
@@ -50,7 +50,7 @@ public class Catalog extends Entity {
 
    @Override
    public Builder<?> toBuilder() {
-      return builder().fromCatalogType(this);
+      return builder().fromCatalog(this);
    }
 
    private static class ConcreteBuilder extends Builder<ConcreteBuilder> {
@@ -63,7 +63,7 @@ public class Catalog extends Entity {
       private Boolean isPublished;
 
       /**
-       * @see CatalogType#getOwner()
+       * @see Catalog#getOwner()
        */
       public B owner(Owner owner) {
          this.owner = owner;
@@ -87,7 +87,7 @@ public class Catalog extends Entity {
       }
 
       /**
-       * @see CatalogType#isPublished()
+       * @see Catalog#isPublished()
        */
       public B isPublished(Boolean isPublished) {
          this.isPublished = isPublished;
@@ -95,7 +95,7 @@ public class Catalog extends Entity {
       }
 
       /**
-       * @see CatalogType#isPublished()
+       * @see Catalog#isPublished()
        */
       public B published() {
          this.isPublished = Boolean.TRUE;
@@ -107,7 +107,7 @@ public class Catalog extends Entity {
          return new Catalog(this);
       }
 
-      public B fromCatalogType(Catalog in) {
+      public B fromCatalog(Catalog in) {
          return fromEntityType(in).owner(in.getOwner()).items(in.getCatalogItems()).isPublished(in.isPublished());
       }
    }

@@ -16,16 +16,8 @@
  */
 package org.jclouds.docker.domain;
 
-<<<<<<< HEAD
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
-=======
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
->>>>>>> JCLOUDS-653: Address Guava 18 deprecations
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +42,6 @@ public abstract class NetworkSettings {
 
    public abstract Map<String, List<Map<String, String>>> ports();
 
-<<<<<<< HEAD
    @SerializedNames({ "IPAddress", "IPPrefixLen", "Gateway", "Bridge", "PortMapping", "Ports" })
    public static NetworkSettings create(String ipAddress, int ipPrefixLen, String gateway, String bridge,
          String portMapping, Map<String, List<Map<String, String>>> ports) {

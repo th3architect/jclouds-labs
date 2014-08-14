@@ -23,17 +23,13 @@ import static org.testng.Assert.assertTrue;
 import java.net.URI;
 
 import org.jclouds.ContextBuilder;
-import org.jclouds.apis.BaseContextLiveTest;
+import org.jclouds.apis.BaseApiLiveTest;
 import org.jclouds.providers.AnonymousProviderMetadata;
 import org.jclouds.providers.ProviderMetadata;
-import org.jclouds.rest.ApiContext;
 import org.jclouds.vcloud.director.testng.FormatApiResultsListener;
 import org.jclouds.vcloud.director.v1_5.domain.SessionWithToken;
-import org.testng.annotations.BeforeGroups;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import com.google.common.reflect.TypeToken;
 
 /**
  * Tests behavior of {@link SessionApi}. Note this class is tested completely independently of
@@ -41,12 +37,13 @@ import com.google.common.reflect.TypeToken;
  */
 @Listeners(FormatApiResultsListener.class)
 @Test(groups = { "live", "user" }, testName = "SessionApiLiveTest")
-public class SessionApiLiveTest extends BaseContextLiveTest<ApiContext<SessionApi>> {
+public class SessionApiLiveTest extends BaseApiLiveTest<SessionApi> {
 
    public SessionApiLiveTest() {
       provider = "vcloud-director";
    }
 
+   /*
    @Override
    @BeforeGroups(groups = { "live" })
    public void setupContext() {
@@ -56,6 +53,7 @@ public class SessionApiLiveTest extends BaseContextLiveTest<ApiContext<SessionAp
    }
 
    private SessionApi api;
+   */
    private SessionWithToken sessionWithToken;
    
    @Test(description = "POST /sessions")
@@ -80,12 +78,6 @@ public class SessionApiLiveTest extends BaseContextLiveTest<ApiContext<SessionAp
    @Test(description = "DELETE /session", dependsOnMethods = "testGetSession")
    public void testLogout() {
       api.logoutSessionWithToken(sessionWithToken.getSession().getHref(), sessionWithToken.getToken());
-   }
-
-   @Override
-   protected TypeToken<ApiContext<SessionApi>> contextType() {
-      return new TypeToken<ApiContext<SessionApi>>() {
-      };
    }
 
    @Override

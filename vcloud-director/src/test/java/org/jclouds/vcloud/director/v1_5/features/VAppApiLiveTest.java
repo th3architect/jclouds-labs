@@ -113,19 +113,16 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
 
    @BeforeClass(alwaysRun = true)
    protected void setupRequiredEntities() {
-
-      if (adminContext != null) {
-         userUrn = adminContext.getApi().getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
-                  .getId();
-      }
+      userUrn = api.getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
+              .getId();
       user = lazyGetUser();
    }
 
    @AfterClass(alwaysRun = true, dependsOnMethods = { "cleanUpEnvironment" })
    public void cleanUp() {
-      if (adminContext != null && testUserCreated && userUrn != null) {
+      if (testUserCreated && userUrn != null) {
          try {
-            adminContext.getApi().getUserApi().remove(userUrn);
+            api.getUserApi().remove(userUrn);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting user");
          }
@@ -172,7 +169,7 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       Vm toAddVm = Iterables.get(vms, 0);
 
       // TODO clean up network config of the vm
-      //cleanUpNetworkConnectionSection(toAddVm);
+      cleanUpNetworkConnectionSection(toAddVm);
       
       RecomposeVAppParams params = addRecomposeParams(composedVApp, toAddVm);
 
@@ -213,9 +210,6 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       }));
    }
 
-   /**
-    * @see VAppApi#edit(URI, VApp)
-    */
    @Test(groups = { "live", "user" }, description = "PUT /vApp/{id}", dependsOnMethods = { "testGetVApp" })
    public void testEditVApp() {
       VApp newVApp = VApp.builder().name(name("new-name-")).description("New Description").build();
@@ -508,7 +502,7 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       tryFindBridgedNetworkInOrg();
       IpRange ipRange = ipRange();
       NetworkConfiguration newConfiguration = NetworkConfiguration.builder()
-               .ipScope(ipScope(ipRange))
+               // TODO .ipScopes(ipScope(ipRange))
                .parentNetwork(Reference.builder().fromEntity(network).build())
                .fenceMode(FenceMode.NAT_ROUTED)
                .retainNetInfoAcrossDeployments(false)
@@ -558,7 +552,8 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
 
       assertEquals(modifiedOptionalVAppNetwork.get().getNetworkName(), newOptionalVAppNetwork.get().getNetworkName(), String.format(ENTITY_EQUAL, "NetworkName"));
       assertEquals(modifiedOptionalVAppNetwork.get().getConfiguration().getFenceMode(), newOptionalVAppNetwork.get().getConfiguration().getFenceMode(), String.format(ENTITY_EQUAL, "FenceMode"));
-      assertEquals(modifiedOptionalVAppNetwork.get().getConfiguration().getIpScope(), newOptionalVAppNetwork.get().getConfiguration().getIpScope(), String.format(ENTITY_EQUAL, "IpScope"));
+      assertEquals(modifiedOptionalVAppNetwork.get().getConfiguration().getIpScopes(),
+              newOptionalVAppNetwork.get().getConfiguration().getIpScopes(), String.format(ENTITY_EQUAL, "IpScope"));
       assertEquals(modifiedOptionalVAppNetwork.get().getConfiguration().getNetworkFeatures(), newOptionalVAppNetwork.get().getConfiguration().getNetworkFeatures(), String.format(ENTITY_EQUAL, "NetworkFeatures"));
    }
 
@@ -631,7 +626,7 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       ProductSectionList newSections = oldSections
                .toBuilder()
                .productSection(
-                        ProductSection.builder().info("Information about the installed software")
+                        ProductSection.builder().info((MsgType.builder().value("Information about the installed software").build()))
                                  // Default ovf:Info text
                                  .required().product(MsgType.builder().value("jclouds").build())
                                  .vendor(MsgType.builder().value("jclouds Inc.").build())
@@ -689,10 +684,10 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
    public void testSetMetadataValue() {
       key = name("key-");
       String value = name("value-");
-      context.getApi().getMetadataApi(vAppUrn).put(key, value);
+      api.getMetadataApi(vAppUrn).put(key, value);
 
       // Retrieve the value, and assert it was set correctly
-      String newMetadataValue = context.getApi().getMetadataApi(vAppUrn).get(key);
+      String newMetadataValue = api.getMetadataApi(vAppUrn).get(key);
 
       // Check the retrieved object is well formed
       assertEquals(newMetadataValue, value);
@@ -702,10 +697,10 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
    public void testGetMetadata() {
       key = name("key-");
       String value = name("value-");
-      context.getApi().getMetadataApi(vAppUrn).put(key, value);
+      api.getMetadataApi(vAppUrn).put(key, value);
 
       // Call the method being tested
-      Metadata metadata = context.getApi().getMetadataApi(vAppUrn).get();
+      Metadata metadata = api.getMetadataApi(vAppUrn).get();
 
       checkMetadata(metadata);
 
@@ -719,10 +714,10 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       
       key = name("key-");
       String value = name("value-");
-      context.getApi().getMetadataApi(vAppUrn).put(key, value);
+      api.getMetadataApi(vAppUrn).put(key, value);
       
       // Call the method being tested
-      String newValue = context.getApi().getMetadataApi(vAppUrn).get(key);
+      String newValue = api.getMetadataApi(vAppUrn).get(key);
 
       assertEquals(newValue, value, String.format(CORRECT_VALUE_OBJECT_FMT, "Value", "MetadataValue", value, newValue));
    }
@@ -730,11 +725,11 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
    @Test(groups = { "live", "user" }, description = "DELETE /vApp/{id}/metadata/{key}", dependsOnMethods = { "testSetMetadataValue" })
    public void testRemoveMetadataEntry() {
       // Delete the entry
-      Task task = context.getApi().getMetadataApi(vAppUrn).remove(key);
+      Task task = api.getMetadataApi(vAppUrn).remove(key);
       retryTaskSuccess.apply(task);
 
       // Confirm the entry has been removed
-      Metadata newMetadata = context.getApi().getMetadataApi(vAppUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vAppUrn).get();
 
       // Check the retrieved object is well formed
       checkMetadataKeyAbsentFor(VAPP, newMetadata, key);
@@ -742,17 +737,17 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
 
    @Test(groups = { "live", "user" }, description = "POST /vApp/{id}/metadata", dependsOnMethods = { "testGetMetadata" })
    public void testMergeMetadata() {
-      Metadata oldMetadata = context.getApi().getMetadataApi(vAppUrn).get();
+      Metadata oldMetadata = api.getMetadataApi(vAppUrn).get();
       Map<String, String> oldMetadataMap = Checks.metadataToMap(oldMetadata);
 
       // Store a value, to be removed
       String key = name("key-");
       String value = name("value-");
-      Task task = context.getApi().getMetadataApi(vAppUrn).putAll(ImmutableMap.of(key, value));
+      Task task = api.getMetadataApi(vAppUrn).putAll(ImmutableMap.of(key, value));
       retryTaskSuccess.apply(task);
 
       // Confirm the entry contains everything that was there, and everything that was being added
-      Metadata newMetadata = context.getApi().getMetadataApi(vAppUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vAppUrn).get();
       Map<String, String> expectedMetadataMap = ImmutableMap.<String, String> builder().putAll(oldMetadataMap)
                .put(key, value).build();
 
@@ -800,7 +795,8 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
          if (!vAppHasNetworkConfigured(vApp)) {
             // add a new network connection section for the vm.
             NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
-                     .info("Empty network configuration parameters").build();
+                     .info(MsgType.builder().value("Empty network configuration parameters").build())
+            .build();
             // adding the network connection section to the instantiation params of the vapp.
             vmInstantiationParams = InstantiationParams.builder().sections(ImmutableSet.of(networkConnectionSection))
                      .build();
@@ -829,7 +825,8 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
                      .network(vAppNetworkConfiguration.getNetworkName())
                      .ipAddressAllocationMode(IpAddressAllocationMode.DHCP).build();
 
-            NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder().info("networkInfo")
+            NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
+                    .info(MsgType.builder().value("networkInfo").build())
                      .primaryNetworkConnectionIndex(0).networkConnection(networkConnection).build();
 
             // adding the network connection section to the instantiation params of the vapp.

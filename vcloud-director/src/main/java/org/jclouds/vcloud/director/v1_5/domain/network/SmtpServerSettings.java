@@ -21,8 +21,8 @@ import static com.google.common.base.Objects.equal;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.MoreObjects.ToStringHelper;
+
+import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Objects;
 
 /**
@@ -206,7 +206,7 @@ public class SmtpServerSettings {
    }
 
    public ToStringHelper string() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("isUseAuthentication", useAuthentication)
             .add("host", host)
             .add("username", username)

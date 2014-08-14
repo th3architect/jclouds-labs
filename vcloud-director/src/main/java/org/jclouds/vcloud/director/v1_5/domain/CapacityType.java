@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 /**
@@ -174,7 +174,7 @@ public class CapacityType<T extends CapacityType<T>> {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("units", units)
             .add("allocated", allocated)
             .add("limit", limit).toString();

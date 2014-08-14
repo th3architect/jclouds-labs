@@ -19,8 +19,10 @@ package org.jclouds.dmtf.ovf;
 import static com.google.common.base.Objects.equal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
@@ -28,7 +30,7 @@ import org.jclouds.dmtf.cim.ResourceAllocationSettingData;
 import org.jclouds.dmtf.cim.VirtualSystemSettingData;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -130,6 +132,9 @@ public class VirtualHardwareSection extends SectionType {
    @XmlElement(name = "Item")
    protected Set<? extends ResourceAllocationSettingData> items = Sets.newLinkedHashSet();
 
+   @XmlAnyElement(lax=true)
+   protected List<Object> any;
+
    protected VirtualHardwareSection(Builder<?> builder) {
       super(builder);
       this.virtualSystem = builder.virtualSystem;
@@ -190,7 +195,7 @@ public class VirtualHardwareSection extends SectionType {
    }
 
    @Override
-   protected MoreObjects.ToStringHelper string() {
+   protected Objects.ToStringHelper string() {
       return super.string()
             .add("transport", transport)
             .add("virtualSystem", virtualSystem)

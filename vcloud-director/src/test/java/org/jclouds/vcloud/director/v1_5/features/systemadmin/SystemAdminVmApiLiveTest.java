@@ -49,17 +49,15 @@ public class SystemAdminVmApiLiveTest extends AbstractVAppApiLiveTest {
    @BeforeClass(alwaysRun = true)
    protected void setupRequiredEntities() {
 
-      if (adminContext != null) {
-         userUrn = adminContext.getApi().getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
+         userUrn = api.getUserApi().addUserToOrg(randomTestUser("VAppAccessTest"), org.getId())
                   .getId();
-      }
    }
 
    @AfterClass(alwaysRun = true, dependsOnMethods = { "cleanUpEnvironment" })
    public void cleanUp() {
-      if (adminContext != null && testUserCreated && userUrn != null) {
+      if (testUserCreated && userUrn != null) {
          try {
-            adminContext.getApi().getUserApi().remove(userUrn);
+            api.getUserApi().remove(userUrn);
          } catch (Exception e) {
             logger.warn("Error when deleting user: %s", e.getMessage());
          }
@@ -89,7 +87,7 @@ public class SystemAdminVmApiLiveTest extends AbstractVAppApiLiveTest {
    @Test(description = "POST /vApp/{id}/action/relocate", dependsOnMethods = { "testGetVm" })
    public void testRelocate() {
       // Relocate to the last of the available datastores
-      QueryResultRecords records = adminContext.getApi().getQueryApi().queryAll("datastore");
+      QueryResultRecords records = api.getAdminQueryApi().queryAll("datastore");
       QueryResultRecordType datastore = Iterables.getLast(records.getRecords());
       RelocateParams params = RelocateParams.builder().datastore(Reference.builder().href(datastore.getHref()).build())
                .build();

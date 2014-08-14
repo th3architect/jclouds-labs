@@ -33,9 +33,9 @@ public class VCloudDirectorApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
    @Test(description = "GET /entity/{id}")
    public void testResolveEntity() {
-      for (Reference orgRef : context.getApi().getOrgApi().list()) {
-         Org org = context.getApi().getOrgApi().get(orgRef.getHref());
-         Entity entity = context.getApi().resolveEntity(org.getId());
+      for (Reference orgRef : api.getOrgApi().list()) {
+         Org org = api.getOrgApi().get(orgRef.getHref());
+         Entity entity = api.resolveEntity(org.getId());
          checkEntityType(entity);
       }
    }

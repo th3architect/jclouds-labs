@@ -37,6 +37,20 @@ public final class VCloudDirectorConstants {
    /** TODO javadoc */
    public static final String PROPERTY_VCLOUD_DIRECTOR_XML_SCHEMA = "jclouds.vcloud-director.xml.schema";
 
+   // TODO put these somewhere else, maybe core?
+
+   /** TODO javadoc */
+   public static final String PROPERTY_DNS_NAME_LEN_MIN = "jclouds.dns_name_length_min";
+
+   /** TODO javadoc */
+   public static final String PROPERTY_NS_NAME_LEN_MAX = "jclouds.dns_name_length_max";
+
+   /** TODO javadoc */
+   /*
+   public static final TypeToken<RestContext<SessionApi, SessionAsyncApi>> SESSION_CONTEXT_TYPE =
+         new TypeToken<RestContext<SessionApi, SessionAsyncApi>>() {
+		   };
+*/
    private VCloudDirectorConstants() {
       throw new AssertionError("intentionally unimplemented");
    }

@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import org.jclouds.dmtf.ovf.ProductSection;
 import org.jclouds.dmtf.ovf.SectionType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -40,6 +40,7 @@ public abstract class BaseVirtualSystem extends SectionType {
 
       private String id;
       private String name;
+      private String info;
       private Set<ProductSection> productSections = Sets.newLinkedHashSet();
       private Set<SectionType> additionalSections = Sets.newLinkedHashSet();
 
@@ -48,6 +49,14 @@ public abstract class BaseVirtualSystem extends SectionType {
        */
       public B name(String name) {
          this.name = name;
+         return self();
+      }
+
+      /**
+       * @see org.jclouds.dmtf.ovf.internal.BaseVirtualSystem#getInfo()
+       */
+      public B info(String info) {
+         this.info = info;
          return self();
       }
 
@@ -104,6 +113,8 @@ public abstract class BaseVirtualSystem extends SectionType {
    private String id;
    @XmlElement(name = "Name")
    private String name;
+   @XmlElement(name = "Info")
+   private String info;
    @XmlElement(name = "ProductSection")
    private Set<ProductSection> productSections;
    @XmlElementRef
@@ -113,6 +124,7 @@ public abstract class BaseVirtualSystem extends SectionType {
       super(builder);
       this.id = builder.id;
       this.name = builder.name;
+      this.info = builder.info;
       this.productSections = ImmutableSet.copyOf(checkNotNull(builder.productSections, "productSections"));
       this.additionalSections = ImmutableSet.copyOf(checkNotNull(builder.additionalSections, "additionalSections"));
    }
@@ -161,10 +173,11 @@ public abstract class BaseVirtualSystem extends SectionType {
    }
 
    @Override
-   protected MoreObjects.ToStringHelper string() {
+   protected Objects.ToStringHelper string() {
       return super.string()
             .add("id", id)
             .add("name", name)
+            .add("info", info)
             .add("productSections", productSections)
             .add("additionalSections", additionalSections);
    }

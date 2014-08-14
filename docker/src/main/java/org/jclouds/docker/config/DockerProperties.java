@@ -16,7 +16,11 @@
  */
 package org.jclouds.docker.config;
 
+<<<<<<< HEAD:docker/src/main/java/org/jclouds/docker/config/DockerProperties.java
 public class DockerProperties {
+=======
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
+>>>>>>> Refactor vcloud-director:vcloud-director/src/test/java/org/jclouds/vcloud/director/v1_5/internal/BaseVCloudDirectorRestApiExpectTest.java
 
    /**
     * default Docker host password

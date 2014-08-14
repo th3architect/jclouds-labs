@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jclouds.dmtf.ovf.MsgType;
 import org.jclouds.vcloud.director.v1_5.AbstractVAppApiLiveTest;
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
 import org.jclouds.vcloud.director.v1_5.domain.Task;
@@ -74,7 +75,7 @@ public class VAppNetworksLiveTest extends AbstractVAppApiLiveTest {
    protected void tidyUp() {
       if (key != null) {
          try {
-	         Task remove = context.getApi().getMetadataApi(vAppTemplateUrn).remove(key);
+	         Task remove = api.getMetadataApi(vAppTemplateUrn).remove(key);
 	         taskDoneEventually(remove);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting metadata entry '%s'", key);
@@ -171,7 +172,7 @@ public class VAppNetworksLiveTest extends AbstractVAppApiLiveTest {
       NatService natService = addNatService();
       IpScope ipScope = addNewIpScope();      
       NetworkConfiguration newConfiguration = NetworkConfiguration.builder()
-               .ipScope(ipScope)
+               // TODO .ipScope(ipScope)
                .parentNetwork(Reference.builder().fromEntity(network).build())
                .fenceMode(FenceMode.NAT_ROUTED)
                .retainNetInfoAcrossDeployments(false)
@@ -180,7 +181,7 @@ public class VAppNetworksLiveTest extends AbstractVAppApiLiveTest {
       
       VAppNetworkConfiguration newVAppNetworkConfiguration = VAppNetworkConfiguration.builder().networkName(newVAppNetworkName).configuration(newConfiguration).build();
       return NetworkConfigSection.builder()
-             .info("modified")
+             .info(MsgType.builder().value("modified").build())
              .networkConfigs(ImmutableSet.of(newVAppNetworkConfiguration))
              .build();
    }
@@ -290,7 +291,7 @@ public class VAppNetworksLiveTest extends AbstractVAppApiLiveTest {
       IpScope ipScope = addNewIpScope();      
 
       NetworkConfiguration newConfiguration = NetworkConfiguration.builder()
-               .ipScope(ipScope)
+               //TODO .ipScope(ipScope)
                .parentNetwork(parentNetworkRef)
                .fenceMode(FenceMode.NAT_ROUTED)
                .retainNetInfoAcrossDeployments(false)
@@ -309,9 +310,9 @@ public class VAppNetworksLiveTest extends AbstractVAppApiLiveTest {
                .getNetworkConnections();
 
       NetworkConnectionSection section = NetworkConnectionSection.builder()
-               .info("info")
-               .primaryNetworkConnectionIndex(0)
-               .build();
+               .info(MsgType.builder().value("networkInfo").build())
+                       .primaryNetworkConnectionIndex(0)
+                       .build();
 
       for (NetworkConnection networkConnection : networkConnections) {
          section = section

@@ -16,7 +16,6 @@
  */
 package org.jclouds.vcloud.director.v1_5.features;
 
-import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.CONTROL_ACCESS;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.DEPLOY_VAPP_PARAMS;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.LEASE_SETTINGS_SECTION;
@@ -39,6 +38,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.dmtf.ovf.StartupSection;
 import org.jclouds.rest.annotations.BinderParam;
@@ -57,14 +57,60 @@ import org.jclouds.vcloud.director.v1_5.domain.params.RecomposeVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.UndeployVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.section.LeaseSettingsSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
-@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+/**
+ * Provides access to {@link VApp} objects.
+ */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface VAppApi {
 
    /**
-    * @see VAppApi#get(String)
+    * Retrieves a {@link VApp}.
+    *
+    * The {@link VApp} could be in one of these statuses:
+    * <ul>
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#FAILED_CREATION
+    * FAILED_CREATION(-1)} - Transient entity state, e.g., model object is addd but the
+    * corresponding VC backing does not exist yet. This is further sub-categorized in the respective
+    * entities.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRESOLVED
+    * UNRESOLVED(0)} - Entity is whole, e.g., VM creation is complete and all the required model
+    * objects and VC backings are created.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#RESOLVED
+    * RESOLVED(1)} - Entity is resolved.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#DEPLOYED
+    * DEPLOYED(2)} - Entity is deployed.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#SUSPENDED
+    * SUSPENDED(3)} - All VMs of the vApp are suspended.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_ON
+    * POWERED_ON(4)} - All VMs of the vApp are powered on.
+    * <li>
+    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#WAITING_FOR_INPUT
+    * WAITING_FOR_INPUT(5)} - VM is pending response on a question.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNKNOWN
+    * UNKNOWN(6)} - Entity state could not be retrieved from the inventory, e.g., VM power state is
+    * null.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRECOGNIZED
+    * UNRECOGNIZED(7)} - Entity state was retrieved from the inventory but could not be mapped to an
+    * internal state.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_OFF
+    * POWERED_OFF(8)} - All VMs of the vApp are powered off.
+    * <li>
+    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#INCONSISTENT_STATE
+    * INCONSISTENT_STATE(9)} - Apply to VM status, if a vm is {@code POWERED_ON}, or
+    * {@code WAITING_FOR_INPUT}, but is undeployed, it is in an inconsistent state.
+    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#MIXED MIXED(10)}
+    * - vApp status is set to {@code MIXED} when the VMs in the vApp are in different power states
+    * </ul>
+    *
+    * <pre>
+    * GET /vApp/{id}
+    * </pre>
+    *
+    * @since 0.9
     */
    @GET
    @Consumes(VAPP)
@@ -86,7 +132,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task edit(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) VApp vApp);
+             @BinderParam(BindToXMLPayload.class) VApp vApp);
 
    /**
     * Deletes a {@link VApp}.
@@ -117,7 +163,7 @@ public interface VAppApi {
    @Consumes(CONTROL_ACCESS)
    @JAXBResponseParser
    ControlAccessParams editControlAccess(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
+            @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
 
    /**
     * Deploys a {@link VApp}.
@@ -139,7 +185,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task deploy(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
+            @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
 
    /**
     * Discard suspended state of a {@link VApp}.
@@ -176,7 +222,7 @@ public interface VAppApi {
    @Path("/action/enterMaintenanceMode")
    @Consumes
    @JAXBResponseParser
-   void enterMaintenanceMode(@EndpointParam(parser = URNToHref.class) String vAppUrn);
+   Void enterMaintenanceMode(@EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Take the {@link VApp} out of maintenance mode.
@@ -216,7 +262,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task recompose(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
+            @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
 
    /**
     * Undeploy a {@link VApp}.
@@ -237,7 +283,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task undeploy(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
 
    /**
     * Retrieves the control access information for a {@link VApp}.
@@ -251,7 +297,6 @@ public interface VAppApi {
     *
     * @since 0.9
     */
-   // TODO: revise
    @GET
    @Path("/controlAccess")
    @Consumes(CONTROL_ACCESS)
@@ -381,7 +426,7 @@ public interface VAppApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    LeaseSettingsSection getLeaseSettingsSection(
-         @EndpointParam(parser = URNToHref.class) String vAppUrn);
+            @EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the lease settings section of a {@link VApp}.
@@ -398,7 +443,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editLeaseSettingsSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
 
    /**
     * Retrieves the network config section of a {@link VApp}.
@@ -415,7 +460,7 @@ public interface VAppApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    NetworkConfigSection getNetworkConfigSection(
-         @EndpointParam(parser = URNToHref.class) String vAppUrn);
+            @EndpointParam(parser = URNToHref.class) String vAppUrn);
 
    /**
     * Modifies the network config section of a {@link VApp}.
@@ -432,7 +477,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editNetworkConfigSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
+            @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
 
    /**
     * Retrieves the network section of a {@link VApp}.
@@ -481,7 +526,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    void editOwner(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) Owner owner);
+            @BinderParam(BindToXMLPayload.class) Owner owner);
 
    /**
     * Retrieves {@link VApp} product sections.
@@ -514,7 +559,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editProductSections(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
 
    /**
     * Retrieves the startup section of a {@link VApp}.
@@ -547,52 +592,10 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editStartupSection(@EndpointParam(parser = URNToHref.class) String vAppUrn,
-         @BinderParam(BindToXMLPayload.class) StartupSection section);
+            @BinderParam(BindToXMLPayload.class) StartupSection section);
 
    /**
-    * Retrieves a {@link VApp}.
-    *
-    * The {@link VApp} could be in one of these statuses:
-    * <ul>
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#FAILED_CREATION
-    * FAILED_CREATION(-1)} - Transient entity state, e.g., model object is addd but the
-    * corresponding VC backing does not exist yet. This is further sub-categorized in the respective
-    * entities.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRESOLVED
-    * UNRESOLVED(0)} - Entity is whole, e.g., VM creation is complete and all the required model
-    * objects and VC backings are created.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#RESOLVED
-    * RESOLVED(1)} - Entity is resolved.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#DEPLOYED
-    * DEPLOYED(2)} - Entity is deployed.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#SUSPENDED
-    * SUSPENDED(3)} - All VMs of the vApp are suspended.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_ON
-    * POWERED_ON(4)} - All VMs of the vApp are powered on.
-    * <li>
-    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#WAITING_FOR_INPUT
-    * WAITING_FOR_INPUT(5)} - VM is pending response on a question.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNKNOWN
-    * UNKNOWN(6)} - Entity state could not be retrieved from the inventory, e.g., VM power state is
-    * null.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#UNRECOGNIZED
-    * UNRECOGNIZED(7)} - Entity state was retrieved from the inventory but could not be mapped to an
-    * internal state.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#POWERED_OFF
-    * POWERED_OFF(8)} - All VMs of the vApp are powered off.
-    * <li>
-    * {@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#INCONSISTENT_STATE
-    * INCONSISTENT_STATE(9)} - Apply to VM status, if a vm is {@code POWERED_ON}, or
-    * {@code WAITING_FOR_INPUT}, but is undeployed, it is in an inconsistent state.
-    * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#MIXED MIXED(10)}
-    * - vApp status is set to {@code MIXED} when the VMs in the vApp are in different power states
-    * </ul>
-    *
-    * <pre>
-    * GET /vApp/{id}
-    * </pre>
-    *
-    * @since 0.9
+    * @see VAppApi#get(URI)
     */
    @GET
    @Consumes(VAPP)
@@ -626,7 +629,7 @@ public interface VAppApi {
    @Consumes(CONTROL_ACCESS)
    @JAXBResponseParser
    ControlAccessParams editControlAccess(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
+            @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
 
    /**
     * @see VAppApi#deploy(URI, DeployVAppParams)
@@ -637,7 +640,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task deploy(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
+            @BinderParam(BindToXMLPayload.class) DeployVAppParams params);
 
    /**
     * @see VAppApi#discardSuspendedState(URI)
@@ -675,7 +678,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task recompose(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
+            @BinderParam(BindToXMLPayload.class) RecomposeVAppParams params);
 
    /**
     * @see VAppApi#undeploy(URI, UndeployVAppParams)
@@ -686,7 +689,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task undeploy(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
+            @BinderParam(BindToXMLPayload.class) UndeployVAppParams params);
 
    /**
     * @see VAppApi#getAccessControl(URI)
@@ -771,7 +774,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editLeaseSettingsSection(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection section);
 
    /**
     * @see VAppApi#getNetworkConfigSection(URI)
@@ -792,7 +795,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editNetworkConfigSection(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
+            @BinderParam(BindToXMLPayload.class) NetworkConfigSection section);
 
    /**
     * @see VAppApi#getNetworkSection(URI)
@@ -843,7 +846,7 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editProductSections(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sectionList);
 
    /**
     * @see VAppApi#getStartupSection(URI)
@@ -864,5 +867,5 @@ public interface VAppApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task editStartupSection(@EndpointParam URI vAppHref,
-         @BinderParam(BindToXMLPayload.class) StartupSection section);
+            @BinderParam(BindToXMLPayload.class) StartupSection section);
 }

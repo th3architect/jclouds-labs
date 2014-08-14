@@ -77,8 +77,8 @@ public class KeyPairsApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 	@Override
 	@BeforeClass(alwaysRun = true)
 	public void setupRequiredApis() {
-		vdcApi = context.getApi().getVdcApi();
-		mediaApi = context.getApi().getMediaApi();
+		vdcApi = api.getVdcApi();
+		mediaApi = api.getMediaApi();
 	}
 
 	@Test(description = "Create Key Pair")
@@ -88,7 +88,7 @@ public class KeyPairsApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 		Vdc currentVDC = lazyGetVdc();
 		Media keyPairsContainer = findOrCreateKeyPairContainerInVDCNamed(currentVDC,
 				keyPairContainer, keyPairName);
-		String keypairValue = context.getApi().getMetadataApi(
+		String keypairValue = api.getMetadataApi(
 				keyPairsContainer.getId()).get(keyPairName);
 		assertEquals(keypairValue, generateKeyPair(keyPairName));
 	}
@@ -118,7 +118,7 @@ public class KeyPairsApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
 					@Override
 					public boolean apply(Media input) {
-						return context.getApi().getMetadataApi(input.getId()).get(
+						return api.getMetadataApi(input.getId()).get(
 								keyPairName) != null;
 					}
 				});
@@ -146,7 +146,7 @@ public class KeyPairsApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 		Link uploadLink = getUploadLinkForMedia(keyPairsContainer);
 		// generate an empty iso
 		byte[] iso = new byte[] {};
-		context.getApi()
+		api
 				.getUploadApi()
 				.upload(uploadLink.getHref(), Payloads.newByteArrayPayload(iso));
 
@@ -204,7 +204,7 @@ public class KeyPairsApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
 	private void setKeyPairOnkeyPairsContainer(Media media, String keyPairName,
 			String keyPair) {
-		Task setKeyPair = context.getApi().getMetadataApi(media.getId()).put(
+		Task setKeyPair = api.getMetadataApi(media.getId()).put(
 				keyPairName, keyPair);
 		Checks.checkTask(setKeyPair);
 		assertTrue(retryTaskSuccess.apply(setKeyPair),

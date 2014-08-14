@@ -22,8 +22,10 @@ import static org.jclouds.dmtf.DMTFConstants.OVF_NS;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.VCLOUD_1_5_NS;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,10 +33,11 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import org.jclouds.ovf.Configuration;
 import org.jclouds.vcloud.director.v1_5.domain.Link;
 
 import com.google.common.base.Objects;
-import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -122,7 +125,6 @@ public class VirtualHardwareSection extends org.jclouds.dmtf.ovf.VirtualHardware
    protected URI href;
    @XmlElement(name = "Link", namespace = VCLOUD_1_5_NS)
    protected Set<Link> links = Sets.newLinkedHashSet();
-
 
    protected VirtualHardwareSection(Builder<?> builder) {
       super(builder);

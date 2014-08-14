@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package org.jclouds.vcloud.director.v1_5.internal;
-
+/*
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,7 +29,13 @@ import org.jclouds.rest.Utils;
 import org.jclouds.rest.internal.ApiContextImpl;
 import org.jclouds.vcloud.director.v1_5.VCloudDirectorContext;
 import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
+<<<<<<< HEAD
 import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
+=======
+import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminAsyncApi;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
+import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorAsyncApi;
+>>>>>>> Refactor vcloud-director
 
 import com.google.common.base.Supplier;
 import com.google.inject.Injector;
@@ -52,3 +58,4 @@ public class VCloudDirectorContextImpl extends ApiContextImpl<VCloudDirectorApi>
       return adminContext;
    }
 }
+*/

@@ -16,48 +16,48 @@
  */
 package org.jclouds.vcloud.director.v1_5.features.admin;
 
-import static org.testng.Assert.assertEquals;
-
-import java.net.URI;
-
-import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
-import org.jclouds.vcloud.director.v1_5.domain.AdminVdc;
-import org.jclouds.vcloud.director.v1_5.domain.Reference;
-import org.jclouds.vcloud.director.v1_5.features.VdcApiExpectTest;
-import org.jclouds.vcloud.director.v1_5.internal.VCloudDirectorAdminApiExpectTest;
-import org.testng.annotations.Test;
-
-/**
- * Test the {@link AdminVdcApi} by observing its side effects.
- */
-@Test(groups = { "unit", "admin" }, singleThreaded = true, testName = "AdminVdcApiExpectTest")
-public class AdminVdcApiExpectTest extends VCloudDirectorAdminApiExpectTest {
-   
-   private Reference vdcRef = Reference.builder()
-         .href(URI.create(endpoint + "???"))
-         .build();
-   
-   @Test( enabled = false )
-   public void testGetVdc() {
-      VCloudDirectorAdminApi api = requestsSendResponses(loginRequest, sessionResponse, 
-         new VcloudHttpRequestPrimer()
-            .apiCommand("GET", "/admin/vdc/???")
-            .acceptAnyMedia()
-            .httpRequestBuilder().build(), 
-         new VcloudHttpResponsePrimer()
-            .xmlFilePayload("/vdc/admin/vdc.xml", 
-                  VCloudDirectorMediaType.ADMIN_VDC)
-            .httpResponseBuilder().build());
-
-      AdminVdc expected = adminVdc();
-
-      assertEquals(api.getVdcApi().get(vdcRef.getHref()), expected);
-   }
-   
-   public static final AdminVdc adminVdc() {
-      return AdminVdc.builder().fromVdc(VdcApiExpectTest.getVdc())
-         
-         .build();
-   }
-}
+//import static org.testng.Assert.assertEquals;
+//
+//import java.net.URI;
+//
+//import org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType;
+//import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
+//import org.jclouds.vcloud.director.v1_5.domain.AdminVdc;
+//import org.jclouds.vcloud.director.v1_5.domain.Reference;
+//import org.jclouds.vcloud.director.v1_5.features.VdcApiExpectTest;
+//import org.jclouds.vcloud.director.v1_5.internal.VCloudDirectorAdminApiExpectTest;
+//import org.testng.annotations.Test;
+//
+///**
+// * Test the {@link AdminVdcApi} by observing its side effects.
+// */
+//@Test(groups = { "unit", "admin" }, singleThreaded = true, testName = "AdminVdcApiExpectTest")
+//public class AdminVdcApiExpectTest extends VCloudDirectorAdminApiExpectTest {
+//
+//   private Reference vdcRef = Reference.builder()
+//         .href(URI.create(endpoint + "???"))
+//         .build();
+//
+//   @Test( enabled = false )
+//   public void testGetVdc() {
+//      VCloudDirectorAdminApi api = requestsSendResponses(loginRequest, sessionResponse,
+//         new VcloudHttpRequestPrimer()
+//            .apiCommand("GET", "/admin/vdc/???")
+//            .acceptAnyMedia()
+//            .httpRequestBuilder().build(),
+//         new VcloudHttpResponsePrimer()
+//            .xmlFilePayload("/vdc/admin/vdc.xml",
+//                  VCloudDirectorMediaType.ADMIN_VDC)
+//            .httpResponseBuilder().build());
+//
+//      AdminVdc expected = adminVdc();
+//
+//      assertEquals(api.getVdcApi().get(vdcRef.getHref()), expected);
+//   }
+//
+//   public static final AdminVdc adminVdc() {
+//      return AdminVdc.builder().fromVdc(VdcApiExpectTest.getVdc())
+//
+//         .build();
+//   }
+//}

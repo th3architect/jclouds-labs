@@ -21,7 +21,7 @@ import static com.google.common.base.Objects.equal;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 /**
@@ -196,7 +196,7 @@ public class NatOneToOneVmRule {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("mappingMode", mappingMode)
             .add("externalIpAddress", externalIpAddress)
             .add("vAppScopedVmId", vAppScopedVmId)

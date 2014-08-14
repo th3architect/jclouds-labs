@@ -38,6 +38,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.google.inject.Guice;
+
 /**
  * Tests live behavior of {@link UserApi}.
  */
@@ -59,7 +61,7 @@ public class UserApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      userApi = adminContext.getApi().getUserApi();
+      userApi = api.getUserApi();
    }
    
    @AfterClass(alwaysRun = true)
@@ -135,7 +137,7 @@ public class UserApiLiveTest extends BaseVCloudDirectorApiLiveTest {
             String.format(OBJ_FIELD_UPDATABLE, USER, "deployedVmQuota"));
            
       // session api isn't typically exposed to the user, as it is implicit
-      SessionApi sessionApi = context.utils().injector().getInstance(SessionApi.class);
+      SessionApi sessionApi = Guice.createInjector().getInstance(SessionApi.class);
 
       // Check the user can really login with the changed password
       // NOTE: the password is NOT returned in the User object returned from the server
@@ -147,11 +149,11 @@ public class UserApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Test(description = "POST /admin/user/{id}/action/unlock", dependsOnMethods = { "testEditUser" })
    public void testUnlockUser() {
       // Need to know how many times to fail login to lock account
-      AdminOrgApi adminOrgApi = adminContext.getApi().getOrgApi();
+      AdminOrgApi adminOrgApi = api.getAdminOrgApi();
       OrgPasswordPolicySettings settingsToRevertTo = null;
 
       // session api isn't typically exposed to the user, as it is implicit
-      SessionApi sessionApi = context.utils().injector().getInstance(SessionApi.class);
+      SessionApi sessionApi = Guice.createInjector().getInstance(SessionApi.class);
       
       OrgPasswordPolicySettings settings = adminOrgApi.getSettings(org.getId()).getPasswordPolicy();
       assertNotNull(settings);

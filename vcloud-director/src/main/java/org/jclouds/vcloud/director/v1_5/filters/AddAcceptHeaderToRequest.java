@@ -14,34 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.vcloud.director.v1_5.functions;
+package org.jclouds.vcloud.director.v1_5.filters;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.jclouds.http.HttpException;
+import org.jclouds.http.HttpRequest;
+import org.jclouds.http.HttpRequestFilter;
 
-import org.jclouds.dmtf.ovf.SectionType;
-import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
+import com.google.common.net.HttpHeaders;
 
-import com.google.common.base.Function;
+public class AddAcceptHeaderToRequest implements HttpRequestFilter {
 
-@Singleton
-public class SectionForVAppTemplate<S extends SectionType> implements Function<VAppTemplate, S> {
-   
-   private final Class<? extends SectionType> sectionType;
-
-   @Inject
-   SectionForVAppTemplate(Class<S> sectionType) {
-      this.sectionType = sectionType;
-   }
-
-   @SuppressWarnings("unchecked")
    @Override
-   public S apply(VAppTemplate from) {
-      for (SectionType section : from.getSections()) {
-         if (sectionType.isAssignableFrom(section.getClass())) {
-            return (S)section;
-         }
-      }
-      return null;
+   public HttpRequest filter(HttpRequest request) throws HttpException {
+      return request.toBuilder().replaceHeader(HttpHeaders.ACCEPT, "application/*+xml;version=1.5").build();
    }
 }

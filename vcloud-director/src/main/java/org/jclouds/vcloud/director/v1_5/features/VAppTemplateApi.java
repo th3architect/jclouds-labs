@@ -16,7 +16,6 @@
  */
 package org.jclouds.vcloud.director.v1_5.features;
 
-import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.CUSTOMIZATION_SECTION;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.LEASE_SETTINGS_SECTION;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.NETWORK_CONFIG_SECTION;
@@ -36,6 +35,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.EndpointParam;
@@ -52,15 +52,19 @@ import org.jclouds.vcloud.director.v1_5.domain.dmtf.Envelope;
 import org.jclouds.vcloud.director.v1_5.domain.section.CustomizationSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.LeaseSettingsSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
+import org.jclouds.vcloud.director.v1_5.filters.AddAcceptHeaderToRequest;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToHref;
 
-@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+/**
+ * Provides access to {@link VAppTemplate} objects.
+ */
+@RequestFilters({AddVCloudAuthorizationAndCookieToRequest.class, AddAcceptHeaderToRequest.class})
 public interface VAppTemplateApi {
 
    /**
     * Retrieves a vApp template (can be used also to retrieve a VM from a vApp Template).
-    * 
+    *
     * The vApp could be in one of these statues:
     * <ul>
     * <li>{@link org.jclouds.vcloud.director.v1_5.domain.ResourceEntityType.Status#FAILED_CREATION
@@ -81,12 +85,12 @@ public interface VAppTemplateApi {
     * - vApp template status is set to {@code MIXED} when the VMs in the vApp are in different power
     * states.
     * </ul>
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}
     * </pre>
-    * 
-    * @param templateUrn
+    *
+    * @param reference
     *           the String of the template
     * @return the requested template
     */
@@ -94,21 +98,15 @@ public interface VAppTemplateApi {
    @Consumes(VAPP_TEMPLATE)
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
-   VAppTemplate get(@EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(VAPP_TEMPLATE)
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   VAppTemplate get(@EndpointParam URI reference);
+   VAppTemplate get(@EndpointParam(parser = URNToHref.class) String reference);
 
    /**
     * Modifies only the name/description of a vApp template.
-    * 
+    *
     * <pre>
     * PUT /vAppTemplate/{id}
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @param template
@@ -121,22 +119,15 @@ public interface VAppTemplateApi {
    @Consumes(TASK)
    @JAXBResponseParser
    Task edit(@EndpointParam(parser = URNToHref.class) String templateUrn,
-         @BinderParam(BindToXMLPayload.class) VAppTemplate template);
-
-   @PUT
-   @Produces(VAPP_TEMPLATE)
-   @Consumes(TASK)
-   @JAXBResponseParser
-   Task edit(@EndpointParam URI templateHref,
-         @BinderParam(BindToXMLPayload.class) VAppTemplate template);
+            @BinderParam(BindToXMLPayload.class) VAppTemplate template);
 
    /**
     * Deletes a vApp template.
-    * 
+    *
     * <pre>
     * DELETE /vAppTemplate/{id}
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the task performing the action. This operation is asynchronous and the user should
@@ -145,40 +136,30 @@ public interface VAppTemplateApi {
    @DELETE
    @Consumes(TASK)
    @JAXBResponseParser
-   Task remove(@EndpointParam String templateUrn);
-
-   @DELETE
-   @Consumes(TASK)
-   @JAXBResponseParser
-   Task remove(@EndpointParam URI templateUri);
+   Task remove(@EndpointParam String templateUri);
 
    /**
     * Disables the download link to the ovf of a vApp template.
-    * 
+    *
     * <pre>
     * POST /vAppTemplate/{id}/action/disableDownload
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     */
    @POST
    @Path("/action/disableDownload")
    @JAXBResponseParser
-   void disableDownload(@EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @POST
-   @Path("/action/disableDownload")
-   @JAXBResponseParser
-   void disableDownload(@EndpointParam URI templateHref);
+   Void disableDownload(@EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Enables downloading of the ovf of a vApp template.
-    * 
+    *
     * <pre>
     * POST /vAppTemplate/{id}/action/enableDownload
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the task performing the action. This operation is asynchronous and the user should
@@ -190,19 +171,13 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    Task enableDownload(@EndpointParam(parser = URNToHref.class) String templateUrn);
 
-   @POST
-   @Consumes(TASK)
-   @Path("/action/enableDownload")
-   @JAXBResponseParser
-   Task enableDownload(@EndpointParam URI templateHref);
-
    /**
     * Retrieves the customization section of a vApp template.
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/customizationSection
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the customization section
@@ -213,22 +188,15 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    CustomizationSection getCustomizationSection(
-         @EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(CUSTOMIZATION_SECTION)
-   @Path("/customizationSection")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   CustomizationSection getCustomizationSection(@EndpointParam URI templateHref);
+            @EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Retrieves the lease settings section of a vApp or vApp template
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/leaseSettingsSection
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the lease settings
@@ -239,22 +207,15 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    LeaseSettingsSection getLeaseSettingsSection(
-         @EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(LEASE_SETTINGS_SECTION)
-   @Path("/leaseSettingsSection")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   LeaseSettingsSection getLeaseSettingsSection(@EndpointParam URI templateHref);
+            @EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Modifies the lease settings section of a vApp or vApp template.
-    * 
+    *
     * <pre>
     * PUT /vAppTemplate/{id}/leaseSettingsSection
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @param settingsSection
@@ -268,24 +229,16 @@ public interface VAppTemplateApi {
    @Path("/leaseSettingsSection")
    @JAXBResponseParser
    Task editLeaseSettingsSection(
-         @EndpointParam(parser = URNToHref.class) String templateUrn,
-         @BinderParam(BindToXMLPayload.class) LeaseSettingsSection settingsSection);
-
-   @PUT
-   @Produces(LEASE_SETTINGS_SECTION)
-   @Consumes(TASK)
-   @Path("/leaseSettingsSection")
-   @JAXBResponseParser
-   Task editLeaseSettingsSection(@EndpointParam URI templateHref,
-         @BinderParam(BindToXMLPayload.class) LeaseSettingsSection settingsSection);
+            @EndpointParam(parser = URNToHref.class) String templateUrn,
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection settingsSection);
 
    /**
     * Retrieves the network config section of a vApp or vApp template.
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/networkConfigSection
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the network config section requested
@@ -296,22 +249,15 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    NetworkConfigSection getNetworkConfigSection(
-         @EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(NETWORK_CONFIG_SECTION)
-   @Path("/networkConfigSection")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   NetworkConfigSection getNetworkConfigSection(@EndpointParam URI templateHref);
+            @EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Retrieves the network section of a vApp or vApp template.
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/networkSection
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the network section requested
@@ -322,26 +268,19 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    NetworkSection getNetworkSection(
-         @EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(NETWORK_SECTION)
-   @Path("/networkSection")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   NetworkSection getNetworkSection(@EndpointParam URI templateHref);
+            @EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Retrieves an OVF descriptor of a vApp template.
-    * 
+    *
     * This OVF represents the vApp template as it is, with all vCloud specific information (like mac
     * address, parent networks, etc). The OVF which could be downloaded by enabling for download
     * will not contain this information. There are no specific states bound to this entity.
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/ovf
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the ovf envelope
@@ -353,20 +292,13 @@ public interface VAppTemplateApi {
    @Fallback(NullOnNotFoundOr404.class)
    Envelope getOvf(@EndpointParam(parser = URNToHref.class) String templateUrn);
 
-   @GET
-   @Consumes
-   @Path("/ovf")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   Envelope getOvf(@EndpointParam URI templateHref);
-
    /**
     * Retrieves vApp template owner.
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/owner
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the owner of the vApp template
@@ -378,20 +310,13 @@ public interface VAppTemplateApi {
    @Fallback(NullOnNotFoundOr404.class)
    Owner getOwner(@EndpointParam(parser = URNToHref.class) String templateUrn);
 
-   @GET
-   @Consumes(OWNER)
-   @Path("/owner")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   Owner getOwner(@EndpointParam URI templateHref);
-
    /**
     * Retrieves VAppTemplate/VM product sections
-    * 
+    *
     * <pre>
     * GET /vAppTemplate/{id}/productSections
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the product sections
@@ -402,22 +327,15 @@ public interface VAppTemplateApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    ProductSectionList getProductSections(
-         @EndpointParam(parser = URNToHref.class) String templateUrn);
-
-   @GET
-   @Consumes(PRODUCT_SECTION_LIST)
-   @Path("/productSections")
-   @JAXBResponseParser
-   @Fallback(NullOnNotFoundOr404.class)
-   ProductSectionList getProductSections(@EndpointParam URI templateHref);
+            @EndpointParam(parser = URNToHref.class) String templateUrn);
 
    /**
     * Modifies the product sections of a vApp or vApp template.
-    * 
+    *
     * <pre>
     * PUT /vAppTemplate/{id}/productSections
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return the task performing the action. This operation is asynchronous and the user should
@@ -429,21 +347,13 @@ public interface VAppTemplateApi {
    @Path("/productSections")
    @JAXBResponseParser
    Task editProductSections(@EndpointParam(parser = URNToHref.class) String templateUrn,
-         @BinderParam(BindToXMLPayload.class) ProductSectionList sections);
-
-   @PUT
-   @Produces(PRODUCT_SECTION_LIST)
-   @Consumes(TASK)
-   @Path("/productSections")
-   @JAXBResponseParser
-   Task editProductSections(@EndpointParam URI templateHref,
-         @BinderParam(BindToXMLPayload.class) ProductSectionList sections);
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sections);
 
    /**
     * <pre>
     * GET /vAppTemplate/{id}/shadowVms
     * </pre>
-    * 
+    *
     * @param templateUrn
     *           the String of the template
     * @return shadowVM references
@@ -455,6 +365,145 @@ public interface VAppTemplateApi {
    @Fallback(NullOnNotFoundOr404.class)
    References getShadowVms(@EndpointParam(parser = URNToHref.class) String templateUrn);
 
+   /**
+    * @see VAppTemplateApi#get(URI)
+    */
+   @GET
+   @Consumes(VAPP_TEMPLATE)
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   VAppTemplate get(@EndpointParam URI reference);
+
+   /**
+    * @see VAppTemplateApi#edit(URI, VAppTemplate)
+    */
+   @PUT
+   @Produces(VAPP_TEMPLATE)
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task edit(@EndpointParam URI templateHref,
+            @BinderParam(BindToXMLPayload.class) VAppTemplate template);
+
+   /**
+    * @see VAppTemplateApi#remove(URI)
+    */
+   @DELETE
+   @Consumes(TASK)
+   @JAXBResponseParser
+   Task remove(@EndpointParam URI templateUri);
+
+   /**
+    * @see VAppTemplateApi#disableDownload(URI)
+    */
+   @POST
+   @Path("/action/disableDownload")
+   @JAXBResponseParser
+   Void disableDownload(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#enableDownload(URI)
+    */
+   @POST
+   @Consumes(TASK)
+   @Path("/action/enableDownload")
+   @JAXBResponseParser
+   Task enableDownload(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getCustomizationSection(URI)
+    */
+   @GET
+   @Consumes(CUSTOMIZATION_SECTION)
+   @Path("/customizationSection")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   CustomizationSection getCustomizationSection(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getLeaseSettingsSection(URI)
+    */
+   @GET
+   @Consumes(LEASE_SETTINGS_SECTION)
+   @Path("/leaseSettingsSection")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   LeaseSettingsSection getLeaseSettingsSection(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#editLeaseSettingsSection(URI, LeaseSettingsSection)
+    */
+   @PUT
+   @Produces(LEASE_SETTINGS_SECTION)
+   @Consumes(TASK)
+   @Path("/leaseSettingsSection")
+   @JAXBResponseParser
+   Task editLeaseSettingsSection(@EndpointParam URI templateHref,
+            @BinderParam(BindToXMLPayload.class) LeaseSettingsSection settingsSection);
+
+   /**
+    * @see VAppTemplateApi#getNetworkConfigSection(URI)
+    */
+   @GET
+   @Consumes(NETWORK_CONFIG_SECTION)
+   @Path("/networkConfigSection")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkConfigSection getNetworkConfigSection(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getNetworkSection(URI)
+    */
+   @GET
+   @Consumes(NETWORK_SECTION)
+   @Path("/networkSection")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   NetworkSection getNetworkSection(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getOvf(URI)
+    */
+   @GET
+   @Consumes
+   @Path("/ovf")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Envelope getOvf(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getOwnerOfVAppTemplate(URI)
+    */
+   @GET
+   @Consumes(OWNER)
+   @Path("/owner")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   Owner getOwner(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#getProductSectionsForVAppTemplate(URI)
+    */
+   @GET
+   @Consumes(PRODUCT_SECTION_LIST)
+   @Path("/productSections")
+   @JAXBResponseParser
+   @Fallback(NullOnNotFoundOr404.class)
+   ProductSectionList getProductSections(@EndpointParam URI templateHref);
+
+   /**
+    * @see VAppTemplateApi#editProductSections(URI, ProductSectionList)
+    */
+   @PUT
+   @Produces(PRODUCT_SECTION_LIST)
+   @Consumes(TASK)
+   @Path("/productSections")
+   @JAXBResponseParser
+   Task editProductSections(@EndpointParam URI templateHref,
+            @BinderParam(BindToXMLPayload.class) ProductSectionList sections);
+
+   /**
+    * @see VAppTemplateApi#getShadowVms(URI)
+    */
    @GET
    @Consumes
    @Path("/shadowVms")

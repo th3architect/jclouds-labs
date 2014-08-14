@@ -51,14 +51,14 @@ public class AdminNetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    /*
     * Convenience references to API apis.
     */
-   private AdminNetworkApi networkApi;
+   private AdminNetworkApi adminNetworkApi;
 
    private Network network;
    
    @Override
    @BeforeClass(alwaysRun = true)
    protected void setupRequiredApis() {
-      networkApi = adminContext.getApi().getNetworkApi();
+      adminNetworkApi = api.getAdminNetworkApi();
    }
    
    @Test(description = "GET /admin/network/{id}")
@@ -91,15 +91,15 @@ public class AdminNetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
       OrgNetwork editNetwork = getMutatedOrgNetwork(oldNetwork);
       
       try {
-         Task editNetworkTask = networkApi.edit(networkUrn, editNetwork);
+         Task editNetworkTask = adminNetworkApi.edit(networkUrn, editNetwork);
          Checks.checkTask(editNetworkTask);
          assertTrue(retryTaskSuccess.apply(editNetworkTask), String.format(TASK_COMPLETE_TIMELY, "editNetworkTask"));
-         network = networkApi.get(networkUrn);
+         network = adminNetworkApi.get(networkUrn);
          
          Checks.checkOrgNetwork(Network.<OrgNetwork>toSubType(network));
          
-         assertTrue(equal(network.getConfiguration().getIpScope(), 
-               editNetwork.getConfiguration().getIpScope()), 
+         assertTrue(equal(network.getConfiguration().getIpScopes(),
+               editNetwork.getConfiguration().getIpScopes()),
                String.format(OBJ_FIELD_UPDATABLE, NETWORK + ".configuration", "ipScope"));
          assertTrue(equal(network.getConfiguration().getParentNetwork(), 
                editNetwork.getConfiguration().getParentNetwork()), 
@@ -128,20 +128,20 @@ public class AdminNetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 //            editNetwork.getAllowedExternalIpAddresses()), 
 //            String.format(OBJ_FIELD_UPDATABLE, NETWORK, "allowedExternalIpAddresses"));
       } finally {
-         Task editNetworkTask = networkApi.edit(networkUrn, oldNetwork);
+         Task editNetworkTask = adminNetworkApi.edit(networkUrn, oldNetwork);
          Checks.checkTask(editNetworkTask);
          assertTrue(retryTaskSuccess.apply(editNetworkTask), String.format(TASK_COMPLETE_TIMELY, "editNetworkTask"));
-         network = networkApi.get(networkUrn);
+         network = adminNetworkApi.get(networkUrn);
       }
    }
    
    @Test(description = "POST /admin/network/{id}/action/reset")
    public void testResetNetwork() { 
       // TODO assert that network is deployed somehow
-      Task resetNetworkTask = networkApi.reset(networkUrn);
+      Task resetNetworkTask = adminNetworkApi.reset(networkUrn);
       Checks.checkTask(resetNetworkTask);
       assertTrue(retryTaskSuccess.apply(resetNetworkTask), String.format(TASK_COMPLETE_TIMELY, "resetNetworkTask"));
-      network = networkApi.get(networkUrn);
+      network = adminNetworkApi.get(networkUrn);
       
       Checks.checkOrgNetwork(Network.<OrgNetwork>toSubType(network));
       // TODO: other assertions about the reset? that network is deployed when task is complete, for example
@@ -168,13 +168,7 @@ public class AdminNetworkApiLiveTest extends BaseVCloudDirectorApiLiveTest {
 
    private static NetworkConfiguration getMutatedNetworkConfiguration(NetworkConfiguration config) {
       NetworkConfiguration.Builder configBuilder = config.toBuilder();
-      
-      if (config.getIpScope() != null) {
-         configBuilder.ipScope(IpScope.builder().fromIpScope(config.getIpScope())
-            // TODO: mutate to test more
-            .build());
-      }
-      
+
       if (config.getParentNetwork() != null) {
 //         configBuilder.parentNetwork(null);
       } // TODO: else?

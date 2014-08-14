@@ -21,7 +21,7 @@ import static com.google.common.base.Objects.equal;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 /**
@@ -247,7 +247,7 @@ public class NatVmRule {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("externalIpAddress", externalIpAddress)
             .add("externalPort", externalPort)
             .add("vAppScopedVmId", vAppScopedVmId)

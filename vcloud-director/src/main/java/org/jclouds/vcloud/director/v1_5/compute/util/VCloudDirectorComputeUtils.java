@@ -31,12 +31,14 @@ import org.jclouds.vcloud.director.v1_5.domain.VApp;
 import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
 import org.jclouds.vcloud.director.v1_5.domain.Vm;
 import org.jclouds.vcloud.director.v1_5.domain.network.NetworkConnection;
+import org.jclouds.vcloud.director.v1_5.domain.network.VAppNetworkConfiguration;
 import org.jclouds.vcloud.director.v1_5.domain.section.GuestCustomizationSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConnectionSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.OperatingSystemSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.VirtualHardwareSection;
 import org.jclouds.vcloud.director.v1_5.functions.SectionForVApp;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
@@ -54,7 +56,7 @@ public class VCloudDirectorComputeUtils {
       return vApp.getChildren().getVms().size() > 0 ? toComputeOs(Iterables.get(vApp.getChildren().getVms(), 0)) : null;
    }
    
-   private static SectionForVApp<OperatingSystemSection> findOperatingSystemSectionForVApp = 
+   private static SectionForVApp<OperatingSystemSection> findOperatingSystemSectionForVApp =
          new SectionForVApp<OperatingSystemSection>(OperatingSystemSection.class);
    
    public static CIMOperatingSystem toComputeOs(Vm vm) {
@@ -141,4 +143,5 @@ public class VCloudDirectorComputeUtils {
       }
       return ips.build();
    }
+
 }

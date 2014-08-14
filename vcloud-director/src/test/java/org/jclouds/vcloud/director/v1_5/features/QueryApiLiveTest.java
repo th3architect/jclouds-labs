@@ -73,8 +73,8 @@ public class QueryApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      queryApi = context.getApi().getQueryApi();
-      vAppApi = context.getApi().getVAppApi();
+      queryApi = api.getQueryApi();
+      vAppApi = api.getVAppApi();
       
       cleanUpVAppTemplateInOrg();
    }

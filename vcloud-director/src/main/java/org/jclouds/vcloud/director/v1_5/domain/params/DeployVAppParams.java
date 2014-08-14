@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 /**
@@ -181,7 +181,7 @@ public class DeployVAppParams {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("").add("powerOn", powerOn).add("deploymentLeaseSeconds", deploymentLeaseSeconds).add("forceCustomization", forceCustomization).toString();
+      return Objects.toStringHelper("").add("powerOn", powerOn).add("deploymentLeaseSeconds", deploymentLeaseSeconds).add("forceCustomization", forceCustomization).toString();
    }
 
 }

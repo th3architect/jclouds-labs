@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jclouds.domain.Credentials;
+import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
 import org.jclouds.vcloud.director.v1_5.annotations.Login;
 import org.jclouds.vcloud.director.v1_5.domain.SessionWithToken;
 import org.jclouds.vcloud.director.v1_5.login.SessionApi;
@@ -31,11 +32,11 @@ import com.google.common.cache.CacheLoader;
 
 @Singleton
 public class LoginUserInOrgWithPassword extends CacheLoader<Credentials, SessionWithToken> {
-   private final SessionApi api;
+   private final VCloudDirectorApi api;
    private final Supplier<URI> loginUrl;
 
    @Inject
-   public LoginUserInOrgWithPassword(SessionApi api, @Login Supplier<URI> loginUrl) {
+   public LoginUserInOrgWithPassword(VCloudDirectorApi api, @Login Supplier<URI> loginUrl) {
       this.api = api;
       this.loginUrl = loginUrl;
    }
@@ -45,7 +46,7 @@ public class LoginUserInOrgWithPassword extends CacheLoader<Credentials, Session
       String user = input.identity.substring(0, input.identity.lastIndexOf('@'));
       String org = input.identity.substring(input.identity.lastIndexOf('@') + 1);
       String password = input.credential;
-      return api.loginUserInOrgWithPassword(loginUrl.get(), user, org, password);
+      return api.getSessionApi().loginUserInOrgWithPassword(loginUrl.get(), user, org, password);
    }
 
    @Override

@@ -14,17 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.vcloud.director.v1_5;
+package org.jclouds.dmtf.ovf;
 
-import org.jclouds.rest.ApiContext;
-import org.jclouds.vcloud.director.v1_5.admin.VCloudDirectorAdminApi;
-import org.jclouds.vcloud.director.v1_5.internal.VCloudDirectorContextImpl;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
-import com.google.inject.ImplementedBy;
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name="LinkType")
+public class LinkType extends ReferenceType
+{
 
-@ImplementedBy(VCloudDirectorContextImpl.class)
-public interface VCloudDirectorContext extends ApiContext<VCloudDirectorApi> {
+  @XmlAttribute(required=true)
+  protected String rel;
 
-   ApiContext<VCloudDirectorAdminApi> getAdminContext();
+  public String getRel()
+  {
+    return this.rel;
+  }
+
+  public void setRel(String value)
+  {
+    this.rel = value;
+  }
 }

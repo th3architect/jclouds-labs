@@ -42,7 +42,9 @@ import org.jclouds.vcloud.director.v1_5.features.NetworkApi;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
 
-@RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
+/**
+ * Provides synchronous access to admin {@link Network} objects.
+ */
 public interface AdminNetworkApi extends NetworkApi {
 
    /**

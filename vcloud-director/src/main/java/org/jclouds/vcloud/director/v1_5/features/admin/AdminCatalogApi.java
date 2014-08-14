@@ -16,10 +16,7 @@
  */
 package org.jclouds.vcloud.director.v1_5.features.admin;
 
-import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
-import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.ADMIN_CATALOG;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.CONTROL_ACCESS;
-import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.PUBLISH_CATALOG_PARAMS;
 
 import java.net.URI;
 
@@ -31,6 +28,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.EndpointParam;
 import org.jclouds.rest.annotations.Fallback;
@@ -46,46 +44,52 @@ import org.jclouds.vcloud.director.v1_5.features.CatalogApi;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 import org.jclouds.vcloud.director.v1_5.functions.URNToAdminHref;
 
+/**
+ * Provides synchronous access to {@link AdminCatalog} objects.
+ */
 @RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface AdminCatalogApi extends CatalogApi {
 
    /**
     * Creates a catalog in an organization. The catalog will always be addd in unpublished state.
-    * 
-    * <pre>
+    *
+    * <pre
     * POST /admin/org/{id}/catalogs
-    * </pre>
-    * 
+    * </pre
+    *
     * @param orgUrn
     *           the urn for the org
     * @return contains a , which will point to the running asynchronous creation operation.
     */
    @POST
    @Path("/catalogs")
-   @Consumes(ADMIN_CATALOG)
-   @Produces(ADMIN_CATALOG)
+   @Consumes(VCloudDirectorMediaType.ADMIN_CATALOG)
+   @Produces(VCloudDirectorMediaType.ADMIN_CATALOG)
    @JAXBResponseParser
    AdminCatalog addCatalogToOrg(@BinderParam(BindToXMLPayload.class) AdminCatalog catalog,
-         @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
-
-   @POST
-   @Path("/catalogs")
-   @Consumes(ADMIN_CATALOG)
-   @Produces(ADMIN_CATALOG)
-   @JAXBResponseParser
-   AdminCatalog addCatalogToOrg(@BinderParam(BindToXMLPayload.class) AdminCatalog catalog,
-         @EndpointParam URI orgHref);
+            @EndpointParam(parser = URNToAdminHref.class) String orgUrn);
 
    /**
     * Retrieves a catalog.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /admin/catalog/{id}
-    * </pre>
-    * 
-    * @param catalogUrn
+    * </pre
+    *
+    * @param orgHref
     *           the urn for the catalog
     * @return a catalog
+    */
+   @POST
+   @Path("/catalogs")
+   @Consumes(VCloudDirectorMediaType.ADMIN_CATALOG)
+   @Produces(VCloudDirectorMediaType.ADMIN_CATALOG)
+   @JAXBResponseParser
+   AdminCatalog addCatalogToOrg(@BinderParam(BindToXMLPayload.class) AdminCatalog catalog,
+            @EndpointParam URI orgHref);
+
+   /**
+    * @see AdminCatalogApi#get(String)
     */
    @Override
    @GET
@@ -93,7 +97,10 @@ public interface AdminCatalogApi extends CatalogApi {
    @JAXBResponseParser
    @Fallback(NullOnNotFoundOr404.class)
    AdminCatalog get(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn);
-   
+
+   /**
+    * @see AdminCatalogApi#get(URI)
+    */
    @Override
    @GET
    @Consumes
@@ -105,51 +112,57 @@ public interface AdminCatalogApi extends CatalogApi {
     * Modifies a catalog. A catalog could be published or unpublished. The IsPublished property is
     * treated as a read only value by the server. In order to control publishing settings use the
     * 'publish' action must be used.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /admin/catalog/{id}
-    * </pre>
-    * 
+    * </pre
+    *
     * @return the edited catalog
     */
    @PUT
-   @Consumes(ADMIN_CATALOG)
-   @Produces(ADMIN_CATALOG)
+   @Consumes(VCloudDirectorMediaType.ADMIN_CATALOG)
+   @Produces(VCloudDirectorMediaType.ADMIN_CATALOG)
    @JAXBResponseParser
    AdminCatalog edit(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
-         @BinderParam(BindToXMLPayload.class) AdminCatalog catalog);
+            @BinderParam(BindToXMLPayload.class) AdminCatalog catalog);
 
+   /**
+    * @see AdminCatalogApi#edit(URI, AdminCatalog)
+    */
    @PUT
-   @Consumes(ADMIN_CATALOG)
-   @Produces(ADMIN_CATALOG)
+   @Consumes(VCloudDirectorMediaType.ADMIN_CATALOG)
+   @Produces(VCloudDirectorMediaType.ADMIN_CATALOG)
    @JAXBResponseParser
    AdminCatalog edit(@EndpointParam URI catalogAdminHref,
-         @BinderParam(BindToXMLPayload.class) AdminCatalog catalog);
+            @BinderParam(BindToXMLPayload.class) AdminCatalog catalog);
 
    /**
     * Deletes a catalog. The catalog could be removed if it is either published or unpublished.
-    * 
-    * <pre>
+    *
+    * <pre
     * DELETE /admin/catalog/{id}
-    * </pre>
+    * </pre
     */
    @DELETE
    @Consumes
    @JAXBResponseParser
-   void remove(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn);
+   Void remove(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn);
 
+   /**
+    * @see AdminCatalogApi#remove(URI)
+    */
    @DELETE
    @Consumes
    @JAXBResponseParser
-   void remove(@EndpointParam URI catalogAdminHref);
+   Void remove(@EndpointParam URI catalogAdminHref);
 
    /**
     * Retrieves the owner of a catalog.
-    * 
-    * <pre>
+    *
+    * <pre
     * GET /admin/catalog/{id}/owner
-    * </pre>
-    * 
+    * </pre
+    *
     * @return the owner or null if not found
     */
    @GET
@@ -159,6 +172,9 @@ public interface AdminCatalogApi extends CatalogApi {
    @Fallback(NullOnNotFoundOr404.class)
    Owner getOwner(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn);
 
+   /**
+    * @see AdminCatalogApi#getOwner(URI)
+    */
    @GET
    @Path("/owner")
    @Consumes
@@ -168,52 +184,60 @@ public interface AdminCatalogApi extends CatalogApi {
 
    /**
     * Changes owner for catalog.
-    * 
-    * <pre>
+    *
+    * <pre
     * PUT /admin/catalog/{id}/owner
-    * </pre>
+    * </pre
     */
    @PUT
    @Path("/owner")
    @Consumes
    @Produces(VCloudDirectorMediaType.OWNER)
    @JAXBResponseParser
-   void setOwner(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
-         @BinderParam(BindToXMLPayload.class) Owner newOwner);
+   Void setOwner(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
+            @BinderParam(BindToXMLPayload.class) Owner newOwner);
 
+   /**
+    * @see AdminCatalogApi#setOwner(URI, Owner)
+    */
    @PUT
    @Path("/owner")
    @Consumes
    @Produces(VCloudDirectorMediaType.OWNER)
    @JAXBResponseParser
-   void setOwner(@EndpointParam URI catalogAdminHref,
-         @BinderParam(BindToXMLPayload.class) Owner newOwner);
-   
+   Void setOwner(@EndpointParam URI catalogAdminHref,
+            @BinderParam(BindToXMLPayload.class) Owner newOwner);
+
    /**
     * Publish a catalog. Publishing a catalog makes the catalog visible to all organizations in a
     * vCloud.
+    * @param catalogUrn
     */
    @POST
    @Path("/action/publish")
    @Consumes
-   @Produces(PUBLISH_CATALOG_PARAMS)
+   @Produces(VCloudDirectorMediaType.PUBLISH_CATALOG_PARAMS)
    @JAXBResponseParser
-   void publish(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
-         @BinderParam(BindToXMLPayload.class) PublishCatalogParams params);
+   Void publish(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
+            @BinderParam(BindToXMLPayload.class) PublishCatalogParams params);
 
+   /**
+    * @see AdminCatalogApi#publish(URI, PublishCatalogParams)
+    */
    @POST
    @Path("/action/publish")
    @Consumes
-   @Produces(PUBLISH_CATALOG_PARAMS)
+   @Produces(VCloudDirectorMediaType.PUBLISH_CATALOG_PARAMS)
    @JAXBResponseParser
-   void publish(@EndpointParam URI catalogAdminHref, @BinderParam(BindToXMLPayload.class) PublishCatalogParams params);
+   Void publish(@EndpointParam URI catalogAdminHref,
+            @BinderParam(BindToXMLPayload.class) PublishCatalogParams params);
 
    /**
     * Modifies a catalog control access.
     *
-    * <pre>
+    * <pre
     * POST /org/{id}/catalog/{catalogId}/action/controlAccess
-    * </pre>
+    * </pre
     *
     * @return the control access information
     */
@@ -223,24 +247,27 @@ public interface AdminCatalogApi extends CatalogApi {
    @Consumes(CONTROL_ACCESS)
    @JAXBResponseParser
    ControlAccessParams editAccessControl(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn,
-         @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
+      @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
 
+   /**
+    * Retrieves the catalog control access information.
+    *
+    * <pre
+    * GET /org/{id}/catalog/{catalogId}/controlAccess
+    * </pre
+    *
+    * @return the control access information
+    */
    @POST
    @Path("/action/controlAccess")
    @Produces(CONTROL_ACCESS)
    @Consumes(CONTROL_ACCESS)
    @JAXBResponseParser
    ControlAccessParams editAccessControl(@EndpointParam URI catalogAdminHref,
-         @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
-
+      @BinderParam(BindToXMLPayload.class) ControlAccessParams params);
+   
    /**
-    * Retrieves the catalog control access information.
-    *
-    * <pre>
-    * GET /org/{id}/catalog/{catalogId}/controlAccess
-    * </pre>
-    *
-    * @return the control access information
+    * @see AdminCatalogApi#getAccessControl(String)
     */
    @GET
    @Path("/controlAccess")
@@ -249,6 +276,9 @@ public interface AdminCatalogApi extends CatalogApi {
    @Fallback(NullOnNotFoundOr404.class)
    ControlAccessParams getAccessControl(@EndpointParam(parser = URNToAdminHref.class) String catalogUrn);
 
+   /**
+    * @see AdminCatalogApi#getAccessControl(URI)
+    */
    @GET
    @Path("/controlAccess")
    @Consumes

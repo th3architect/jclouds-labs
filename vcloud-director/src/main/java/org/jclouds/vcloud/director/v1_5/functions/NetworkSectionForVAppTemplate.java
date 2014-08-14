@@ -14,20 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.vcloud.director.v1_5;
+package org.jclouds.vcloud.director.v1_5.functions;
 
-import org.jclouds.View;
-import org.jclouds.apis.internal.BaseApiMetadataTest;
-import org.testng.annotations.Test;
+import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.TypeToken;
+import org.jclouds.dmtf.ovf.SectionType;
+import org.jclouds.dmtf.ovf.NetworkSection;
+import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
+import com.google.common.base.Function;
 
-@Test(groups = "unit", testName = "VCloudDirectorApiMetadataTest")
-//TODO: BaseComputeServiceApiMetadataTest
-public class VCloudDirectorApiMetadataTest extends BaseApiMetadataTest {
+@Singleton
+public class NetworkSectionForVAppTemplate implements Function<VAppTemplate, NetworkSection> {
 
-   public VCloudDirectorApiMetadataTest() {
-      super(new VCloudDirectorApiMetadata(), ImmutableSet.<TypeToken<? extends View>>of());
+   @SuppressWarnings("unchecked")
+   @Override
+   public NetworkSection apply(VAppTemplate from) {
+      for (SectionType section : from.getSections()) {
+         if (section instanceof NetworkSection) {
+            return (NetworkSection) section;
+         }
+      }
+      return null;
    }
 }

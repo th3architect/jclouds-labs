@@ -53,7 +53,7 @@ public class GroupApiLiveTest extends BaseVCloudDirectorApiLiveTest {
    @Override
    @BeforeClass(alwaysRun = true)
    public void setupRequiredApis() {
-      groupApi = adminContext.getApi().getGroupApi();
+      groupApi = api.getGroupApi();
       Reference orgRef = null;
       
       // TODO: requisite LDAP settings

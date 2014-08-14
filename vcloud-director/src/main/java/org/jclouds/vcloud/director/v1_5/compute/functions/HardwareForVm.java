@@ -31,6 +31,7 @@ import org.jclouds.vcloud.director.v1_5.domain.Reference;
 import org.jclouds.vcloud.director.v1_5.domain.Vm;
 import org.jclouds.vcloud.director.v1_5.domain.section.VirtualHardwareSection;
 import org.jclouds.vcloud.director.v1_5.functions.SectionForVApp;
+import org.jclouds.vcloud.director.v1_5.functions.VirtualHardwareSectionForVApp;
 import org.jclouds.vcloud.director.v1_5.predicates.LinkPredicates;
 
 import com.google.common.base.Function;
@@ -41,15 +42,16 @@ public class HardwareForVm implements Function<Vm, Hardware> {
    @Resource
    protected Logger logger = Logger.NULL;
 
-   private final Function<Reference, Location> findLocationForResource;
+   //private final Function<Reference, Location> findLocationForResource;
    private final VCloudHardwareBuilderFromResourceAllocations rasdToHardwareBuilder;
-   private final SectionForVApp<VirtualHardwareSection> findVirtualHardwareSectionForVm;
+   private final VirtualHardwareSectionForVApp findVirtualHardwareSectionForVm;
 
    @Inject
-   protected HardwareForVm(Function<Reference, Location> findLocationForResource,
+   protected HardwareForVm(
+           //Function<Reference, Location> findLocationForResource,
             VCloudHardwareBuilderFromResourceAllocations rasdToHardwareBuilder,
-            SectionForVApp<VirtualHardwareSection> findVirtualHardwareSectionForVm) {
-      this.findLocationForResource = checkNotNull(findLocationForResource, "findLocationForResource");
+            VirtualHardwareSectionForVApp findVirtualHardwareSectionForVm) {
+      //this.findLocationForResource = checkNotNull(findLocationForResource, "findLocationForResource");
       this.rasdToHardwareBuilder = checkNotNull(rasdToHardwareBuilder, "rasdToHardwareBuilder");
       this.findVirtualHardwareSectionForVm = checkNotNull(findVirtualHardwareSectionForVm, "findVirtualHardwareSectionForVm");
    }
@@ -63,8 +65,10 @@ public class HardwareForVm implements Function<Vm, Hardware> {
       
       VirtualHardwareSection hardware = findVirtualHardwareSectionForVm.apply(from);
       HardwareBuilder builder = rasdToHardwareBuilder.apply(hardware.getItems());
+      /*
       builder.location(findLocationForResource.apply(Iterables.find(checkNotNull(from, "from").getLinks(), 
             LinkPredicates.typeEquals(VCloudDirectorMediaType.VDC))));
+            */
       builder.ids(from.getHref().toASCIIString()).name(from.getName()).supportsImage(
                ImagePredicates.idEquals(from.getHref().toASCIIString()));
       builder.hypervisor("VMware");

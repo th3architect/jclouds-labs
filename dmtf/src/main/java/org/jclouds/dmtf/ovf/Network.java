@@ -16,6 +16,7 @@
  */
 package org.jclouds.dmtf.ovf;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Network")
@@ -53,7 +54,9 @@ public class Network {
       }
    }
 
+   @XmlElement(name = "Name")
    private String name;
+   @XmlElement(name = "Description")
    private String description;
 
    protected Network(String name, String description) {

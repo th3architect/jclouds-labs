@@ -19,6 +19,7 @@ package org.jclouds.vcloud.director.v1_5.features.admin;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 import org.jclouds.rest.annotations.JAXBResponseParser;
 import org.jclouds.rest.annotations.QueryParams;
@@ -28,12 +29,15 @@ import org.jclouds.vcloud.director.v1_5.domain.query.QueryResultRecords;
 import org.jclouds.vcloud.director.v1_5.features.QueryApi;
 import org.jclouds.vcloud.director.v1_5.filters.AddVCloudAuthorizationAndCookieToRequest;
 
+/**
+ * Provides access to {@link Query} objects.
+ */
 @RequestFilters(AddVCloudAuthorizationAndCookieToRequest.class)
 public interface AdminQueryApi extends QueryApi {
 
+
    /**
-    * Retrieves a list of {@link Group}s for organization the org admin belongs to by using REST API general
-    * QueryHandler
+    * Retrieves a list of {@link org.jclouds.vcloud.director.v1_5.domain.Group}s for organization the org admin belongs to by using REST API general QueryHandler
     *
     * <pre>
     * GET /admin/groups/query
@@ -51,12 +55,33 @@ public interface AdminQueryApi extends QueryApi {
     * <pre>
     * GET /admin/orgs/query
     * </pre>
+    *
+    * @see #queryAll(String)
+    */
+   @GET
+   @Path("/admin/groups/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords groupsQuery(@QueryParam("filter") String filter);
+
+   /**
+    * Retrieves a list of {@link Org}s by using REST API general QueryHandler.
+    *
+    * <pre>
+    * GET /admin/orgs/query
+    * </pre>
     */
    @GET
    @Path("/admin/orgs/query")
    @Consumes
    @JAXBResponseParser
    QueryResultRecords orgsQueryAll();
+
+   @GET
+   @Path("/admin/orgs/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords orgsQuery(@QueryParam("filter") String filter);
 
    /**
     * Retrieves a list of {@link Right}s by using REST API general QueryHandler.
@@ -71,6 +96,12 @@ public interface AdminQueryApi extends QueryApi {
    @JAXBResponseParser
    QueryResultRecords rightsQueryAll();
 
+   @GET
+   @Path("/admin/rights/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords rightsQuery(@QueryParam("filter") String filter);
+
    /**
     * Retrieves a list of {@link Role}s by using REST API general QueryHandler.
     *
@@ -84,12 +115,20 @@ public interface AdminQueryApi extends QueryApi {
    @JAXBResponseParser
    QueryResultRecords rolesQueryAll();
 
+   /** @see #rolesQueryAll() */
+   @GET
+   @Path("/admin/roles/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords rolesQuery(@QueryParam("filter") String filter);
+
    /**
-    * Retrieves a list of {@link RoleReference}s by using REST API general QueryHandler.
+    * Retrieves a list of {@link org.jclouds.vcloud.director.v1_5.domain.RoleReference}s by using REST API general QueryHandler.
     *
     * <pre>
     * GET /admin/roles/query?format=references
     * </pre>
+    *
     */
    @GET
    @Path("/admin/roles/query")
@@ -111,6 +150,12 @@ public interface AdminQueryApi extends QueryApi {
    @JAXBResponseParser
    QueryResultRecords strandedUsersQueryAll();
 
+   @GET
+   @Path("/admin/strandedUsers/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords strandedUsersQuery(@QueryParam("filter") String filter);
+
    /**
     * Retrieves a list of {@link User}s by using REST API general QueryHandler.
     *
@@ -126,6 +171,12 @@ public interface AdminQueryApi extends QueryApi {
    @JAXBResponseParser
    QueryResultRecords usersQueryAll();
 
+   @GET
+   @Path("/admin/users/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords usersQuery(@QueryParam("filter") String filter);
+
    /**
     * Retrieves a list of {@link Vdc}s by using REST API general QueryHandler.
     *
@@ -140,4 +191,10 @@ public interface AdminQueryApi extends QueryApi {
    @Consumes
    @JAXBResponseParser
    QueryResultRecords vdcsQueryAll();
+
+   @GET
+   @Path("/admin/vdcs/query")
+   @Consumes
+   @JAXBResponseParser
+   QueryResultRecords vdcsQuery(@QueryParam("filter") String filter);
 }

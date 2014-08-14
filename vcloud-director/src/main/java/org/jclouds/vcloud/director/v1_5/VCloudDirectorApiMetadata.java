@@ -26,11 +26,18 @@ import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_
 import java.net.URI;
 import java.util.Properties;
 
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
+import org.jclouds.vcloud.director.v1_5.compute.config.VCloudDirectorComputeServiceContextModule;
 import org.jclouds.vcloud.director.v1_5.config.VCloudDirectorHttpApiModule;
-import org.jclouds.vcloud.director.v1_5.user.VCloudDirectorApi;
 
-public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata {
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Module;
+
+/**
+ * Implementation of {@link org.jclouds.apis.ApiMetadata} for VCloudDirector 1.5 API
+ */
+public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata<VCloudDirectorApi> {
 
    @Override
    public Builder toBuilder() {
@@ -51,10 +58,10 @@ public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata {
       properties.setProperty(PROPERTY_SESSION_INTERVAL, Integer.toString(30 * 60));
 
       properties.setProperty(PROPERTY_VCLOUD_DIRECTOR_XML_NAMESPACE,
-            String.format("http://www.vmware.com/vcloud/v${%s}", PROPERTY_VCLOUD_DIRECTOR_VERSION_SCHEMA));
+              String.format("http://www.vmware.com/vcloud/v${%s}", PROPERTY_VCLOUD_DIRECTOR_VERSION_SCHEMA));
       properties.setProperty(PROPERTY_SESSION_INTERVAL, Integer.toString(8 * 60));
       properties.setProperty(PROPERTY_VCLOUD_DIRECTOR_XML_SCHEMA, "${jclouds.endpoint}/v1.5/schema/master.xsd");
-      
+
       // TODO integrate these with the {@link ComputeTimeouts} instead of having a single timeout for everything.
       properties.setProperty(PROPERTY_SESSION_INTERVAL, Integer.toString(300));
       properties.setProperty(PROPERTY_VCLOUD_DIRECTOR_TIMEOUT_TASK_COMPLETED, Long.toString(1200l * 1000l));
@@ -65,16 +72,17 @@ public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata {
    public static class Builder extends BaseHttpApiMetadata.Builder<VCloudDirectorApi, Builder> {
 
       protected Builder() {
-         super(VCloudDirectorApi.class);
-          id("vcloud-director")
-         .name("vCloud Director 1.5 API")
-         .identityName("User at Organization (user@org)")
-         .credentialName("Password")
-         .documentation(URI.create("http://www.vmware.com/support/pubs/vcd_pubs.html"))
-         .version("1.5")
-         .defaultProperties(VCloudDirectorApiMetadata.defaultProperties())
-         .context(typeToken(VCloudDirectorContext.class))
-         .defaultModule(VCloudDirectorHttpApiModule.class);
+         id("vcloud-director")
+                 .name("vCloud Director 1.5 API")
+                 .identityName("User at Organization (user@org)")
+                 .credentialName("Password")
+                 .documentation(URI.create("http://www.vmware.com/support/pubs/vcd_pubs.html"))
+                 .version("1.5")
+                 .defaultProperties(VCloudDirectorApiMetadata.defaultProperties())
+                 .view(typeToken(ComputeServiceContext.class))
+                 .defaultModules(ImmutableSet.<Class<? extends Module>>of(
+                         VCloudDirectorHttpApiModule.class,
+                         VCloudDirectorComputeServiceContextModule.class));
       }
 
       @Override

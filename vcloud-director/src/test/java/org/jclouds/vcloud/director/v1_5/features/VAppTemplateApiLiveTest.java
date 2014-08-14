@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jclouds.dmtf.ovf.MsgType;
 import org.jclouds.dmtf.ovf.NetworkSection;
 import org.jclouds.vcloud.director.v1_5.AbstractVAppApiLiveTest;
 import org.jclouds.vcloud.director.v1_5.domain.Link;
@@ -78,7 +79,7 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
    protected void tidyUp() {
       if (key != null) {
          try {
-            Task remove = context.getApi().getMetadataApi(vAppTemplateUrn).remove(key);
+            Task remove = api.getMetadataApi(vAppTemplateUrn).remove(key);
             taskDoneEventually(remove);
          } catch (Exception e) {
             logger.warn(e, "Error when deleting metadata entry '%s'", key);
@@ -139,7 +140,7 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
 
    @Test(description = "GET /vAppTemplate/{id}/metadata", dependsOnMethods = { "testEditMetadataValue" })
    public void testGetVAppTemplateMetadata() {
-      Metadata metadata = context.getApi().getMetadataApi(vAppTemplateUrn).get();
+      Metadata metadata = api.getMetadataApi(vAppTemplateUrn).get();
 
       checkMetadata(metadata);
    }
@@ -148,10 +149,10 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
    // otherwise no entry may exist
    @Test(description = "GET /vAppTemplate/{id}/metadata/{key}", dependsOnMethods = { "testGetVAppTemplateMetadata" })
    public void testGetMetadataValue() {
-      Metadata metadata = context.getApi().getMetadataApi(vAppTemplateUrn).get();
+      Metadata metadata = api.getMetadataApi(vAppTemplateUrn).get();
       MetadataEntry entry = Iterables.get(metadata.getMetadataEntries(), 0);
 
-      String val = context.getApi().getMetadataApi(vAppTemplateUrn).get(entry.getKey());
+      String val = api.getMetadataApi(vAppTemplateUrn).get(entry.getKey());
 
       assertEquals(val, entry.getValue());
    }
@@ -193,16 +194,16 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
 
    @Test(description = "POST /vAppTemplate/{id}/metadata", dependsOnMethods = { "testGetVAppTemplate" })
    public void testEditMetadata() {
-      Metadata oldMetadata = context.getApi().getMetadataApi(vAppTemplateUrn).get();
+      Metadata oldMetadata = api.getMetadataApi(vAppTemplateUrn).get();
       Map<String, String> oldMetadataMap = metadataToMap(oldMetadata);
 
       key = name("key-");
       val = name("value-");
 
-      final Task task = context.getApi().getMetadataApi(vAppTemplateUrn).putAll(ImmutableMap.of(key, val));
+      final Task task = api.getMetadataApi(vAppTemplateUrn).putAll(ImmutableMap.of(key, val));
       assertTaskSucceeds(task);
 
-      Metadata newMetadata = context.getApi().getMetadataApi(vAppTemplateUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vAppTemplateUrn).get();
       Map<String, String> expectedMetadataMap = ImmutableMap.<String, String> builder().putAll(oldMetadataMap)
                .put(key, val).build();
       checkMetadataFor("vAppTemplate", newMetadata, expectedMetadataMap);
@@ -212,19 +213,19 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
    public void testEditMetadataValue() {
       val = "new" + val;
 
-      final Task task = context.getApi().getMetadataApi(vAppTemplateUrn).put(key, val);
+      final Task task = api.getMetadataApi(vAppTemplateUrn).put(key, val);
       retryTaskSuccess.apply(task);
 
-      String newMetadataValue = context.getApi().getMetadataApi(vAppTemplateUrn).get(key);
+      String newMetadataValue = api.getMetadataApi(vAppTemplateUrn).get(key);
       assertEquals(newMetadataValue, val);
    }
 
    @Test(description = "DELETE /vAppTemplate/{id}/metadata/{key}", dependsOnMethods = { "testGetMetadataValue" })
    public void testRemoveVAppTemplateMetadataValue() {
-      final Task deletionTask = context.getApi().getMetadataApi(vAppTemplateUrn).remove(key);
+      final Task deletionTask = api.getMetadataApi(vAppTemplateUrn).remove(key);
       assertTaskSucceeds(deletionTask);
 
-      Metadata newMetadata = context.getApi().getMetadataApi(vAppTemplateUrn).get();
+      Metadata newMetadata = api.getMetadataApi(vAppTemplateUrn).get();
       checkMetadataKeyAbsentFor("vAppTemplate", newMetadata, key);
       key = null;
    }
@@ -235,7 +236,8 @@ public class VAppTemplateApiLiveTest extends AbstractVAppApiLiveTest {
       // NOTE use smallish number for storageLeaseInSeconds; it seems to be capped at 5184000?
       int storageLeaseInSeconds = random.nextInt(10000) + 1;
 
-      LeaseSettingsSection leaseSettingSection = LeaseSettingsSection.builder().info("my info")
+      LeaseSettingsSection leaseSettingSection = LeaseSettingsSection.builder()
+              .info(MsgType.builder().value("my info").build())
                .storageLeaseInSeconds(storageLeaseInSeconds).build();
 
       final Task task = vAppTemplateApi.editLeaseSettingsSection(vAppTemplateUrn, leaseSettingSection);
