@@ -169,7 +169,7 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       Vm toAddVm = Iterables.get(vms, 0);
 
       // TODO clean up network config of the vm
-      //cleanUpNetworkConnectionSection(toAddVm);
+      cleanUpNetworkConnectionSection(toAddVm);
       
       RecomposeVAppParams params = addRecomposeParams(composedVApp, toAddVm);
 
@@ -210,9 +210,6 @@ public class VAppApiLiveTest extends AbstractVAppApiLiveTest {
       }));
    }
 
-   /**
-    * @see VAppApi#edit(URI, VApp)
-    */
    @Test(groups = { "live", "user" }, description = "PUT /vApp/{id}", dependsOnMethods = { "testGetVApp" })
    public void testEditVApp() {
       VApp newVApp = VApp.builder().name(name("new-name-")).description("New Description").build();

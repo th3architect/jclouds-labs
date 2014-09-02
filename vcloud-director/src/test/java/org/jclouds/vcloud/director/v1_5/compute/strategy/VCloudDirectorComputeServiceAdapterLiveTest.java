@@ -60,7 +60,9 @@ public class VCloudDirectorComputeServiceAdapterLiveTest extends BaseVCloudDirec
       String name = "vm-" + new Random().nextInt();
 
       Template template = templateBuilder
-              .osFamily(OsFamily.CENTOS).build();
+              .osFamily(OsFamily.CENTOS)
+              .imageNameMatches("cloudsoft-template")
+              .build();
 
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
       assertEquals(guest.getNodeId(), guest.getNode().getId() + "");

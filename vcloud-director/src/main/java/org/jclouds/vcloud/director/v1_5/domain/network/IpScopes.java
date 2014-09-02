@@ -16,21 +16,67 @@
  */
 package org.jclouds.vcloud.director.v1_5.domain.network;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 @XmlRootElement(name = "IpScopes")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class IpScopes {
 
+   public static Builder builder() {
+      return new Builder();
+   }
+
+   public Builder toBuilder() {
+      return new Builder().fromIpScopes(this);
+   }
+
+   public static class Builder {
+      private List<IpScope> ipScopes = Lists.newArrayList();
+
+      public Builder ipScopes(List<IpScope> ipScopes) {
+         this.ipScopes = Lists.newArrayList(checkNotNull(ipScopes, "ipScopes"));
+         return this;
+      }
+
+      public Builder ipScope(IpScope ipScope) {
+         ipScopes.add(checkNotNull(ipScope, "ipScope"));
+         return this;
+      }
+
+      public IpScopes build() {
+         return new IpScopes(ipScopes);
+      }
+
+      public Builder fromIpScopes(IpScopes in) {
+         return ipScopes(in.getIpsScopes());
+      }
+   }
+
    @XmlElement(name = "IpScope")
-   private List<IpScope> ipsScopes = null;
+   private List<IpScope> ipsScopes = Lists.newArrayList();
 
    public List<IpScope> getIpsScopes() {
-      return ipsScopes;
+      return Collections.unmodifiableList(ipsScopes);
+   }
+
+   IpScopes() {
+      // For JAXB
+   }
+
+   public IpScopes(List<IpScope> ipScopes) {
+      this.ipsScopes = ImmutableList.copyOf(ipScopes);
    }
 }

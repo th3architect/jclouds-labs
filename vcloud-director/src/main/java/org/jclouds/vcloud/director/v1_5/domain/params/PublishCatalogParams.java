@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 /**
@@ -114,7 +114,7 @@ public class PublishCatalogParams {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("isPublished", isPublished).toString();
    }
 

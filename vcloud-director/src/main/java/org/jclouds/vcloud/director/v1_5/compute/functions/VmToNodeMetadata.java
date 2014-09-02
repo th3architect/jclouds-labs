@@ -69,12 +69,11 @@ public class VmToNodeMetadata implements Function<Vm, NodeMetadata> {
 
    public NodeMetadata apply(Vm from) {
       NodeMetadataBuilder builder = new NodeMetadataBuilder();
-      builder.ids(from.getHref().toASCIIString());
+      builder.ids(from.getId());
       builder.uri(from.getHref());
       builder.name(from.getName());
       builder.hostname(from.getName());
-      builder.location(findLocationForResourceInVDC.apply(
-            Iterables.find(from.getLinks(), LinkPredicates.typeEquals(VCloudDirectorMediaType.VDC))));
+      //builder.location(findLocationForResourceInVDC.apply(Iterables.find(from.getLinks(),LinkPredicates.typeEquals(VCloudDirectorMediaType.VDC))));
       builder.group(nodeNamingConvention.groupInUniqueNameOrNull(from.getName()));
       builder.operatingSystem(toComputeOs(from));
       builder.hardware(hardwareForVm.apply(from));

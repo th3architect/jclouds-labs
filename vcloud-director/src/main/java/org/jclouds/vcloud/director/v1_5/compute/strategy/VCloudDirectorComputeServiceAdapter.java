@@ -21,9 +21,12 @@ import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Iterables.tryFind;
 import static org.jclouds.util.Predicates2.retry;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.ORG_NETWORK;
+import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VAPP;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VAPP_TEMPLATE;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorMediaType.VDC;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -43,6 +46,7 @@ import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import org.jclouds.vcloud.director.v1_5.VCloudDirectorApi;
+import org.jclouds.vcloud.director.v1_5.compute.util.VCloudDirectorComputeUtils;
 import org.jclouds.vcloud.director.v1_5.domain.Link;
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
 import org.jclouds.vcloud.director.v1_5.domain.ResourceEntity;
@@ -52,26 +56,47 @@ import org.jclouds.vcloud.director.v1_5.domain.VApp;
 import org.jclouds.vcloud.director.v1_5.domain.VAppTemplate;
 import org.jclouds.vcloud.director.v1_5.domain.Vdc;
 import org.jclouds.vcloud.director.v1_5.domain.Vm;
+import org.jclouds.vcloud.director.v1_5.domain.network.FirewallRule;
+import org.jclouds.vcloud.director.v1_5.domain.network.FirewallRuleProtocols;
+import org.jclouds.vcloud.director.v1_5.domain.network.FirewallService;
+import org.jclouds.vcloud.director.v1_5.domain.network.IpRange;
+import org.jclouds.vcloud.director.v1_5.domain.network.IpRanges;
+import org.jclouds.vcloud.director.v1_5.domain.network.IpScope;
+import org.jclouds.vcloud.director.v1_5.domain.network.IpScopes;
+import org.jclouds.vcloud.director.v1_5.domain.network.NatService;
 import org.jclouds.vcloud.director.v1_5.domain.network.Network;
+import org.jclouds.vcloud.director.v1_5.domain.network.NetworkAssignment;
 import org.jclouds.vcloud.director.v1_5.domain.network.NetworkConfiguration;
+import org.jclouds.vcloud.director.v1_5.domain.network.NetworkConnection;
+import org.jclouds.vcloud.director.v1_5.domain.network.NetworkFeatures;
+import org.jclouds.vcloud.director.v1_5.domain.network.NetworkServiceType;
+import org.jclouds.vcloud.director.v1_5.domain.network.RouterInfo;
 import org.jclouds.vcloud.director.v1_5.domain.network.VAppNetworkConfiguration;
 import org.jclouds.vcloud.director.v1_5.domain.org.Org;
+import org.jclouds.vcloud.director.v1_5.domain.params.ComposeVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.DeployVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.InstantiateVAppParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.InstantiateVAppTemplateParams;
 import org.jclouds.vcloud.director.v1_5.domain.params.InstantiationParams;
+import org.jclouds.vcloud.director.v1_5.domain.params.RecomposeVAppParams;
+import org.jclouds.vcloud.director.v1_5.domain.params.SourcedCompositionItemParam;
 import org.jclouds.vcloud.director.v1_5.domain.params.UndeployVAppParams;
+import org.jclouds.vcloud.director.v1_5.domain.section.GuestCustomizationSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConfigSection;
+import org.jclouds.vcloud.director.v1_5.domain.section.NetworkConnectionSection;
 import org.jclouds.vcloud.director.v1_5.predicates.ReferencePredicates;
 import org.jclouds.vcloud.director.v1_5.predicates.TaskSuccess;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -83,6 +108,8 @@ public class VCloudDirectorComputeServiceAdapter implements
         ComputeServiceAdapter<Vm, Hardware, VAppTemplate, Location> {
 
    protected static final long TASK_TIMEOUT_SECONDS = 300L;
+   private static final String HTTP_SECURITY_GROUP = "http";
+   private static final String DEFAULT_SECURITY_GROUP = "default";
 
    @Resource
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
@@ -105,9 +132,6 @@ public class VCloudDirectorComputeServiceAdapter implements
       String imageId = checkNotNull(template.getImage().getId(), "template image id must not be null");
       String imageName = checkNotNull(template.getImage().getName(), "template image name must not be null");
 
-      String loginUser = template.getImage().getDefaultCredentials().getUser();
-      String loginUserPassword = template.getImage().getDefaultCredentials().getPassword();
-
       // workflow
       /*
          1. tryFindVdcByName(InOrg)
@@ -118,7 +142,8 @@ public class VCloudDirectorComputeServiceAdapter implements
        */
 
       Session session = api.getCurrentSession();
-      Org org = api.getOrgApi().get(find(api.getOrgApi().list(), ReferencePredicates.nameEquals(session.get())).getHref());
+      final Org org = api.getOrgApi().get(find(api.getOrgApi().list(), ReferencePredicates.nameEquals(session.get()))
+              .getHref());
       final Network network;
       Network.FenceMode fenceMode = Network.FenceMode.NAT_ROUTED;
       Optional<Network> optionalNetwork = tryFindNetworkInOrgWithFenceMode(org, fenceMode);
@@ -127,10 +152,19 @@ public class VCloudDirectorComputeServiceAdapter implements
       }
       network = optionalNetwork.get();
 
-
       Vdc vdc = api.getVdcApi()
               .get(find(org.getLinks(), ReferencePredicates.<Link> typeEquals(VDC)).getHref());
       String vdcUrn = vdc.getId();
+
+      /*
+      ImmutableList<Reference> vAppReferences =  FluentIterable.from(vdc.getResourceEntities())
+              .filter(ReferencePredicates.typeEquals(VAPP))
+              .toList();
+
+      for (Reference vAppReference : vAppReferences) {
+         api.getVAppApi().get(vAppReference.getHref());
+      }
+      */
 
       Set<Reference> networks = vdc.getAvailableNetworks();
       Optional<Reference> parentNetwork = Iterables.tryFind(networks, new Predicate<Reference>() {
@@ -140,32 +174,66 @@ public class VCloudDirectorComputeServiceAdapter implements
          }
       });
 
-      NetworkConfiguration networkConfiguration = NetworkConfiguration.builder().parentNetwork(parentNetwork.get())
-              .fenceMode(fenceMode).build();
+      NetworkConfiguration networkConfiguration = NetworkConfiguration.builder()
+              .parentNetwork(parentNetwork.get())
+              .fenceMode(Network.FenceMode.BRIDGED) // simplest solution
+              .build();
 
       NetworkConfigSection networkConfigSection = NetworkConfigSection
               .builder()
               .info(MsgType.builder().value("Configuration parameters for logical networks").build())
               .networkConfigs(
-                      ImmutableSet.of(VAppNetworkConfiguration.builder().networkName("vAppNetwork")
-                              .configuration(networkConfiguration).build())).build();
+                      ImmutableSet.of(VAppNetworkConfiguration.builder()
+                              .networkName("vAppNetwork")
+                              .configuration(networkConfiguration)
+                              .build()))
+              .build();
 
-      InstantiationParams instantiationParams = InstantiationParams.builder()
-              .sections(ImmutableSet.of(networkConfigSection)).build();
-/*
-      VAppTemplate vAppTemplate;
-      Optional<VAppTemplate> optionalvAppTemplate = tryFindVAppTemplateByNameInOrg(vdc, imageName);
-      if (!optionalvAppTemplate.isPresent()) {
-         throw new IllegalStateException();
+      VAppTemplate vAppTemplate = api.getVAppTemplateApi().get(imageId);
+      Set<Vm> vms = getAvailableVMsFromVAppTemplate(vAppTemplate);
+      // get the first vm to be added to vApp
+      Vm toAddVm = Iterables.get(vms, 0);
+
+      String networkName = "M523007043-2739-default-routed"; //name("vAppNetwork-");
+      SourcedCompositionItemParam vmItem = createVmItem(toAddVm, networkName);
+      Set<String> securityGroups = ImmutableSet.of(DEFAULT_SECURITY_GROUP); // template.getOptions().getGroups()
+      ComposeVAppParams compositionParams = ComposeVAppParams.builder()
+              .name(name("composed-"))
+              .instantiationParams(instantiationParams(org, vdc, networkName, securityGroups))
+              .sourcedItems(ImmutableList.of(vmItem))
+              .deploy()
+              .powerOn()
+              .build();
+      VApp vApp = api.getVdcApi().composeVApp(vdcUrn, compositionParams);
+      Task compositionTask = Iterables.getFirst(vApp.getTasks(), null);
+      retryTaskSuccess = retry(new TaskSuccess(api.getTaskApi()), TASK_TIMEOUT_SECONDS * 1000L);
+      logger.debug(">> awaiting vApp(%s) deployment", vApp.getId());
+      boolean vAppDeployed = retryTaskSuccess.apply(compositionTask);
+      logger.trace("<< vApp(%s) deployment completed(%s)", vApp.getId(), vAppDeployed);
+
+      if (!vApp.getTasks().isEmpty()) {
+         for (Task task : vApp.getTasks()) {
+            retryTaskSuccess = retry(new TaskSuccess(api.getTaskApi()), TASK_TIMEOUT_SECONDS * 1000L);
+            logger.debug(">> awaiting vApp(%s) deployment", vApp.getId());
+            boolean vmReady = retryTaskSuccess.apply(task);
+            logger.trace("<< vApp(%s) deployment completed(%s)", vApp.getId(), vmReady);
+         }
       }
-      vAppTemplate = optionalvAppTemplate.get();
-*/
-      InstantiateVAppTemplateParams instantiate = InstantiateVAppTemplateParams.builder().name(name("test-vapp-"))
-              .notDeploy().description("Test VApp").instantiationParams(instantiationParams)
-              .source(api.getVAppTemplateApi().get(imageId).getHref()).build();
+/*
+      InstantiationParams instantiationParams = InstantiationParams.builder()
+              .sections(ImmutableSet.of(networkConfigSection))
+              .build();
+
+      InstantiateVAppTemplateParams instantiate = InstantiateVAppTemplateParams.builder()
+              .name(name)
+              .notDeploy()
+              .notPowerOn()
+              .description("jclouds vapp")
+              .instantiationParams(instantiationParams)
+              .source(vAppTemplate.getHref())
+              .build();
 
       VApp vApp = api.getVdcApi().instantiateVApp(vdcUrn, instantiate);
-      //Task vAppDeployment = api.getVAppApi().deploy(vApp.getHref(), DeployVAppParams.builder().build());
 
       if (!vApp.getTasks().isEmpty()) {
          for (Task task : vApp.getTasks()) {
@@ -175,17 +243,314 @@ public class VCloudDirectorComputeServiceAdapter implements
             logger.trace("<< vApp(%s) deployment completed(%s)", vApp.getId(), vAppDeployed);
          }
       }
+      */
 
       Vm vm = Iterables.getOnlyElement(api.getVAppApi().get(vApp.getHref()).getChildren().getVms());
+/*
+      GuestCustomizationSection customizationSection = api.getVmApi().getGuestCustomizationSection(vm.getHref());
+      GuestCustomizationSection newSection = customizationSection.toBuilder()
+              .resetPasswordRequired(false)
+              .build();
+      Task editGuestCustomizationSection = api.getVmApi().editGuestCustomizationSection(vm.getHref(), newSection);
+      logger.debug(">> awaiting vm(%s) guest customization reset", vm.getId());
+      boolean finished = retryTaskSuccess.apply(editGuestCustomizationSection);
+      logger.trace("<< vm(%s) reset completed(%s)", vm.getId(), finished);
 
-      Task powerOnTask = api.getVmApi().powerOn(vm.getHref());
-      retryTaskSuccess = retry(new TaskSuccess(api.getTaskApi()), TASK_TIMEOUT_SECONDS * 1000L);
-      logger.debug(">> awaiting login details for vm(%s)", vm.getId());
-      boolean vmStarted = retryTaskSuccess.apply(powerOnTask);
-      logger.trace("<< vm(%s) complete(%s)", vm.getId(), vmStarted);
+      Task powerOnTask = api.getVAppApi().powerOn(vApp.getHref());
+      logger.debug(">> awaiting vApp(%s) guest customization reset", vApp.getId());
+      boolean poweredOn = retryTaskSuccess.apply(powerOnTask);
+      logger.trace("<< vApp(%s) reset completed(%s)", vApp.getId(), poweredOn);
+*/
+      LoginCredentials loginCredentials = VCloudDirectorComputeUtils.getCredentialsFrom(vm);
+      return new NodeAndInitialCredentials(vm, vm.getId(), loginCredentials.toBuilder().user("root").build());
+   }
 
-      return new NodeAndInitialCredentials(vm, vm.getId(),
-              LoginCredentials.builder().user(loginUser).password(loginUserPassword).build());
+   private SourcedCompositionItemParam createVmItem(Vm vm, String networkName) {
+      // creating an item element. this item will contain the vm which should be added to the vapp.
+      Reference reference = Reference.builder().name(name("vm-")).href(vm.getHref()).type(vm.getType()).build();
+      SourcedCompositionItemParam vmItem = SourcedCompositionItemParam.builder().source(reference).build();
+
+      InstantiationParams vmInstantiationParams = null;
+      Set<NetworkAssignment> networkAssignments = Sets.newLinkedHashSet();
+
+      // add a new network connection section for the vm.
+      /*
+      NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
+              .info(MsgType.builder()
+                      .value("Empty network configuration parameters")
+                      .build())
+              .build();
+      */
+
+      NetworkConnection networkConnection = NetworkConnection.builder()
+              .network(networkName)
+              .ipAddressAllocationMode(NetworkConnection.IpAddressAllocationMode.POOL)
+              .isConnected(true)
+              .build();
+
+      NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
+              .info(MsgType.builder().value("networkInfo").build())
+              .primaryNetworkConnectionIndex(0).networkConnection(networkConnection).build();
+
+      // adding the network connection section to the instantiation params of the vapp.
+      GuestCustomizationSection customizationSection = api.getVmApi().getGuestCustomizationSection(vm.getHref());
+      GuestCustomizationSection guestCustomizationSection = customizationSection.toBuilder()
+              .adminPasswordAuto(true)
+              .resetPasswordRequired(false)
+              .build();
+
+      vmInstantiationParams = InstantiationParams.builder()
+              .sections(ImmutableSet.of(networkConnectionSection, guestCustomizationSection))
+              .build();
+/*
+      // if the vm contains a network connection and the vApp does not contain any configured
+      // network
+      if (vmHasNetworkConnectionConfigured(vm)) {
+         //if (!vAppHasNetworkConfigured(vApp)) {
+            // add a new network connection section for the vm.
+            NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
+                    .info(MsgType.builder().value("Empty network configuration parameters").build())
+                    .build();
+            // adding the network connection section to the instantiation params of the vapp.
+            vmInstantiationParams = InstantiationParams.builder().sections(ImmutableSet.of(networkConnectionSection))
+                    .build();
+         //}
+
+         // if the vm already contains a network connection section and if the vapp contains a
+         // configured network -> vm could be mapped to that network.
+         else {
+            Set<VAppNetworkConfiguration> vAppNetworkConfigurations = listVappNetworkConfigurations(vApp);
+            for (VAppNetworkConfiguration vAppNetworkConfiguration : vAppNetworkConfigurations) {
+               NetworkAssignment networkAssignment = NetworkAssignment.builder()
+                       .innerNetwork(vAppNetworkConfiguration.getNetworkName())
+                       .containerNetwork(vAppNetworkConfiguration.getNetworkName()).build();
+               networkAssignments.add(networkAssignment);
+            }
+         }
+      }
+
+      // if the vm does not contain any network connection sections and if the
+      // vapp contains a network configuration. we should add the vm to this
+      // vapp network
+      else {
+         if (vAppHasNetworkConfigured(vApp)) {
+            VAppNetworkConfiguration vAppNetworkConfiguration = getVAppNetworkConfig(vApp);
+            NetworkConnection networkConnection = NetworkConnection.builder()
+                    .network(vAppNetworkConfiguration.getNetworkName())
+                    .ipAddressAllocationMode(NetworkConnection.IpAddressAllocationMode.DHCP).build();
+
+            NetworkConnectionSection networkConnectionSection = NetworkConnectionSection.builder()
+                    .info(MsgType.builder().value("networkInfo").build())
+                    .primaryNetworkConnectionIndex(0).networkConnection(networkConnection).build();
+
+            // adding the network connection section to the instantiation params of the vapp.
+            vmInstantiationParams = InstantiationParams.builder().sections(ImmutableSet.of(networkConnectionSection))
+                    .build();
+         }
+      }
+      */
+
+      if (vmInstantiationParams != null)
+         vmItem = SourcedCompositionItemParam.builder().fromSourcedCompositionItemParam(vmItem)
+                 .instantiationParams(vmInstantiationParams).build();
+
+      if (networkAssignments != null)
+         vmItem = SourcedCompositionItemParam.builder().fromSourcedCompositionItemParam(vmItem)
+                 .networkAssignment(networkAssignments).build();
+      return vmItem;
+   }
+
+   protected Set<VAppNetworkConfiguration> listVappNetworkConfigurations(VApp vApp) {
+      Set<VAppNetworkConfiguration> vAppNetworkConfigs = api.getVAppApi().getNetworkConfigSection(vApp.getId())
+              .getNetworkConfigs();
+      return vAppNetworkConfigs;
+   }
+
+   protected boolean vAppHasNetworkConfigured(VApp vApp) {
+      return getVAppNetworkConfig(vApp) != null;
+   }
+
+   protected VAppNetworkConfiguration getVAppNetworkConfig(VApp vApp) {
+      Set<VAppNetworkConfiguration> vAppNetworkConfigs = api.getVAppApi().getNetworkConfigSection(vApp.getId())
+              .getNetworkConfigs();
+      return Iterables.tryFind(vAppNetworkConfigs, Predicates.notNull()).orNull();
+   }
+
+   boolean vmHasNetworkConnectionConfigured(Vm vm) {
+      return listNetworkConnections(vm).size() > 0;
+   }
+
+   protected Set<NetworkConnection> listNetworkConnections(Vm vm) {
+      return api.getVmApi().getNetworkConnectionSection(vm.getId()).getNetworkConnections();
+   }
+
+   protected InstantiationParams instantiationParams(Org org, Vdc vdc, String networkName, Set<String> securityGroups) {
+      NetworkConfiguration networkConfiguration = networkConfiguration(org, vdc, securityGroups);
+
+      InstantiationParams instantiationParams = InstantiationParams.builder()
+              .sections(ImmutableSet.of(networkConfigSection(networkName, networkConfiguration)))
+              .build();
+
+      return instantiationParams;
+   }
+
+   /** Build a {@link NetworkConfigSection} object. */
+   private NetworkConfigSection networkConfigSection(String networkName, NetworkConfiguration networkConfiguration) {
+      NetworkConfigSection networkConfigSection = NetworkConfigSection
+              .builder()
+              .info(MsgType.builder().value("Configuration parameters for logical networks").build())
+              .networkConfigs(
+                      ImmutableSet.of(VAppNetworkConfiguration.builder()
+                              .networkName(networkName)
+                              .configuration(networkConfiguration)
+                              .build()))
+              .build();
+
+      return networkConfigSection;
+   }
+
+   private NetworkConfiguration networkConfiguration(Org org, Vdc vdc, Set<String> securityGroups) {
+      // Create a vAppNetwork with firewall rules
+      Network.FenceMode fenceMode = Network.FenceMode.NAT_ROUTED;
+      final Optional<Network> optionalNetwork = tryFindNetworkInOrgWithFenceMode(org, fenceMode);
+      if (!optionalNetwork.isPresent()) {
+         throw new IllegalStateException();
+      }
+      Set<Reference> networks = vdc.getAvailableNetworks();
+      Optional<Reference> parentNetwork = Iterables.tryFind(networks, new Predicate<Reference>() {
+         @Override
+         public boolean apply(Reference reference) {
+            return reference.getHref().equals(optionalNetwork.get().getHref());
+         }
+      });
+
+      Map<String, NetworkConfiguration> securityGroupToNetworkConfig = addSecurityGroupToNetworkConfiguration(parentNetwork.get());
+
+      Set<FirewallRule> firewallRules = Sets.newLinkedHashSet();
+      for (String securityGroup : securityGroups) {
+         Set<FirewallRule> securityGroupFirewallRules = retrieveAllFirewallRules(securityGroupToNetworkConfig.get(securityGroup).getNetworkFeatures());
+         firewallRules.addAll(securityGroupFirewallRules);
+      }
+      FirewallService firewallService = addFirewallService(firewallRules);
+
+      return NetworkConfiguration.builder()
+              .parentNetwork(parentNetwork.get())
+              //.ipScopes(IpScopes.builder().ipScope(addNewIpScope()).build())
+              .fenceMode(Network.FenceMode.BRIDGED)
+              .retainNetInfoAcrossDeployments(false)
+              //.features(toNetworkFeatures(ImmutableSet.of(firewallService)))//, natService)))
+              .build();
+   }
+
+   private IpScope addNewIpScope() {
+      IpRange newIpRange = addIpRange();
+      IpRanges newIpRanges = IpRanges.builder()
+              .ipRange(newIpRange)
+              .build();
+      return IpScope.builder()
+              .isInherited(false)
+              .gateway("192.168.2.1")
+              .netmask("255.255.0.0")
+              .ipRanges(newIpRanges).build();
+   }
+
+   private IpRange addIpRange() {
+      IpRange newIpRange = IpRange.builder()
+              .startAddress("192.168.2.100")
+              .endAddress("192.168.2.199")
+              .build();
+      return newIpRange;
+   }
+
+   private NetworkFeatures toNetworkFeatures(Set<? extends NetworkServiceType<?>> networkServices) {
+      NetworkFeatures networkFeatures = NetworkFeatures.builder()
+              .services(networkServices)
+              .build();
+      return networkFeatures;
+   }
+
+   private FirewallService addFirewallService(Set<FirewallRule> firewallRules) {
+      FirewallService firewallService = FirewallService.builder()
+              .enabled(true)
+              .defaultAction("drop")
+              .logDefaultAction(false)
+              .firewallRules(firewallRules)
+              .build();
+      return firewallService;
+   }
+
+   private Map<String, NetworkConfiguration> addSecurityGroupToNetworkConfiguration(Reference parentNetworkRef) {
+      Set<FirewallRule> defaultFirewallRules = defaultFirewallRules();
+      Set<FirewallRule> httpFirewallRules = httpIngressFirewallRules();
+
+      Map<String, NetworkConfiguration> securityGroupToNetworkConfigurations = Maps.newHashMap();
+      securityGroupToNetworkConfigurations.put(DEFAULT_SECURITY_GROUP, addNetworkConfiguration(parentNetworkRef, defaultFirewallRules));
+      securityGroupToNetworkConfigurations.put(HTTP_SECURITY_GROUP, addNetworkConfiguration(parentNetworkRef, httpFirewallRules));
+
+      return securityGroupToNetworkConfigurations;
+   }
+
+   private NetworkConfiguration addNetworkConfiguration(Reference parentNetworkRef, Set<FirewallRule> newFirewallRules) {
+      FirewallService firewallService = addFirewallService(newFirewallRules);
+
+      NetworkConfiguration newConfiguration = NetworkConfiguration.builder()
+              //TODO .ipScope(ipScope)
+              .parentNetwork(parentNetworkRef)
+              .fenceMode(Network.FenceMode.NAT_ROUTED)
+              .retainNetInfoAcrossDeployments(false)
+              .features(toNetworkFeatures(ImmutableSet.of(firewallService)))
+              .build();
+      return newConfiguration;
+   }
+
+   private Set<FirewallRule> defaultFirewallRules() {
+      FirewallRuleProtocols protocols = FirewallRuleProtocols.builder()
+              .any(true)
+              .build();
+      FirewallRule sshIngoing = addFirewallRule(FirewallRuleProtocols.builder().tcp(true).build(), "allow ssh ingoing traffic", -1, 22, "in");
+      FirewallRule egressAll = addFirewallRule(protocols, "allow all outgoing traffic", -1, -1, "out");
+      FirewallRule ingressInternal = addFirewallRule(protocols, "allow all incoming traffic", -1,  -1, "Internal",
+              "Any", "in");
+
+      return ImmutableSet.of(egressAll, sshIngoing, ingressInternal);
+   }
+
+   private Set<FirewallRule> httpIngressFirewallRules() {
+      FirewallRuleProtocols protocols = FirewallRuleProtocols.builder().tcp(true).build();
+      FirewallRule httpIngoing = addFirewallRule(protocols, "allow http ingoing traffic", 80, 80, "in");
+      FirewallRule httpsIngoing = addFirewallRule(protocols , "allow https ingoing traffic", 443, 443, "in");
+      return ImmutableSet.of(httpIngoing, httpsIngoing);
+   }
+
+   private FirewallRule addFirewallRule(FirewallRuleProtocols protocols, String description, int sourcePort,
+                                        int outPort, String direction) {
+      return  addFirewallRule(protocols, description, sourcePort, outPort, "Any", "Any", direction);
+   }
+
+   private FirewallRule addFirewallRule(FirewallRuleProtocols protocols, String description, int sourcePort,
+                                        int outPort, String sourceIp, String destinationIp, String direction) {
+      return FirewallRule.builder()
+              .isEnabled(true)
+              .description(description)
+              .policy("allow")
+              .protocols(protocols)
+              .port(outPort)
+              .destinationIp(destinationIp)
+              .sourcePort(sourcePort)
+              .sourceIp(sourceIp)
+              .direction(direction)
+              .enableLogging(false)
+              .build();
+   }
+
+   private Set<FirewallRule> retrieveAllFirewallRules(NetworkFeatures networkFeatures) {
+      Set<FirewallRule> firewallRules = Sets.newLinkedHashSet();
+      for (NetworkServiceType<?> networkServiceType : networkFeatures.getNetworkServices()) {
+         if (networkServiceType instanceof FirewallService) {
+            firewallRules.addAll(((FirewallService) networkServiceType).getFirewallRules());
+         }
+      }
+      return firewallRules;
    }
 
    public Optional<VAppTemplate> tryFindVAppTemplateByNameInOrg(Vdc vdc, final String name) {
@@ -257,6 +622,23 @@ public class VCloudDirectorComputeServiceAdapter implements
                  }
               })
               .filter(Predicates.notNull()).toSet();
+   }
+
+   private Set<Vm> getAvailableVMsFromVAppTemplate(VAppTemplate vAppTemplate) {
+      return ImmutableSet.copyOf(Iterables.filter(vAppTemplate.getChildren(), new Predicate<Vm>() {
+         // filter out vms in the vApp template with computer name that contains underscores, dots,
+         // or both.
+         @Override
+         public boolean apply(Vm input) {
+            GuestCustomizationSection guestCustomizationSection = api.getVmApi().getGuestCustomizationSection(input.getId());
+            String computerName = guestCustomizationSection.getComputerName();
+            /*
+            String retainComputerName = CharMatcher.inRange('0', '9').or(CharMatcher.inRange('a', 'z'))
+                    .or(CharMatcher.inRange('A', 'Z')).or(CharMatcher.is('-')).retainFrom(computerName);
+            */
+            return computerName.equals(computerName);
+         }
+      }));
    }
 
    private Org getOrgForSession() {

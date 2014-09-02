@@ -43,7 +43,7 @@ import org.jclouds.vcloud.director.v1_5.domain.section.RuntimeInfoSection;
 import org.jclouds.vcloud.director.v1_5.domain.section.VirtualHardwareSection;
 
 import com.google.common.base.Objects;
-import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -224,11 +224,4 @@ public abstract class AbstractVAppType extends ResourceEntity {
       return Objects.hashCode(super.hashCode(), vAppParent, sections, deployed);
    }
 
-   @Override
-   public ToStringHelper string() {
-      return super.string()
-            .add("vAppParent", vAppParent)
-            .add("sections", sections)
-            .add("deployed", deployed);
-   }
 }

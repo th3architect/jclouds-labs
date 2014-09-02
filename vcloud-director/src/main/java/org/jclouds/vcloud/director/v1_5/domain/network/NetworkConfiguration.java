@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
 import org.jclouds.vcloud.director.v1_5.domain.network.Network.FenceMode;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
@@ -236,7 +236,7 @@ public class NetworkConfiguration {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("").add("ipScopes", ipScopes).add("parentNetwork", parentNetwork)
+      return Objects.toStringHelper("").add("ipScopes", ipScopes).add("parentNetwork", parentNetwork)
             .add("fenceMode", fenceMode)
             .add("retainNetInfoAcrossDeployments", retainNetInfoAcrossDeployments)
             .add("features", features)

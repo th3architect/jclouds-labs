@@ -17,6 +17,7 @@
 package org.jclouds.vcloud.director.v1_5;
 
 import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
+import static org.jclouds.reflect.Reflection2.typeToken;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_TIMEOUT_TASK_COMPLETED;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_VERSION_SCHEMA;
 import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_VCLOUD_DIRECTOR_XML_NAMESPACE;
@@ -25,6 +26,7 @@ import static org.jclouds.vcloud.director.v1_5.VCloudDirectorConstants.PROPERTY_
 import java.net.URI;
 import java.util.Properties;
 
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 import org.jclouds.vcloud.director.v1_5.compute.config.VCloudDirectorComputeServiceContextModule;
 import org.jclouds.vcloud.director.v1_5.config.VCloudDirectorHttpApiModule;
@@ -77,6 +79,7 @@ public class VCloudDirectorApiMetadata extends BaseHttpApiMetadata<VCloudDirecto
                  .documentation(URI.create("http://www.vmware.com/support/pubs/vcd_pubs.html"))
                  .version("1.5")
                  .defaultProperties(VCloudDirectorApiMetadata.defaultProperties())
+                 .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(
                          VCloudDirectorHttpApiModule.class,
                          VCloudDirectorComputeServiceContextModule.class));

@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.jclouds.vcloud.director.v1_5.domain.Reference;
 
-import com.google.common.base.MoreObjects;
+
 import com.google.common.base.Objects;
 
 
@@ -109,7 +109,7 @@ public class RelocateParams {
 
    @Override
    public String toString() {
-      return MoreObjects.toStringHelper("")
+      return Objects.toStringHelper("")
             .add("datastore", datastore).toString();
    }
 }
