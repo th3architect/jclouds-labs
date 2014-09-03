@@ -83,6 +83,7 @@
     <module>abiquo</module>
     <module>jclouds-representations</module>
     <module>jclouds-management</module>
+    <module>xstream</module>
   </modules>
 
   <build>
