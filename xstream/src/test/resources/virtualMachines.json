@@ -1,0 +1,669 @@
+[
+    {
+        "VirtualMachineID": "d207f9c4-38c4-8a25-4625-590fffeeec06",
+        "BootTime": "2014-04-11T07:56:43.549Z",
+        "Cdroms": [
+            {
+                "VirtualMachineCdromID": "dd546d85-05de-08c7-fbbf-94e8dd99962b",
+                "ControllerKey": 200,
+                "DeviceKey": 3000,
+                "UnitNumber": 0
+            }
+        ],
+        "Consumption": {
+            "VirtualMachineConsumptionID": "d207f9c4-38c4-8a25-4625-590fffeeec06",
+            "TenantID": "73beb3a1-add7-475d-b2a6-46ea24dc8685",
+            "Last30DayVmuHour": 1.91,
+            "Last30DayBasicTierVmuHour": 1.91,
+            "Last7DayVmuHour": 1.91,
+            "Last7DayBasicTierVmuHour": 1.91,
+            "Last7DayAveVmu": 0.01,
+            "Last7DayBasicTierAveVmu": 0.01
+        },
+        "CpuLimitMHz": -1,
+        "CpuShares": 1000,
+        "Disks": [
+            {
+                "VirtualMachineDiskID": "a7e15830-d753-8864-05f2-9d28982f9708",
+                "StorageID": "0a855ef2-a03c-6e12-6190-9e98f2d33695",
+                "StorageIdentifier": "datastore-21",
+                "CapacityKB": 102400,
+                "ControllerKey": 1000,
+                "DeviceKey": 2000,
+                "DiskFileName": "[qa6comp1] B1US014XVM004/B1US014XVM004.vmdk",
+                "DiskMode": 5,
+                "DiskNumber": 1,
+                "UnitNumber": 0,
+                "StorageProfileID": "560022dc-74f0-abe8-72e4-69797569cc58"
+            }
+        ],
+        "DnsName": "",
+        "Group": "Unassigned",
+        "Guest": {
+            "Disks": [],
+            "Networks": [
+                {
+                    "DeviceConfigId": 4000,
+                    "Network": "e1 a5 26 50 d8 28 f7 aa-1a c2 55 41 a3 ba af 14",
+                    "MacAddress": "00:50:56:a6:36:b2"
+                }
+            ],
+            "GuestFullName": "CentOS 4/5/6 (32-bit)",
+            "GuestState": "notRunning",
+            "ToolsStatus": "toolsNotInstalled",
+            "ToolsVersion": "0",
+            "ToolsVersionStatus": "guestToolsNotInstalled",
+            "ToolsRunningStatus": "guestToolsNotRunning"
+        },
+        "IPAddress": "",
+        "IsTemplate": true,
+        "Nics": [
+            {
+                "VirtualMachineNicID": "2642f84a-e295-d8f4-9af9-0b309528740e",
+                "NetworkID": "a625b03b-2759-9da9-8d91-fb697976fb90",
+                "NetworkIdentifier": "dvportgroup-30",
+                "NicNumber": 1,
+                "AdapterType": 1,
+                "DeviceKey": 4000,
+                "MacAddress": "00:50:56:a6:36:b2"
+            }
+        ],
+        "NumCpu": 1,
+        "NumNic": 1,
+        "NumVirtualDisk": 1,
+        "OS": "centosGuest",
+        "OSFullName": "CentOS 4/5/6 (32-bit)",
+        "ParentHost": "host-20",
+        "PowerState": "poweredOff",
+        "RamAllocatedMB": 768,
+        "RamLimitMB": -1,
+        "RamShares": 7680,
+        "StorageCapacityAllocatedMB": 1063,
+        "StorageCapacityUsedMB": 100,
+        "StorageCapacityUsedPc": 9,
+        "StorageIoAllocated": 10,
+        "TierLevel": 3,
+        "Timestamp": "2014-09-18T13:41:35.262Z",
+        "HypervisorToolsStatus": "toolsNotInstalled",
+        "HypervisorToolsVersion": "0",
+        "VmHostName": "10.12.227.5",
+        "CorrelationId": "975c4135-39f9-4cc5-8e01-07cb475a607c",
+        "Hypervisor": {
+            "HypervisorID": "e16dec02-f5f4-5c91-c90e-b8127fca835f",
+            "Code": "1",
+            "Name": "QA6-10561",
+            "Site": {
+                "SiteID": "f777baf5-d67c-654b-5678-448def5020b1",
+                "Code": "1",
+                "Name": "USDC1",
+                "Region": {
+                    "RegionID": "2a9ebc12-dac9-38dd-c7ee-faa75cacb805",
+                    "Code": "2",
+                    "Name": "North America",
+                    "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                    "Active": true
+                },
+                "Topology": 2,
+                "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                "Active": true,
+                "Settings": {
+                    "Storage.SupportedProvisioningTypes": "Thick",
+                    "Storage.IsolationLevel": "Dedicated",
+                    "Authentication.Endpoint": "https://localhost/api/v1.2/auth?invalidCert=true",
+                    "Rid.LocationCode": "01",
+                    "Rid.CountryCode": "US"
+                }
+            },
+            "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+            "Acl": [
+                {
+                    "UserGroup": "4ab19659-f0b1-54ac-d2d5-8015b7f13938",
+                    "ResourceRole": "ecb6d3ae-1ac8-46db-8206-3b2bf7e04714",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "1393a841-0fa5-8d9c-9f44-561f995daf93",
+                    "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "4c674b2d-04c4-b774-6edb-bf9ab7e6b45c",
+                    "ResourceRole": "b690f28c-287c-4962-95de-3c66dc35ec4f",
+                    "Permissions": 1
+                }
+            ],
+            "DriverID": "2d78b9f5-7f6e-4616-bd8e-1316ef95ef1e"
+        },
+        "ExternalIdentifier": "vm-52",
+        "TenantID": "73beb3a1-add7-475d-b2a6-46ea24dc8685",
+        "Name": "B1US014XVM004-template",
+        "CustomerDefinedName": "default",
+        "ResourceGroups": [
+            "All Resources",
+            "Unassigned",
+            "All Virtual Machines and Templates"
+        ],
+        "UniqueId": "5026b994-339e-1f83-6a2a-71345ed7b70b",
+        "Acl": [
+            {
+                "UserGroup": "985635c3-24ae-4424-8446-57e030793b17",
+                "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                "Permissions": 9223372036854775807
+            },
+            {
+                "UserGroup": "d2dd8bdf-e88a-4984-ac69-23ff44e95054",
+                "ResourceRole": "3985741b-0df2-4e9a-869b-46369842b0da",
+                "Permissions": 1
+            },
+            {
+                "UserGroup": "02a70f69-adc7-3e46-6c34-03e97a87c8f8",
+                "ResourceRole": "3985741b-0df2-4e9a-869b-46369842b0da",
+                "Permissions": 1
+            },
+            {
+                "UserGroup": "5cd77368-23ba-444d-b1b1-3649ff078ef7",
+                "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                "Permissions": 9223372036854775807
+            },
+            {
+                "UserGroup": "985635c3-24ae-4424-8446-57e030793b17",
+                "ResourceRole": "3985741b-0df2-4e9a-869b-46369842b0da",
+                "Permissions": 1
+            }
+        ]
+    },
+    {
+        "VirtualMachineID": "22fb4083-6da8-c3ad-be9a-4c7d83109c64",
+        "Cdroms": [
+            {
+                "VirtualMachineCdromID": "19c98f74-1d34-8964-abeb-73a4b854d1d1",
+                "ControllerKey": 201,
+                "DeviceKey": 3002,
+                "UnitNumber": 0
+            }
+        ],
+        "CpuLimitMHz": -1,
+        "CpuShares": 1000,
+        "Disks": [
+            {
+                "VirtualMachineDiskID": "c38f65da-0e7d-79c7-4ba7-2eabf4d75b7a",
+                "StorageID": "a43eaf36-c50b-1cc5-32d8-fb17cbc6c42b",
+                "StorageIdentifier": "datastore-37",
+                "CapacityKB": 16777216,
+                "ControllerKey": 1000,
+                "DeviceKey": 2000,
+                "DiskFileName": "[A003QA6LUN001] BravoApp template/BravoApp template.vmdk",
+                "DiskMode": 5,
+                "DiskNumber": 1,
+                "UnitNumber": 0
+            }
+        ],
+        "DnsName": "",
+        "Guest": {
+            "Disks": [],
+            "Networks": [
+                {
+                    "DeviceConfigId": 4000,
+                    "Network": "ba ce 26 50 f5 da 3c d6-42 17 7f 49 a6 19 42 a1",
+                    "MacAddress": "00:50:56:a6:41:03"
+                }
+            ],
+            "GuestFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+            "GuestState": "notRunning",
+            "ToolsStatus": "toolsNotRunning",
+            "ToolsVersionStatus": "guestToolsUnmanaged",
+            "ToolsRunningStatus": "guestToolsNotRunning"
+        },
+        "IPAddress": "",
+        "IsTemplate": true,
+        "Nics": [
+            {
+                "VirtualMachineNicID": "45971571-9323-4c1c-4472-f1ec3504ce9e",
+                "NicNumber": 1,
+                "AdapterType": 1,
+                "DeviceKey": 4000,
+                "MacAddress": "00:50:56:a6:41:03"
+            }
+        ],
+        "NumCpu": 1,
+        "NumNic": 1,
+        "NumVirtualDisk": 1,
+        "OS": "rhel6_64Guest",
+        "OSFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+        "ParentHost": "host-20",
+        "PowerState": "poweredOff",
+        "RamAllocatedMB": 512,
+        "RamLimitMB": -1,
+        "RamShares": 5120,
+        "StorageCapacityAllocatedMB": 17108,
+        "StorageCapacityUsedMB": 16384,
+        "StorageCapacityUsedPc": 96,
+        "StorageIoAllocated": 10,
+        "Timestamp": "2014-09-18T13:40:40.726Z",
+        "HypervisorToolsStatus": "toolsNotRunning",
+        "VmHostName": "10.12.227.5",
+        "Hypervisor": {
+            "HypervisorID": "e16dec02-f5f4-5c91-c90e-b8127fca835f",
+            "Code": "1",
+            "Name": "QA6-10561",
+            "Site": {
+                "SiteID": "f777baf5-d67c-654b-5678-448def5020b1",
+                "Code": "1",
+                "Name": "USDC1",
+                "Region": {
+                    "RegionID": "2a9ebc12-dac9-38dd-c7ee-faa75cacb805",
+                    "Code": "2",
+                    "Name": "North America",
+                    "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                    "Active": true
+                },
+                "Topology": 2,
+                "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                "Active": true,
+                "Settings": {
+                    "Storage.SupportedProvisioningTypes": "Thick",
+                    "Storage.IsolationLevel": "Dedicated",
+                    "Authentication.Endpoint": "https://localhost/api/v1.2/auth?invalidCert=true",
+                    "Rid.LocationCode": "01",
+                    "Rid.CountryCode": "US"
+                }
+            },
+            "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+            "Acl": [
+                {
+                    "UserGroup": "4ab19659-f0b1-54ac-d2d5-8015b7f13938",
+                    "ResourceRole": "ecb6d3ae-1ac8-46db-8206-3b2bf7e04714",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "1393a841-0fa5-8d9c-9f44-561f995daf93",
+                    "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "4c674b2d-04c4-b774-6edb-bf9ab7e6b45c",
+                    "ResourceRole": "b690f28c-287c-4962-95de-3c66dc35ec4f",
+                    "Permissions": 1
+                }
+            ],
+            "DriverID": "2d78b9f5-7f6e-4616-bd8e-1316ef95ef1e"
+        },
+        "ExternalIdentifier": "vm-106",
+        "Name": "BravoApp template",
+        "CustomerDefinedName": "BravoApp template",
+        "UniqueId": "502641fa-3f5f-26b9-d41f-3d2fea814c82"
+    },
+    {
+        "VirtualMachineID": "c96f4710-fdd4-493e-b86b-fd3e13a9e6b0",
+        "BootTime": "2014-07-30T07:55:05.197Z",
+        "Cdroms": [
+            {
+                "VirtualMachineCdromID": "c5839315-2552-8bd3-0ce2-62ce745f548d",
+                "ControllerKey": 201,
+                "DeviceKey": 3002,
+                "UnitNumber": 0
+            }
+        ],
+        "Consumption": {
+            "VirtualMachineConsumptionID": "c96f4710-fdd4-493e-b86b-fd3e13a9e6b0",
+            "Last30DayVmuHour": 0.78,
+            "Last30DayBasicTierVmuHour": 0.78
+        },
+        "Comment": "AppAgent template thin provisioned",
+        "CpuLimitMHz": -1,
+        "CpuShares": 1000,
+        "Disks": [
+            {
+                "VirtualMachineDiskID": "e56fe92b-5146-d22f-f767-3bc70f26a119",
+                "StorageID": "8a2ce623-fb4f-bfe7-098f-cb1372a724f4",
+                "StorageIdentifier": "datastore-14",
+                "CapacityKB": 16777216,
+                "ControllerKey": 1000,
+                "DeviceKey": 2000,
+                "DiskFileName": "[qa6mgmt1] AppAgent CentOS 6.5 template/AppAgent CentOS 6.5 template thin.vmdk",
+                "DiskMode": 5,
+                "DiskNumber": 1,
+                "UnitNumber": 0
+            }
+        ],
+        "DnsName": "",
+        "Guest": {
+            "Disks": [],
+            "Networks": [
+                {
+                    "DeviceConfigId": 4000,
+                    "Network": "ba ce 26 50 f5 da 3c d6-42 17 7f 49 a6 19 42 a1",
+                    "MacAddress": "00:50:56:a6:54:74"
+                }
+            ],
+            "GuestFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+            "GuestState": "notRunning",
+            "ToolsStatus": "toolsNotRunning",
+            "ToolsVersion": "2147483647",
+            "ToolsVersionStatus": "guestToolsUnmanaged",
+            "ToolsRunningStatus": "guestToolsNotRunning"
+        },
+        "IPAddress": "",
+        "IsGlobalTemplate": true,
+        "IsTemplate": true,
+        "Nics": [
+            {
+                "VirtualMachineNicID": "a2e48cf8-60d5-58ce-246d-39e735363cb7",
+                "NetworkID": "fcd589e0-bb9b-5479-cc70-ad7b1b374937",
+                "NetworkIdentifier": "dvportgroup-24",
+                "NicNumber": 1,
+                "AdapterType": 4,
+                "DeviceKey": 4000,
+                "MacAddress": "00:50:56:a6:54:74"
+            }
+        ],
+        "NumCpu": 1,
+        "NumNic": 1,
+        "NumVirtualDisk": 1,
+        "OS": "rhel6_64Guest",
+        "OSFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+        "ParentHost": "host-12",
+        "PowerState": "poweredOff",
+        "RamAllocatedMB": 512,
+        "RamLimitMB": -1,
+        "RamShares": 5120,
+        "StorageCapacityAllocatedMB": 17109,
+        "StorageCapacityUsedMB": 1820,
+        "StorageCapacityUsedPc": 11,
+        "StorageIoAllocated": 10,
+        "Timestamp": "2014-09-18T13:40:52.352Z",
+        "HypervisorToolsStatus": "toolsNotRunning",
+        "HypervisorToolsVersion": "2147483647",
+        "VmHostName": "10.12.227.2",
+        "Hypervisor": {
+            "HypervisorID": "e16dec02-f5f4-5c91-c90e-b8127fca835f",
+            "Code": "1",
+            "Name": "QA6-10561",
+            "Site": {
+                "SiteID": "f777baf5-d67c-654b-5678-448def5020b1",
+                "Code": "1",
+                "Name": "USDC1",
+                "Region": {
+                    "RegionID": "2a9ebc12-dac9-38dd-c7ee-faa75cacb805",
+                    "Code": "2",
+                    "Name": "North America",
+                    "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                    "Active": true
+                },
+                "Topology": 2,
+                "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                "Active": true,
+                "Settings": {
+                    "Storage.SupportedProvisioningTypes": "Thick",
+                    "Storage.IsolationLevel": "Dedicated",
+                    "Authentication.Endpoint": "https://localhost/api/v1.2/auth?invalidCert=true",
+                    "Rid.LocationCode": "01",
+                    "Rid.CountryCode": "US"
+                }
+            },
+            "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+            "Acl": [
+                {
+                    "UserGroup": "4ab19659-f0b1-54ac-d2d5-8015b7f13938",
+                    "ResourceRole": "ecb6d3ae-1ac8-46db-8206-3b2bf7e04714",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "1393a841-0fa5-8d9c-9f44-561f995daf93",
+                    "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "4c674b2d-04c4-b774-6edb-bf9ab7e6b45c",
+                    "ResourceRole": "b690f28c-287c-4962-95de-3c66dc35ec4f",
+                    "Permissions": 1
+                }
+            ],
+            "DriverID": "2d78b9f5-7f6e-4616-bd8e-1316ef95ef1e"
+        },
+        "ExternalIdentifier": "vm-142",
+        "Name": "AppAgent CentOS 6.5 template_",
+        "CustomerDefinedName": "AppAgent CentOS 6.5 template thin",
+        "UniqueId": "50267a37-215c-fe80-74bd-704e085e6de3"
+    },
+    {
+        "VirtualMachineID": "9e424312-69a0-2ffa-3986-f4ba8238bb42",
+        "Cdroms": [
+            {
+                "VirtualMachineCdromID": "002140c2-9eaf-fe74-858a-9f7c42762080",
+                "ControllerKey": 201,
+                "DeviceKey": 3002,
+                "UnitNumber": 0
+            }
+        ],
+        "CpuLimitMHz": -1,
+        "CpuShares": 1000,
+        "Disks": [
+            {
+                "VirtualMachineDiskID": "c91057b5-6da2-8f3f-5255-341ba74f17bc",
+                "StorageID": "8a2ce623-fb4f-bfe7-098f-cb1372a724f4",
+                "StorageIdentifier": "datastore-14",
+                "CapacityKB": 16777216,
+                "ControllerKey": 1000,
+                "DeviceKey": 2000,
+                "DiskFileName": "[qa6mgmt1] Hardened Linux Gold Image v1.0/Hardened Linux Gold Image v1.0.vmdk",
+                "DiskMode": 5,
+                "DiskNumber": 1,
+                "UnitNumber": 0
+            }
+        ],
+        "DnsName": "",
+        "Guest": {
+            "Disks": [],
+            "Networks": [],
+            "GuestFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+            "GuestState": "notRunning",
+            "ToolsStatus": "toolsNotInstalled",
+            "ToolsVersionStatus": "guestToolsNotInstalled",
+            "ToolsRunningStatus": "guestToolsNotRunning"
+        },
+        "IPAddress": "",
+        "IsTemplate": true,
+        "Nics": [
+            {
+                "VirtualMachineNicID": "e8f0067b-00c6-758d-cd46-b6cd3dddf95b",
+                "NetworkID": "bd97daff-ca44-cbb1-1b73-7c18882ad9e5",
+                "NetworkIdentifier": "network-44",
+                "NicNumber": 1,
+                "AdapterType": 1,
+                "DeviceKey": 4000,
+                "MacAddress": "00:50:56:ae:38:4c"
+            }
+        ],
+        "NumCpu": 1,
+        "NumNic": 1,
+        "NumVirtualDisk": 1,
+        "OS": "rhel6_64Guest",
+        "OSFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+        "ParentHost": "host-12",
+        "PowerState": "poweredOff",
+        "RamAllocatedMB": 512,
+        "RamLimitMB": -1,
+        "RamShares": 5120,
+        "StorageCapacityAllocatedMB": 17091,
+        "StorageCapacityUsedMB": 16384,
+        "StorageCapacityUsedPc": 96,
+        "StorageIoAllocated": 10,
+        "Timestamp": "2014-09-18T13:41:12.855Z",
+        "HypervisorToolsStatus": "toolsNotInstalled",
+        "VmHostName": "10.12.227.2",
+        "Hypervisor": {
+            "HypervisorID": "e16dec02-f5f4-5c91-c90e-b8127fca835f",
+            "Code": "1",
+            "Name": "QA6-10561",
+            "Site": {
+                "SiteID": "f777baf5-d67c-654b-5678-448def5020b1",
+                "Code": "1",
+                "Name": "USDC1",
+                "Region": {
+                    "RegionID": "2a9ebc12-dac9-38dd-c7ee-faa75cacb805",
+                    "Code": "2",
+                    "Name": "North America",
+                    "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                    "Active": true
+                },
+                "Topology": 2,
+                "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                "Active": true,
+                "Settings": {
+                    "Storage.SupportedProvisioningTypes": "Thick",
+                    "Storage.IsolationLevel": "Dedicated",
+                    "Authentication.Endpoint": "https://localhost/api/v1.2/auth?invalidCert=true",
+                    "Rid.LocationCode": "01",
+                    "Rid.CountryCode": "US"
+                }
+            },
+            "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+            "Acl": [
+                {
+                    "UserGroup": "4ab19659-f0b1-54ac-d2d5-8015b7f13938",
+                    "ResourceRole": "ecb6d3ae-1ac8-46db-8206-3b2bf7e04714",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "1393a841-0fa5-8d9c-9f44-561f995daf93",
+                    "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "4c674b2d-04c4-b774-6edb-bf9ab7e6b45c",
+                    "ResourceRole": "b690f28c-287c-4962-95de-3c66dc35ec4f",
+                    "Permissions": 1
+                }
+            ],
+            "DriverID": "2d78b9f5-7f6e-4616-bd8e-1316ef95ef1e"
+        },
+        "ExternalIdentifier": "vm-43",
+        "Name": "Hardened Linux Gold Image v1.0",
+        "CustomerDefinedName": "Hardened Linux Gold Image v1.0",
+        "UniqueId": "502e1971-5578-853a-bea2-d9188dfaef32"
+    },
+    {
+        "VirtualMachineID": "cef54053-ca24-060a-46bc-4090e38825d6",
+        "Cdroms": [
+            {
+                "VirtualMachineCdromID": "d7f091f4-f4e1-314c-f428-1f7e55d0ef14",
+                "ControllerKey": 201,
+                "DeviceKey": 3002,
+                "UnitNumber": 0
+            }
+        ],
+        "CpuLimitMHz": -1,
+        "CpuShares": 1000,
+        "Disks": [
+            {
+                "VirtualMachineDiskID": "47625a87-5d90-8c6b-f01d-65cb26642e93",
+                "StorageID": "f1914447-c547-6bc0-0f26-87368ac25fbb",
+                "StorageIdentifier": "datastore-35",
+                "CapacityKB": 323584,
+                "ControllerKey": 1000,
+                "DeviceKey": 2000,
+                "DiskFileName": "[A001QA6LUN001] empty/empty.vmdk",
+                "DiskMode": 5,
+                "DiskNumber": 1,
+                "UnitNumber": 0
+            }
+        ],
+        "DnsName": "",
+        "Guest": {
+            "Disks": [],
+            "Networks": [
+                {
+                    "DeviceConfigId": 4000,
+                    "Network": "e1 a5 26 50 d8 28 f7 aa-1a c2 55 41 a3 ba af 14",
+                    "MacAddress": "00:50:56:a6:7c:48"
+                }
+            ],
+            "GuestFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+            "GuestState": "notRunning",
+            "ToolsStatus": "toolsNotInstalled",
+            "ToolsVersionStatus": "guestToolsNotInstalled",
+            "ToolsRunningStatus": "guestToolsNotRunning"
+        },
+        "IPAddress": "",
+        "IsGlobalTemplate": true,
+        "IsTemplate": true,
+        "Nics": [
+            {
+                "VirtualMachineNicID": "8727a7c5-1420-ed76-4ac3-1aee45af1aca",
+                "NetworkID": "a7e56c99-2afb-7888-5f9b-db8263a2d0e1",
+                "NetworkIdentifier": "dvportgroup-440",
+                "NicNumber": 1,
+                "AdapterType": 4,
+                "DeviceKey": 4000,
+                "MacAddress": "00:50:56:a6:7c:48"
+            }
+        ],
+        "NumCpu": 1,
+        "NumNic": 1,
+        "NumVirtualDisk": 1,
+        "OS": "rhel6_64Guest",
+        "OSFullName": "Red Hat Enterprise Linux 6 (64-bit)",
+        "ParentHost": "host-18",
+        "PowerState": "poweredOff",
+        "RamAllocatedMB": 2048,
+        "RamLimitMB": -1,
+        "RamShares": 20480,
+        "StorageCapacityAllocatedMB": 2559,
+        "StorageIoAllocated": 10,
+        "TierLevel": 2,
+        "Timestamp": "2014-09-18T13:41:19.026Z",
+        "HypervisorToolsStatus": "toolsNotInstalled",
+        "VmHostName": "10.12.227.4",
+        "Hypervisor": {
+            "HypervisorID": "e16dec02-f5f4-5c91-c90e-b8127fca835f",
+            "Code": "1",
+            "Name": "QA6-10561",
+            "Site": {
+                "SiteID": "f777baf5-d67c-654b-5678-448def5020b1",
+                "Code": "1",
+                "Name": "USDC1",
+                "Region": {
+                    "RegionID": "2a9ebc12-dac9-38dd-c7ee-faa75cacb805",
+                    "Code": "2",
+                    "Name": "North America",
+                    "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                    "Active": true
+                },
+                "Topology": 2,
+                "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+                "Active": true,
+                "Settings": {
+                    "Storage.SupportedProvisioningTypes": "Thick",
+                    "Storage.IsolationLevel": "Dedicated",
+                    "Authentication.Endpoint": "https://localhost/api/v1.2/auth?invalidCert=true",
+                    "Rid.LocationCode": "01",
+                    "Rid.CountryCode": "US"
+                }
+            },
+            "TenantID": "800106a5-880b-4db0-a034-a099f145c72d",
+            "Acl": [
+                {
+                    "UserGroup": "4ab19659-f0b1-54ac-d2d5-8015b7f13938",
+                    "ResourceRole": "ecb6d3ae-1ac8-46db-8206-3b2bf7e04714",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "1393a841-0fa5-8d9c-9f44-561f995daf93",
+                    "ResourceRole": "3f9d5bf4-0f63-4ede-8a31-f832af8dc07b",
+                    "Permissions": 9223372036854775807
+                },
+                {
+                    "UserGroup": "4c674b2d-04c4-b774-6edb-bf9ab7e6b45c",
+                    "ResourceRole": "b690f28c-287c-4962-95de-3c66dc35ec4f",
+                    "Permissions": 1
+                }
+            ],
+            "DriverID": "2d78b9f5-7f6e-4616-bd8e-1316ef95ef1e"
+        },
+        "ExternalIdentifier": "vm-441",
+        "Name": "empty",
+        "CustomerDefinedName": "empty",
+        "UniqueId": "50268f0b-a483-73d3-f407-49cfd82ca75b"
+    }
+]

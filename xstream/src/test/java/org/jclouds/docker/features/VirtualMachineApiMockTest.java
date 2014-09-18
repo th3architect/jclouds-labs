@@ -49,7 +49,7 @@ public class VirtualMachineApiMockTest extends BaseXStreamMockTest {
 
       try {
          Set<VirtualMachine> vms = remoteApi.listVirtualMachines();
-         assertRequestHasCommonFields(server.takeRequest(), "/VirtualMachine?$filter=");
+         assertRequestHasCommonFields(server.takeRequest(), "/api/v1.3/VirtualMachine?%24filter=IsTemplate%20eq%20false%20and%20IsRemoved%20eq%20false");
          assertEquals(vms.size(), 1);
       } finally {
          api.close();
@@ -93,7 +93,7 @@ public class VirtualMachineApiMockTest extends BaseXStreamMockTest {
 
    public void testGetVirtualMachine() throws Exception {
       MockWebServer server = mockWebServer();
-      server.enqueue(new MockResponse().setBody(payloadFromResource("/virtualMachine.json")));
+      server.enqueue(new MockResponse().setBody(payloadFromResource("/virtualMachines.json")));
       XStreamApi api = api(server.getUrl("/"));
       VirtualMachineApi remoteApi = api.getVirtualMachineApi();
       String virtualMachineId = "b03d4cd15b76f8876110615cdeed15eadf77c9beb408d62f1687dcc69192cd6d";
@@ -101,10 +101,9 @@ public class VirtualMachineApiMockTest extends BaseXStreamMockTest {
          VirtualMachine virtualMachine = remoteApi.getVirtualMachine(virtualMachineId);
          assertRequestHasCommonFields(server.takeRequest(), "/virtualMachines/" + virtualMachineId + "/json");
          assertNotNull(virtualMachine);
-         assertNotNull(virtualMachine.getId(), virtualMachineId);
-         assertNotNull(virtualMachine.getHostConfig());
+         assertNotNull(virtualMachine.getVirtualMachineID(), virtualMachineId);
          assertEquals(virtualMachine.getName(), "/tender_lumiere");
-         assertEquals(virtualMachine.getState().isRunning(), true);
+         assertEquals(virtualMachine.getPowerState(), "powerOn");
       } finally {
          api.close();
          server.shutdown();
@@ -138,7 +137,7 @@ public class VirtualMachineApiMockTest extends BaseXStreamMockTest {
          VirtualMachine virtualMachine = remoteApi.createVirtualMachine(virtualMachineConfig);
          assertRequestHasCommonFields(server.takeRequest(), "POST", "/virtualMachines/create?name=test");
          assertNotNull(virtualMachine);
-         assertEquals(virtualMachine.getId(), "c6c74153ae4b1d1633d68890a68d89c40aa5e284a1ea016cbc6ef0e634ee37b2");
+         assertEquals(virtualMachine.getVirtualMachineID(), "c6c74153ae4b1d1633d68890a68d89c40aa5e284a1ea016cbc6ef0e634ee37b2");
       } finally {
          api.close();
          server.shutdown();

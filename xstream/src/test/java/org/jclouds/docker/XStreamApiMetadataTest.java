@@ -30,14 +30,14 @@ import org.testng.annotations.Test;
  * Unit tests for the {@link org.jclouds.xstream.XStreamApiMetadata} class.
  */
 @Test(groups = "unit", testName = "AbiquoApiMetadataTest")
-public class DockerApiMetadataTest extends BaseComputeServiceApiMetadataTest {
+public class XStreamApiMetadataTest extends BaseComputeServiceApiMetadataTest {
 
-   public DockerApiMetadataTest() {
+   public XStreamApiMetadataTest() {
       super(new XStreamApiMetadata());
    }
 
    public void testDockerApiRegistered() {
-      ApiMetadata api = Apis.withId("docker");
+      ApiMetadata api = Apis.withId("xstream");
 
       assertNotNull(api);
       assertTrue(api instanceof XStreamApiMetadata);

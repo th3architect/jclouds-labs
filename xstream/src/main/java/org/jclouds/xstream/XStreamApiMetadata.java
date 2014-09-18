@@ -21,7 +21,6 @@ import com.google.inject.Module;
 import org.jclouds.Constants;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 import org.jclouds.xstream.compute.config.XStreamComputeServiceContextModule;
 import org.jclouds.xstream.config.XStreamHttpApiModule;
@@ -29,7 +28,6 @@ import org.jclouds.xstream.config.XStreamHttpApiModule;
 import java.net.URI;
 import java.util.Properties;
 
-import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
 import static org.jclouds.reflect.Reflection2.typeToken;
 
 /**
@@ -54,9 +52,8 @@ public class XStreamApiMetadata extends BaseHttpApiMetadata<XStreamApi> {
       Properties properties = BaseHttpApiMetadata.defaultProperties();
       properties.setProperty(Constants.PROPERTY_MAX_RETRIES, "15");
       properties.setProperty("jclouds.ssh.retry-auth", "true");
-      properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
-      properties.setProperty(ComputeServiceProperties.IMAGE_LOGIN_USER, "root:password");
-      properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true,osVersionMatches=1[012].[01][04]");
+      //properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
+      //properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true,osVersionMatches=1[012].[01][04]");
       return properties;
    }
 
@@ -68,9 +65,9 @@ public class XStreamApiMetadata extends BaseHttpApiMetadata<XStreamApi> {
                  .name("XStream API")
                  .identityName("user")
                  .credentialName("password")
-                 .documentation(URI.create("https://TODO/")) // TODO
-                 .version("1.2")
-                 .defaultEndpoint("http://127.0.0.1:2375")
+                 .documentation(URI.create("https://10.12.227.9"))
+                 .version("1.3")
+                 .defaultEndpoint("https://10.12.227.9/api/v1.3/")
                  .defaultProperties(XStreamApiMetadata.defaultProperties())
                  .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(

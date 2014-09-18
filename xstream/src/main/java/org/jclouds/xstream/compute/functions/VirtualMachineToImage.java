@@ -35,8 +35,9 @@ import static com.google.common.collect.Iterables.get;
 
 public class VirtualMachineToImage implements Function<VirtualMachine, Image> {
 
-   private static final String CENTOS = "centos";
+   private static final String CENTOS = "CentOS";
    private static final String UBUNTU = "ubuntu";
+   private static final String RHEL = "Red Hat Enterprise Linux";
 
    @Resource
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
@@ -47,8 +48,8 @@ public class VirtualMachineToImage implements Function<VirtualMachine, Image> {
       checkNotNull(from, "image");
       String name = checkNotNull(from.getName());
 
-      OsFamily osFamily = osFamily().apply(name);
-      String osVersion = parseVersion(name);
+      OsFamily osFamily = osFamily().apply(from.getOs());
+      String osVersion = parseVersion(from.getOsFullName());
 
       OperatingSystem os = OperatingSystem.builder()
               .description(name)
@@ -58,9 +59,9 @@ public class VirtualMachineToImage implements Function<VirtualMachine, Image> {
               .build();
 
       return new ImageBuilder()
-              .ids(from.getId())
+              .ids(from.getVirtualMachineID())
               .name(get(Splitter.on(":").split(name), 0))
-              .description(name)
+              .description(from.getOsFullName())
               .operatingSystem(os)
               .status(Image.Status.AVAILABLE)
               .build();
@@ -80,19 +81,27 @@ public class VirtualMachineToImage implements Function<VirtualMachine, Image> {
       return new Function<String, OsFamily>() {
 
          @Override
-         public OsFamily apply(final String description) {
-            if (description != null) {
-               if (description.contains(CENTOS)) return OsFamily.CENTOS;
-               else if (description.contains(UBUNTU)) return OsFamily.UBUNTU;
+         public OsFamily apply(final String osFullName) {
+            if (osFullName != null) {
+               if (osFullName.startsWith(CENTOS)) return OsFamily.CENTOS;
+               else if (osFullName.startsWith(UBUNTU)) return OsFamily.UBUNTU;
+               else if (osFullName.startsWith(RHEL)) return OsFamily.RHEL;
             }
             return OsFamily.UNRECOGNIZED;
          }
       };
    }
 
-   private String parseVersion(String description) {
-      String version = get(Splitter.on(":").split(description), 1);
-      logger.debug("os version for item: %s is %s", description, version);
+   private String parseVersion(String osFullName) {
+      String version = "UNRECOGNIZED";
+      if (osFullName.startsWith(CENTOS)) version = osFullName.subSequence(CENTOS.length() + 1,
+              CENTOS.length() + 7).toString();
+      else if (osFullName.startsWith(UBUNTU)) version = osFullName.subSequence(UBUNTU.length(),
+              UBUNTU.length() + 1).toString();
+      else if (osFullName.startsWith(RHEL)) version = osFullName.subSequence(RHEL.length() + 1,
+              RHEL.length() + 2).toString();
+
+      logger.debug("os version for item: %s is %s", osFullName, version);
       return version;
    }
 

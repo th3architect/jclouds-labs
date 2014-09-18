@@ -55,13 +55,12 @@ public class XStreamComputeServiceAdapterLiveTest extends BaseXStreamApiLiveTest
 
    public void testCreateNodeWithGroupEncodedIntoNameThenStoreCredentials() {
       String group = "foo";
-      String name = "container-" + new Random().nextInt();
+      String name = "jclouds-" + new Random().nextInt();
 
-      Template template = templateBuilder.smallest()
-              .osDescriptionMatches("jclouds/default:latest").build();
+      Template template = templateBuilder.imageDescriptionMatches("Red Hat Enterprise Linux").build();
 
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
-      assertEquals(guest.getNodeId(), guest.getNode().getId() + "");
+      assertEquals(guest.getNodeId(), guest.getNode().getVirtualMachineID() + "");
    }
 
    public void testListHardwareProfiles() {
@@ -76,7 +75,7 @@ public class XStreamComputeServiceAdapterLiveTest extends BaseXStreamApiLiveTest
    @AfterGroups(groups = "live")
    protected void tearDown() {
       if (guest != null) {
-         adapter.destroyNode(guest.getNode().getId() + "");
+         adapter.destroyNode(guest.getNode().getVirtualMachineID() + "");
       }
       super.tearDown();
    }

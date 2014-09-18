@@ -16,21 +16,14 @@
  */
 package org.jclouds.docker.compute;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import com.google.inject.Module;
 import org.jclouds.Constants;
 import org.jclouds.apis.BaseApiLiveTest;
 import org.jclouds.xstream.XStreamApi;
 import org.jclouds.sshj.config.SshjSshClientModule;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Properties;
 
 @Test(groups = "live")
@@ -51,17 +44,6 @@ public class BaseXStreamApiLiveTest extends BaseApiLiveTest<XStreamApi> {
       overrides.setProperty(Constants.PROPERTY_MAX_RETRIES, "15");
       overrides.setProperty("jclouds.ssh.retry-auth", "true");
       return overrides;
-   }
-
-   protected String consumeStream(InputStream stream, boolean swallowIOException) {
-      String result = null;
-      try {
-         result = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
-         Closeables.close(stream, swallowIOException);
-      } catch (IOException e) {
-         Assert.fail();
-      }
-      return result;
    }
 
 }

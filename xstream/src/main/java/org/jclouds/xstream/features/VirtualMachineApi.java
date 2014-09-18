@@ -28,19 +28,23 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks;
+import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.rest.annotations.QueryParams;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.xstream.binders.BindODataQueryToQueryParams;
 import org.jclouds.xstream.domain.VirtualMachine;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
+@RequestFilters(BasicAuthentication.class)
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/api/v{jclouds.api-version}")
 public interface VirtualMachineApi extends Closeable {
 
    String VIRTUAL_MACHINES_FILTER = "IsTemplate eq false and IsRemoved eq false";
    String VIRTUAL_MACHINE_FILTER = "IsRemoved eq false";
-   String TEMPLATES_FILTER = "IsTemplate eq true and IsRemoved eq false and TenantID eq ";
+   String TEMPLATES_FILTER = "IsTemplate eq true and IsRemoved eq false";
    String TEMPLATE_FILTER = "IsRemoved eq false";
 
    /**
