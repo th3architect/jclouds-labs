@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute;
+package org.jclouds.xstream.compute;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

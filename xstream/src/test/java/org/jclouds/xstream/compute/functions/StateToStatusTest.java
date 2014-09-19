@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.functions;
+package org.jclouds.xstream.compute.functions;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;

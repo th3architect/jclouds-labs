@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.functions;
+package org.jclouds.xstream.compute.functions;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
@@ -76,9 +76,10 @@ public class VirtualMachineToNodeMetadataTest {
               .ghost(false)
               .build();
       virtualMachine = VirtualMachine.builder()
-              .id("6d35806c1bd2b25cd92bba2d2c2c5169dc2156f53ab45c2b62d76e2d2fee14a9")
+              .virtualMachineID("6d35806c1bd2b25cd92bba2d2c2c5169dc2156f53ab45c2b62d76e2d2fee14a9")
               .name("/hopeful_mclean")
-              .created("2014-03-22T07:16:45.784120972Z")
+              .bootTime("2014-03-22T07:16:45.784120972Z")
+              /*
               .path("/usr/sbin/sshd")
               .args(new String[] {"-D"})
               .state(state)
@@ -101,6 +102,7 @@ public class VirtualMachineToNodeMetadataTest {
               .status("")
               .hostConfig(HostConfig.builder().publishAllPorts(true).build())
               .ports(ImmutableList.<Port>of())
+              */
               .build();
       ProviderMetadata providerMetadata = EasyMock.createMock(ProviderMetadata.class);
       expect(providerMetadata.getEndpoint()).andReturn("http://127.0.0.1:4243");
@@ -171,12 +173,8 @@ public class VirtualMachineToNodeMetadataTest {
    private VirtualMachine mockVirtualMachine() {
       VirtualMachine mockVirtualMachine = EasyMock.createMock(VirtualMachine.class);
 
-      expect(mockVirtualMachine.getId()).andReturn(virtualMachine.getId());
+      expect(mockVirtualMachine.getVirtualMachineID()).andReturn(virtualMachine.getVirtualMachineID());
       expect(mockVirtualMachine.getName()).andReturn(virtualMachine.getName());
-      expect(mockVirtualMachine.getContainerConfig()).andReturn(virtualMachine.getContainerConfig()).anyTimes();
-      expect(mockVirtualMachine.getNetworkSettings()).andReturn(virtualMachine.getNetworkSettings()).anyTimes();
-      expect(mockVirtualMachine.getState()).andReturn(virtualMachine.getState());
-      expect(mockVirtualMachine.getImage()).andReturn(virtualMachine.getImage()).anyTimes();
       replay(mockVirtualMachine);
 
       return mockVirtualMachine;

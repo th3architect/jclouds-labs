@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.compute.functions;
+package org.jclouds.xstream.compute.functions;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -52,13 +52,13 @@ public class VirtualMachineToImageTest {
 
       verify(mockImage);
 
-      assertEquals(mockImage.getId(), image.getId().toString());
+      assertEquals(mockImage.getVirtualMachineID(), image.getId().toString());
    }
 
    private VirtualMachine mockImage() {
       VirtualMachine mockImage = EasyMock.createMock(VirtualMachine.class);
 
-      expect(mockImage.getId()).andReturn(image.getId()).anyTimes();
+      expect(mockImage.getVirtualMachineID()).andReturn(image.getVirtualMachineID()).anyTimes();
       replay(mockImage);
 
       return mockImage;

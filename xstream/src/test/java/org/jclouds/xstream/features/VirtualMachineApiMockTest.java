@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.features;
+package org.jclouds.xstream.features;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
-import org.jclouds.docker.internal.BaseXStreamMockTest;
+import org.jclouds.xstream.domain.Config;
+import org.jclouds.xstream.domain.Task;
+import org.jclouds.xstream.internal.BaseXStreamMockTest;
 import org.jclouds.xstream.XStreamApi;
 import org.jclouds.xstream.domain.VirtualMachine;
-import org.jclouds.xstream.features.VirtualMachineApi;
 import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.annotations.Test;
 
@@ -131,13 +132,13 @@ public class VirtualMachineApiMockTest extends BaseXStreamMockTest {
 
       XStreamApi api = api(server.getUrl("/"));
       VirtualMachineApi remoteApi = api.getVirtualMachineApi();
-      VirtualMachine virtualMachineConfig = VirtualMachine.builder()
+      Config virtualMachineConfig = Config.builder()
               .build();
       try {
-         VirtualMachine virtualMachine = remoteApi.createVirtualMachine(virtualMachineConfig);
+         Task creationTask = remoteApi.createVirtualMachine(virtualMachineConfig);
          assertRequestHasCommonFields(server.takeRequest(), "POST", "/virtualMachines/create?name=test");
-         assertNotNull(virtualMachine);
-         assertEquals(virtualMachine.getVirtualMachineID(), "c6c74153ae4b1d1633d68890a68d89c40aa5e284a1ea016cbc6ef0e634ee37b2");
+         assertNotNull(creationTask);
+         assertEquals(creationTask.getId(), "c6c74153ae4b1d1633d68890a68d89c40aa5e284a1ea016cbc6ef0e634ee37b2");
       } finally {
          api.close();
          server.shutdown();

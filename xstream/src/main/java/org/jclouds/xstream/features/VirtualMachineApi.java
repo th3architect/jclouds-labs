@@ -32,6 +32,8 @@ import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.rest.annotations.QueryParams;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.xstream.binders.BindODataQueryToQueryParams;
+import org.jclouds.xstream.domain.Config;
+import org.jclouds.xstream.domain.Task;
 import org.jclouds.xstream.domain.VirtualMachine;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
@@ -60,27 +62,15 @@ public interface VirtualMachineApi extends Closeable {
    Set<VirtualMachine> listVirtualMachines();
 
    /**
-    * List all running containers
-    *
-    * @param options the options to list the containers (@see ListContainerOptions)
-    * @return a set of containers
-   @Named("virtualmachine:list")
-   @GET
-   @Path("/VirtualMachine")
-   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<VirtualMachine> listVirtualMachines(ListVirtualMachineOptions options);
-   */
-
-   /**
     * Create a virtual machine
     *
-    * @param virtualMachine the virtual machine’s configuration (@see BindToJsonPayload)
-    * @return a new virtual machine
+    * @param virtualMachineConfig the virtual machine’s configuration (@see BindToJsonPayload)
+    * @return task
     */
    @Named("virtualmachine:create")
    @POST
    @Path("/VirtualMachine/SetVM")
-   VirtualMachine createVirtualMachine(@BinderParam(BindToJsonPayload.class) VirtualMachine virtualMachine);
+   Task createVirtualMachine(@BinderParam(BindToJsonPayload.class) Config virtualMachineConfig);
 
    /**
     * Return low-level information on the virtual machine

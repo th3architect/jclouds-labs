@@ -33,10 +33,12 @@ import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.reference.ComputeServiceConstants;
+import org.jclouds.xstream.domain.Config;
 import org.jclouds.xstream.domain.Disk;
 import org.jclouds.xstream.XStreamApi;
 import org.jclouds.xstream.compute.options.XStreamTemplateOptions;
 import org.jclouds.xstream.domain.Nic;
+import org.jclouds.xstream.domain.Task;
 import org.jclouds.xstream.domain.VirtualMachine;
 import org.jclouds.xstream.domain.HostConfig;
 import org.jclouds.domain.Location;
@@ -112,17 +114,20 @@ public class XStreamComputeServiceAdapter implements
       Config containerConfig = containerConfigBuilder.build();
       */
 
-      VirtualMachine vmConfig = VirtualMachine.builder()
+      Config vmConfig = Config.builder()
+              .virtualMachineID("2aed1f6b-7e0c-4397-7ce1-6b43273d4e4a")
               .customerDefinedName("jclouds-test")
               .numCpu(1)
               .ramAllocatedMB(2048)
-              .resourceGroups(ImmutableList.of("jclouds"))
               .sourceTemplateId(imageId)
+              .computeProfileId("2aaaafc4-9a28-f217-2a77-ae1f908bfe9b")
+              .hypervisorResourceId("b6897114-79c1-49b5-9277-7bc89371a7cf")
               .tenantId("1357ddcd-ca97-4994-a1fc-90b67f30b4fc")
               .disks(ImmutableList.of(Disk.builder()
-                      .storageId("0a855ef2-a03c-6e12-6190-9e98f2d33695")
+                      .storageId("8a2ce623-fb4f-bfe7-098f-cb1372a724f4")
                       .capacityKB(102400)
                       .deviceKey(2000)
+                      .storageProfileId("560022dc-74f0-abe8-72e4-69797569cc58")
                       .build()))
               .nics(ImmutableList.of(Nic.builder()
                       .networkId("a625b03b-2759-9da9-8d91-fb697976fb90")
@@ -132,8 +137,10 @@ public class XStreamComputeServiceAdapter implements
                       .build()))
               .build();
       logger.debug(">> creating new virtual machine with vm config(%s)", vmConfig);
-      VirtualMachine virtualMachine = api.getVirtualMachineApi().createVirtualMachine(vmConfig);
-      logger.trace("<< virtualMachine(%s)", virtualMachine.getVirtualMachineID());
+      Task creationTask = api.getVirtualMachineApi().createVirtualMachine(vmConfig);
+      logger.trace("<< virtualMachine(%s)", creationTask.getId());
+
+      /*
 
       HostConfig.Builder hostConfigBuilder = HostConfig.builder()
               .publishAllPorts(true)
@@ -155,6 +162,8 @@ public class XStreamComputeServiceAdapter implements
          destroyNode(virtualMachine.getVirtualMachineID());
          throw new IllegalStateException(String.format("VM %s has not started correctly", virtualMachine.getVirtualMachineID()));
       }
+      */
+      VirtualMachine virtualMachine = api.getVirtualMachineApi().getVirtualMachine("");
       return new NodeAndInitialCredentials(virtualMachine, virtualMachine.getVirtualMachineID(),
               LoginCredentials.builder().user(loginUser).password(loginUserPassword).build());
    }

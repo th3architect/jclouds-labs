@@ -66,27 +66,27 @@ public class VirtualMachineToNodeMetadata implements Function<VirtualMachine, No
    }
 
    @Override
-   public NodeMetadata apply(VirtualMachine container) {
-      String name = cleanUpName(container.getName());
+   public NodeMetadata apply(VirtualMachine vm) {
+      String name = cleanUpName(vm.getName());
       String group = nodeNamingConvention.extractGroup(name);
       NodeMetadataBuilder builder = new NodeMetadataBuilder();
-      builder.ids(container.getId())
+      builder.ids(vm.getVirtualMachineID())
               .name(name)
               .group(group)
-              .hostname(container.getContainerConfig().getHostname())
+              .hostname(vm.getDnsName())
                // TODO Set up hardware
               .hardware(new HardwareBuilder()
                       .id("")
-                      .ram(container.getContainerConfig().getMemory())
-                      .processor(new Processor(container.getContainerConfig().getCpuShares(), container.getContainerConfig().getCpuShares()))
+                      .ram(vm.getRamAllocatedMB())
+                      .processor(new Processor(vm.getCpuShares(), vm.getCpuLimitMHz()))
                       .build());
-      builder.status(toPortableStatus.apply(container.getState()));
-      builder.imageId(container.getImage());
-      builder.loginPort(getLoginPort(container));
+      //builder.status(toPortableStatus.apply(vm.getPowerState()));
+      builder.imageId(vm.getSourceTemplateId());
+      //builder.loginPort(getLoginPort(vm));
       builder.publicAddresses(getPublicIpAddresses());
-      builder.privateAddresses(getPrivateIpAddresses(container));
+      builder.privateAddresses(getPrivateIpAddresses(vm));
       builder.location(Iterables.getOnlyElement(locations.get()));
-      Image image = images.get().get(container.getImage());
+      Image image = images.get().get(vm.getSourceTemplateId());
       builder.imageId(image.getId());
       builder.operatingSystem(image.getOperatingSystem());
 
@@ -97,9 +97,8 @@ public class VirtualMachineToNodeMetadata implements Function<VirtualMachine, No
       return name.startsWith("/") ? name.substring(1) : name;
    }
 
-   private Iterable<String> getPrivateIpAddresses(VirtualMachine container) {
-      if (container.getNetworkSettings() == null) return ImmutableList.of();
-      return ImmutableList.of(container.getNetworkSettings().getIpAddress());
+   private Iterable<String> getPrivateIpAddresses(VirtualMachine virtualMachine) {
+      return ImmutableList.of(virtualMachine.getIpAddress());
    }
 
    private List<String> getPublicIpAddresses() {
@@ -107,20 +106,4 @@ public class VirtualMachineToNodeMetadata implements Function<VirtualMachine, No
       return ImmutableList.of(dockerIpAddress);
    }
 
-   protected static int getLoginPort(VirtualMachine container) {
-      if (container.getNetworkSettings() != null) {
-          Map<String, List<Map<String, String>>> ports = container.getNetworkSettings().getPorts();
-          if (ports != null) {
-            return Integer.parseInt(getOnlyElement(ports.get("22/tcp")).get("HostPort"));
-          }
-      // this is needed in case the container list is coming from listContainers
-      } else if (container.getPorts() != null) {
-         for (Port port : container.getPorts()) {
-            if (port.getPrivatePort() == 22) {
-               return port.getPublicPort();
-            }
-         }
-      }
-      throw new IllegalStateException("Cannot determine the login port for " + container.getId());
-   }
 }

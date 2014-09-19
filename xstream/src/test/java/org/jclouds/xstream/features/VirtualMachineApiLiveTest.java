@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.features;
+package org.jclouds.xstream.features;
 
-import org.jclouds.docker.compute.BaseXStreamApiLiveTest;
+import org.jclouds.xstream.compute.BaseXStreamApiLiveTest;
+import org.jclouds.xstream.domain.Config;
+import org.jclouds.xstream.domain.Task;
 import org.jclouds.xstream.domain.VirtualMachine;
-import org.jclouds.xstream.features.VirtualMachineApi;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -38,29 +39,29 @@ public class VirtualMachineApiLiveTest extends BaseXStreamApiLiveTest {
 
    @Test(dependsOnMethods = "testListImages")
    public void testVirtualMachine() throws IOException, InterruptedException {
-      VirtualMachine vmConfig = VirtualMachine.builder()
+      Config vmConfig = Config.builder()
               .build();
-      virtualMachine = api().createVirtualMachine(vmConfig);
+      Task creationTask = api().createVirtualMachine(vmConfig);
       assertNotNull(virtualMachine);
-      assertNotNull(virtualMachine.getId());
+      assertNotNull(virtualMachine.getVirtualMachineID());
    }
 
    @Test(dependsOnMethods = "testVirtualMachine")
    public void testPowerOn() throws IOException, InterruptedException {
-      api().powerOn(virtualMachine.getId());
-      assertTrue(api().getVirtualMachine(virtualMachine.getId()).getState().isRunning());
+      api().powerOn(virtualMachine.getVirtualMachineID());
+      assertTrue(api().getVirtualMachine(virtualMachine.getVirtualMachineID()).getPowerState().equals("powerOn"));
    }
 
    @Test(dependsOnMethods = "testPowerOn")
    public void testPowerOff() {
-      api().powerOff(virtualMachine.getId());
-      assertFalse(api().getVirtualMachine(virtualMachine.getId()).getState().isRunning());
+      api().powerOff(virtualMachine.getVirtualMachineID());
+      assertFalse(api().getVirtualMachine(virtualMachine.getVirtualMachineID()).getPowerState().equals("powerOn"));
    }
 
    @Test(dependsOnMethods = "testPowerOff", expectedExceptions = NullPointerException.class)
    public void testRemoveVirtualMachine() {
-      api().removeVirtualMachine(virtualMachine.getId());
-      assertFalse(api().getVirtualMachine(virtualMachine.getId()).getState().isRunning());
+      api().removeVirtualMachine(virtualMachine.getVirtualMachineID());
+      assertFalse(api().getVirtualMachine(virtualMachine.getVirtualMachineID()).getPowerState().equals("powerOn"));
    }
 
    private VirtualMachineApi api() {
