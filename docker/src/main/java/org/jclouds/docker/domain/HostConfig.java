@@ -53,22 +53,22 @@ public class HostConfig {
    @SerializedName("VolumesFrom")
    private final List<String> volumesFrom;
 
-   @ConstructorProperties({ "ContainerIDFile", "Binds", "LxcConf", "Privileged", "Dns", "DnsSearch", "PortBindings",
-           "Links", "PublishAllPorts", "VolumesFrom" })
+   @ConstructorProperties({"ContainerIDFile", "Binds", "LxcConf", "Privileged", "Dns", "DnsSearch", "PortBindings",
+           "Links", "PublishAllPorts", "VolumesFrom"})
    protected HostConfig(@Nullable String containerIDFile, @Nullable List<String> binds,
                         Map<String, String> lxcConf, boolean privileged, @Nullable String dns,
                         @Nullable String dnsSearch, @Nullable Map<String, List<Map<String, String>>> portBindings,
                         @Nullable List<String> links, boolean publishAllPorts, @Nullable List<String> volumesFrom) {
       this.containerIDFile = containerIDFile;
-      this.binds = binds != null ? ImmutableList.copyOf(binds) : ImmutableList.<String> of();
-      this.lxcConf = lxcConf != null ? ImmutableMap.copyOf(lxcConf) : ImmutableMap.<String, String> of();
+      this.binds = binds != null ? ImmutableList.copyOf(binds) : ImmutableList.<String>of();
+      this.lxcConf = lxcConf != null ? ImmutableMap.copyOf(lxcConf) : ImmutableMap.<String, String>of();
       this.privileged = checkNotNull(privileged, "privileged");
       this.dns = dns;
       this.dnsSearch = dnsSearch;
-      this.portBindings = portBindings != null ? ImmutableMap.copyOf(portBindings) : ImmutableMap.<String, List<Map<String, String>>> of();
-      this.links = links != null ? ImmutableList.copyOf(links) : ImmutableList.<String> of();
+      this.portBindings = portBindings != null ? ImmutableMap.copyOf(portBindings) : ImmutableMap.<String, List<Map<String, String>>>of();
+      this.links = links != null ? ImmutableList.copyOf(links) : ImmutableList.<String>of();
       this.publishAllPorts = checkNotNull(publishAllPorts, "publishAllPorts");
-      this.volumesFrom = volumesFrom != null ? ImmutableList.copyOf(volumesFrom) : ImmutableList.<String> of();
+      this.volumesFrom = volumesFrom != null ? ImmutableList.copyOf(volumesFrom) : ImmutableList.<String>of();
    }
 
    public String getContainerIDFile() {
@@ -87,9 +87,13 @@ public class HostConfig {
       return privileged;
    }
 
-   public String getDns() { return dns; }
+   public String getDns() {
+      return dns;
+   }
 
-   public String getDnsSearch() { return dnsSearch; }
+   public String getDnsSearch() {
+      return dnsSearch;
+   }
 
    public Map<String, List<Map<String, String>>> getPortBindings() {
       return portBindings;

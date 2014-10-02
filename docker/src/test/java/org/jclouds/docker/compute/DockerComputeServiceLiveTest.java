@@ -16,20 +16,43 @@
  */
 package org.jclouds.docker.compute;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
+import static java.lang.String.format;
+import static java.util.logging.Logger.getAnonymousLogger;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.nameTask;
+import static org.jclouds.compute.options.TemplateOptions.Builder.runAsRoot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
+
+import org.jclouds.compute.JettyStatements;
+import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.internal.BaseComputeServiceLiveTest;
+import org.jclouds.docker.DockerApi;
+import org.jclouds.docker.compute.options.DockerTemplateOptions;
+import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.features.ImageApi;
+import org.jclouds.docker.options.CreateImageOptions;
+import org.jclouds.docker.options.DeleteImageOptions;
+import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.sshj.config.SshjSshClientModule;
-import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.net.HostAndPort;
 import com.google.inject.Module;
 
 /**
@@ -38,7 +61,8 @@ import com.google.inject.Module;
 @Test(groups = "live", singleThreaded = true, testName = "DockerComputeServiceLiveTest")
 public class DockerComputeServiceLiveTest extends BaseComputeServiceLiveTest {
 
-   private static final String DEFAULT_JCLOUDS_IMAGE = "jclouds/default";
+   private static final String SSHABLE_IMAGE = "tutum/ubuntu";
+   private static final String SSHABLE_IMAGE_TAG = "trusty";
    private Image defaultImage;
 
    public DockerComputeServiceLiveTest() {
@@ -53,90 +77,117 @@ public class DockerComputeServiceLiveTest extends BaseComputeServiceLiveTest {
    @Override
    protected void initializeContext() {
       super.initializeContext();
-      Optional<? extends Image> optionalImage = Iterables.tryFind(client.listImages(), new Predicate<Image>() {
-         @Override
-         public boolean apply(Image image) {
-            return image.getName().equals(DEFAULT_JCLOUDS_IMAGE);
-         }
-      });
-      if (optionalImage.isPresent()) {
-         defaultImage = optionalImage.get();
-      } else {
-         Assert.fail("Please create an ssh-able image called " + DEFAULT_JCLOUDS_IMAGE);
+
+      String imageName = SSHABLE_IMAGE + ":" + SSHABLE_IMAGE_TAG;
+      org.jclouds.docker.domain.Image image = imageApi().inspectImage(imageName);
+      if (image == null) {
+         CreateImageOptions options = CreateImageOptions.Builder.fromImage(SSHABLE_IMAGE).tag(SSHABLE_IMAGE_TAG);
+         imageApi().createImage(options);
       }
+      image = imageApi().inspectImage(imageName);
+      defaultImage = client.getImage(image.getId());
+      assertNotNull(defaultImage);
+   }
+
+   @AfterClass
+   @Override
+   protected void tearDownContext() {
+      super.tearDownContext();
+      if (defaultImage != null) {
+         imageApi().deleteImage(SSHABLE_IMAGE + ":" + SSHABLE_IMAGE_TAG, DeleteImageOptions.Builder.force(true));
+      }
+   }
+
+   private ImageApi imageApi() {
+      return client.getContext().unwrapApi(DockerApi.class).getImageApi();
    }
 
    @Override
    protected Template buildTemplate(TemplateBuilder templateBuilder) {
-      return templateBuilder.imageId(defaultImage.getId()).build();
+      template = templateBuilder.imageId(defaultImage.getId()).build();
+      DockerTemplateOptions options = template.getOptions().as(DockerTemplateOptions.class);
+      options.env(ImmutableList.of("ROOT_PASS=password"));
+      return template;
    }
 
    @Override
-   public void testOptionToNotBlock() throws Exception {
-      // Docker ComputeService implementation has to block until the node
-      // is provisioned, to be able to return it.
+   public void testImageById() {
+      Template defaultTemplate = buildTemplate(client.templateBuilder());
+      assertEquals(view.getComputeService().getImage(defaultTemplate.getImage().getId()), defaultTemplate.getImage());
    }
 
    @Override
-   protected void checkTagsInNodeEquals(NodeMetadata node, ImmutableSet<String> tags) {
-      // Docker does not support tags
+   protected void createAndRunAServiceInGroup(String group) throws RunNodesException {
+      // note that some cloud providers do not support mixed case tag names
+      ImmutableMap<String, String> userMetadata = ImmutableMap.<String, String> of("test", group);
+
+      ImmutableSet<String> tags = ImmutableSet.of(group);
+      Stopwatch watch = Stopwatch.createStarted();
+
+      template = buildTemplate(client.templateBuilder());
+      template.getOptions().inboundPorts(22, 8080).blockOnPort(22, 300).userMetadata(userMetadata).tags(tags);
+
+      NodeMetadata node = getOnlyElement(client.createNodesInGroup(group, 1, template));
+      long createSeconds = watch.elapsed(TimeUnit.SECONDS);
+
+      final String nodeId = node.getId();
+
+      checkUserMetadataContains(node, userMetadata);
+      checkTagsInNodeEquals(node, tags);
+
+      getAnonymousLogger().info(
+              format("<< available node(%s) os(%s) in %ss", node.getId(), node.getOperatingSystem(), createSeconds));
+
+      watch.reset().start();
+
+      client.runScriptOnNode(nodeId, JettyStatements.install(), nameTask("configure-jetty"));
+
+      long configureSeconds = watch.elapsed(TimeUnit.SECONDS);
+
+      getAnonymousLogger().info(
+              format(
+                      "<< configured node(%s) with %s and jetty %s in %ss",
+                      nodeId,
+                      exec(nodeId, "java -fullversion"),
+                      exec(nodeId, JettyStatements.version()), configureSeconds));
+
+      trackProcessOnNode(JettyStatements.start(), "start jetty", node);
+
+      client.runScriptOnNode(nodeId, JettyStatements.stop(), runAsRoot(false).wrapInInitScript(false));
+
+      trackProcessOnNode(JettyStatements.start(), "start jetty", node);
    }
 
-   @Override
-   protected void checkUserMetadataContains(NodeMetadata node, ImmutableMap<String, String> userMetadata) {
-      // Docker does not support user metadata
+   protected void trackProcessOnNode(Statement process, String processName, NodeMetadata node) {
+      ServiceStats stats = new ServiceStats();
+      Stopwatch watch = Stopwatch.createStarted();
+      ExecResponse exec = client.runScriptOnNode(node.getId(), process, runAsRoot(false).wrapInInitScript(false));
+      stats.backgroundProcessMilliseconds = watch.elapsed(TimeUnit.MILLISECONDS);
+
+      Container container = client.getContext().unwrapApi(DockerApi.class).getContainerApi().inspectContainer(node.getId());
+      Map<String, List<Map<String, String>>> ports = container.getNetworkSettings().getPorts();
+      int port = Integer.parseInt(getOnlyElement(ports.get("8080/tcp")).get("HostPort"));
+
+      watch.reset().start();
+      HostAndPort socket;
+      try {
+         socket = openSocketFinder.findOpenSocketOnNode(node, port, 600, TimeUnit.SECONDS);
+      } catch (NoSuchElementException e) {
+         throw new NoSuchElementException(format("%s%n%s%s", e.getMessage(), exec.getOutput(), exec.getError()));
+      }
+      stats.socketOpenMilliseconds = watch.elapsed(TimeUnit.MILLISECONDS);
+      getAnonymousLogger().info(format("<< %s on node(%s)[%s] %s", processName, node.getId(), socket, stats));
    }
 
-   @Override
-   public void testCreateAndRunAService() throws Exception {
-      // Docker does not support blockOnPort
-   }
+   static class ServiceStats {
+      long backgroundProcessMilliseconds;
+      long socketOpenMilliseconds;
 
-   @Override
-   @Test(enabled = true, dependsOnMethods = { "testCompareSizes" })
-   public void testAScriptExecutionAfterBootWithBasicTemplate() throws Exception {
-      super.testAScriptExecutionAfterBootWithBasicTemplate();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = "testReboot", expectedExceptions = UnsupportedOperationException.class)
-   public void testSuspendResume() throws Exception {
-      super.testSuspendResume();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = "testSuspendResume")
-   public void testGetNodesWithDetails() throws Exception {
-      super.testGetNodesWithDetails();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = "testSuspendResume")
-   public void testListNodes() throws Exception {
-      super.testListNodes();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = "testSuspendResume")
-   public void testListNodesByIds() throws Exception {
-      super.testListNodesByIds();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = { "testListNodes", "testGetNodesWithDetails", "testListNodesByIds" })
-   public void testDestroyNodes() {
-      super.testDestroyNodes();
-   }
-
-   @Test(enabled = true, expectedExceptions = NullPointerException.class)
-   public void testCorrectExceptionRunningNodesNotFound() throws Exception {
-      super.testCorrectExceptionRunningNodesNotFound();
-   }
-
-   @Test(enabled = true, expectedExceptions = NullPointerException.class)
-   public void testCorrectAuthException() throws Exception {
-      // Docker does not support authentication yet
-      super.testCorrectAuthException();
+      @Override
+      public String toString() {
+         return format("[backgroundProcessMilliseconds=%s, socketOpenMilliseconds=%s]",
+                 backgroundProcessMilliseconds, socketOpenMilliseconds);
+      }
    }
 
 }

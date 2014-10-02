@@ -27,12 +27,17 @@ import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.docker.DockerApi;
+import org.jclouds.docker.compute.options.DockerTemplateOptions;
 import org.jclouds.docker.compute.strategy.DockerComputeServiceAdapter;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.testng.annotations.AfterGroups;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.inject.Injector;
@@ -41,9 +46,26 @@ import com.google.inject.Module;
 @Test(groups = "live", singleThreaded = true, testName = "DockerComputeServiceAdapterLiveTest")
 public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
 
+   private static final String SSHABLE_IMAGE = "tutum/ubuntu";
+   private static final String SSHABLE_IMAGE_TAG = "trusty";
+   private Image defaultImage;
+
    private DockerComputeServiceAdapter adapter;
    private TemplateBuilder templateBuilder;
    private NodeAndInitialCredentials<Container> guest;
+
+   @BeforeClass
+   protected void init() {
+      super.initialize();
+      String imageName = SSHABLE_IMAGE + ":" + SSHABLE_IMAGE_TAG;
+      Image image = api.getImageApi().inspectImage(imageName);
+      if (image == null) {
+         CreateImageOptions options = CreateImageOptions.Builder.fromImage(SSHABLE_IMAGE).tag(SSHABLE_IMAGE_TAG);
+         api.getImageApi().createImage(options);
+      }
+      defaultImage = api.getImageApi().inspectImage(imageName);
+      assertNotNull(defaultImage);
+   }
 
    @Override
    protected DockerApi create(Properties props, Iterable<Module> modules) {
@@ -55,13 +77,14 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
 
    public void testCreateNodeWithGroupEncodedIntoNameThenStoreCredentials() {
       String group = "foo";
-      String name = "container-" + new Random().nextInt();
+      String name = "container" + new Random().nextInt();
 
-      Template template = templateBuilder.smallest()
-              .osDescriptionMatches("jclouds/default:latest").build();
+      Template template = templateBuilder.imageId(defaultImage.getId()).build();
 
+      DockerTemplateOptions options = template.getOptions().as(DockerTemplateOptions.class);
+      options.env(ImmutableList.of("ROOT_PASS=password"));
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
-      assertEquals(guest.getNodeId(), guest.getNode().getId() + "");
+      assertEquals(guest.getNodeId(), guest.getNode().getId());
    }
 
    public void testListHardwareProfiles() {
@@ -77,6 +100,9 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
    protected void tearDown() {
       if (guest != null) {
          adapter.destroyNode(guest.getNode().getId() + "");
+      }
+      if (defaultImage != null) {
+         api.getImageApi().deleteImage(SSHABLE_IMAGE + ":" + SSHABLE_IMAGE_TAG);
       }
       super.tearDown();
    }

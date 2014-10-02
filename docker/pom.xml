@@ -125,6 +125,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <forkCount>0</forkCount>
                   <systemPropertyVariables>
                     <test.docker.endpoint>${test.docker.endpoint}</test.docker.endpoint>
                     <test.docker.api-version>${test.docker.api-version}</test.docker.api-version>

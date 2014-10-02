@@ -23,31 +23,30 @@ import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 
 public class Version {
-   @SerializedName("Arch")
-   private final String arch;
+
+   @SerializedName("ApiVersion")
+   private final String apiVersion;
+   @SerializedName("Version")
+   private final String version;
    @SerializedName("GitCommit")
    private final String gitCommit;
    @SerializedName("GoVersion")
    private final String goVersion;
-   @SerializedName("KernelVersion")
-   private final String kernelVersion;
-   @SerializedName("Os")
-   private final String os;
-   @SerializedName("Version")
-   private final String version;
 
-   @ConstructorProperties({ "Arch", "GitCommit", "GoVersion", "KernelVersion", "Os", "Version" })
-   protected Version(String arch, String gitCommit, String goVersion, String kernelVersion, String os, String version) {
-      this.arch = checkNotNull(arch, "arch");
+   @ConstructorProperties({"ApiVersion", "Version", "GitCommit", "GoVersion"})
+   protected Version(String apiVersion, String version, String gitCommit, String goVersion) {
+      this.apiVersion = checkNotNull(apiVersion, "apiVersion");
+      this.version = checkNotNull(version, "version");
       this.gitCommit = checkNotNull(gitCommit, "gitCommit");
       this.goVersion = checkNotNull(goVersion, "goVersion");
-      this.kernelVersion = checkNotNull(kernelVersion, "kernelVersion");
-      this.os = checkNotNull(os, "os");
-      this.version = checkNotNull(version, "version");
    }
 
-   public String getArch() {
-      return arch;
+   public String getApiVersion() {
+      return apiVersion;
+   }
+
+   public String getVersion() {
+      return version;
    }
 
    public String getGitCommit() {
@@ -58,18 +57,6 @@ public class Version {
       return goVersion;
    }
 
-   public String getKernelVersion() {
-      return kernelVersion;
-   }
-
-   public String getOs() {
-      return os;
-   }
-
-   public String getVersion() {
-      return version;
-   }
-
    @Override
    public boolean equals(Object o) {
       if (this == o) return true;
@@ -77,29 +64,15 @@ public class Version {
 
       Version that = (Version) o;
 
-      return Objects.equal(this.arch, that.arch) &&
+      return Objects.equal(this.apiVersion, that.apiVersion) &&
+              Objects.equal(this.version, that.version) &&
               Objects.equal(this.gitCommit, that.gitCommit) &&
-              Objects.equal(this.goVersion, that.goVersion) &&
-              Objects.equal(this.kernelVersion, that.kernelVersion) &&
-              Objects.equal(this.os, that.os) &&
-              Objects.equal(this.version, that.version);
+              Objects.equal(this.goVersion, that.goVersion);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(arch, gitCommit, goVersion, kernelVersion, os, version);
-   }
-
-   @Override
-   public String toString() {
-      return Objects.toStringHelper(this)
-              .add("arch", arch)
-              .add("gitCommit", gitCommit)
-              .add("goVersion", goVersion)
-              .add("kernelVersion", kernelVersion)
-              .add("os", os)
-              .add("version", version)
-              .toString();
+      return Objects.hashCode(apiVersion, version, gitCommit, goVersion);
    }
 
    public static Builder builder() {
@@ -110,17 +83,30 @@ public class Version {
       return builder().fromVersion(this);
    }
 
+   @Override
+   public String toString() {
+      return Objects.toStringHelper(this)
+              .add("apiVersion", apiVersion)
+              .add("version", version)
+              .add("gitCommit", gitCommit)
+              .add("goVersion", goVersion)
+              .toString();
+   }
+
    public static final class Builder {
 
-      private String arch;
+      private String apiVersion;
+      private String version;
       private String gitCommit;
       private String goVersion;
-      private String kernelVersion;
-      private String os;
-      private String version;
 
-      public Builder arch(String arch) {
-         this.arch = arch;
+      public Builder apiVersion(String apiVersion) {
+         this.apiVersion = apiVersion;
+         return this;
+      }
+
+      public Builder version(String version) {
+         this.version = version;
          return this;
       }
 
@@ -134,33 +120,16 @@ public class Version {
          return this;
       }
 
-      public Builder kernelVersion(String kernelVersion) {
-         this.kernelVersion = kernelVersion;
-         return this;
-      }
-
-      public Builder os(String os) {
-         this.os = os;
-         return this;
-      }
-
-      public Builder version(String version) {
-         this.version = version;
-         return this;
-      }
-
       public Version build() {
-         return new Version(arch, gitCommit, goVersion, kernelVersion, os, version);
+         return new Version(apiVersion, version, gitCommit, goVersion);
       }
 
       public Builder fromVersion(Version in) {
          return this
-                 .arch(in.getArch())
+                 .apiVersion(in.getApiVersion())
+                 .version(in.getVersion())
                  .gitCommit(in.getGitCommit())
-                 .goVersion(in.getGoVersion())
-                 .kernelVersion(in.getKernelVersion())
-                 .os(in.getOs())
-                 .version(in.getVersion());
+                 .goVersion(in.getGoVersion());
       }
    }
 }

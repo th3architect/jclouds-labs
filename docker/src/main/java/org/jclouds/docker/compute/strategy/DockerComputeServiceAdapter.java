@@ -37,6 +37,7 @@ import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.compute.options.DockerTemplateOptions;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerSummary;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.ListContainerOptions;
@@ -119,10 +120,15 @@ public class DockerComputeServiceAdapter implements
          }
          containerConfigBuilder.volumes(volumes);
       }
+
+      if (templateOptions.getEnv().isPresent()) {
+         containerConfigBuilder.env(templateOptions.getEnv().get());
+      }
+
       Config containerConfig = containerConfigBuilder.build();
 
       logger.debug(">> creating new container with containerConfig(%s)", containerConfig);
-      Container container = api.getRemoteApi().createContainer(name, containerConfig);
+      Container container = api.getContainerApi().createContainer(name, containerConfig);
       logger.trace("<< container(%s)", container.getId());
 
       HostConfig.Builder hostConfigBuilder = HostConfig.builder()
@@ -140,13 +146,13 @@ public class DockerComputeServiceAdapter implements
       }
       HostConfig hostConfig = hostConfigBuilder.build();
 
-      api.getRemoteApi().startContainer(container.getId(), hostConfig);
-      container = api.getRemoteApi().inspectContainer(container.getId());
+      api.getContainerApi().startContainer(container.getId(), hostConfig);
+      container = api.getContainerApi().inspectContainer(container.getId());
       if (container.getState().getExitCode() != 0) {
          destroyNode(container.getId());
          throw new IllegalStateException(String.format("Container %s has not started correctly", container.getId()));
       }
-      return new NodeAndInitialCredentials<Container>(container, container.getId(),
+      return new NodeAndInitialCredentials(container, container.getId(),
               LoginCredentials.builder().user(loginUser).password(loginUserPassword).build());
    }
 
@@ -164,9 +170,9 @@ public class DockerComputeServiceAdapter implements
    @Override
    public Set<Image> listImages() {
       Set<Image> images = Sets.newHashSet();
-      for (Image image : api.getRemoteApi().listImages()) {
+      for (Image image : api.getImageApi().listImages()) {
          // less efficient than just listImages but returns richer json that needs repoTags coming from listImages
-         Image inspected = api.getRemoteApi().inspectImage(image.getId());
+         Image inspected = api.getImageApi().inspectImage(image.getId());
          if (inspected.getRepoTags().isEmpty()) {
             inspected = Image.builder().fromImage(inspected).repoTags(image.getRepoTags()).build();
          }
@@ -190,9 +196,9 @@ public class DockerComputeServiceAdapter implements
    @Override
    public Iterable<Container> listNodes() {
       Set<Container> containers = Sets.newHashSet();
-      for (Container container : api.getRemoteApi().listContainers(ListContainerOptions.Builder.all(true))) {
+      for (ContainerSummary containerSummary : api.getContainerApi().listContainers(ListContainerOptions.Builder.all(true))) {
          // less efficient than just listNodes but returns richer json
-         containers.add(api.getRemoteApi().inspectContainer(container.getId()));
+         containers.add(api.getContainerApi().inspectContainer(containerSummary.getId()));
       }
       return containers;
    }
@@ -201,7 +207,7 @@ public class DockerComputeServiceAdapter implements
    public Iterable<Container> listNodesByIds(final Iterable<String> ids) {
       Set<Container> containers = Sets.newHashSet();
       for (String id : ids) {
-         containers.add(api.getRemoteApi().inspectContainer(id));
+         containers.add(api.getContainerApi().inspectContainer(id));
       }
       return containers;
    }
@@ -213,18 +219,18 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public Container getNode(String id) {
-      return api.getRemoteApi().inspectContainer(id);
+      return api.getContainerApi().inspectContainer(id);
    }
 
    @Override
    public void destroyNode(String id) {
-      api.getRemoteApi().removeContainer(id, RemoveContainerOptions.Builder.force(true));
+      api.getContainerApi().removeContainer(id, RemoveContainerOptions.Builder.force(true));
    }
 
    @Override
    public void rebootNode(String id) {
-      api.getRemoteApi().stopContainer(id);
-      api.getRemoteApi().startContainer(id);
+      api.getContainerApi().stopContainer(id);
+      api.getContainerApi().startContainer(id);
    }
 
    @Override

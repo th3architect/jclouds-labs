@@ -16,12 +16,11 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.gson.annotations.SerializedName;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
 
 public class Port {
 
@@ -34,7 +33,7 @@ public class Port {
    @SerializedName("IP")
    private final String ip;
 
-   @ConstructorProperties({ "PrivatePort", "PublicPort", "Type", "IP" })
+   @ConstructorProperties({"PrivatePort", "PublicPort", "Type", "IP"})
    protected Port(int privatePort, int publicPort, String type, String ip) {
       this.privatePort = checkNotNull(privatePort, "privatePort");
       this.publicPort = checkNotNull(publicPort, "publicPort");

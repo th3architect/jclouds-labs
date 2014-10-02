@@ -17,10 +17,11 @@
 package org.jclouds.docker.domain;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Named;
 
 import org.jclouds.javax.annotation.Nullable;
 
@@ -31,64 +32,65 @@ import com.google.gson.annotations.SerializedName;
 
 public class Config {
 
-   @SerializedName("Hostname")
+   @Named("Hostname")
    private final String hostname;
-   @SerializedName("Domainname")
+   @Named("Domainname")
    private final String domainName;
-   @SerializedName("User")
+   @Named("User")
    private final String user;
-   @SerializedName("Memory")
+   @Named("Memory")
    private final int memory;
-   @SerializedName("MemorySwap")
+   @Named("MemorySwap")
    private final int memorySwap;
-   @SerializedName("CpuShares")
+   @Named("CpuShares")
    private final int cpuShares;
-   @SerializedName("AttachStdin")
+   @Named("AttachStdin")
    private final boolean attachStdin;
-   @SerializedName("AttachStdout")
+   @Named("AttachStdout")
    private final boolean attachStdout;
-   @SerializedName("AttachStderr")
+   @Named("AttachStderr")
    private final boolean attachStderr;
-   @SerializedName("ExposedPorts")
+   @Named("ExposedPorts")
    private final Map<String, ?> exposedPorts;
-   @SerializedName("Tty")
+   @Named("Tty")
    private final boolean tty;
-   @SerializedName("OpenStdin")
+   @Named("OpenStdin")
    private final boolean openStdin;
-   @SerializedName("StdinOnce")
+   @Named("StdinOnce")
    private final boolean stdinOnce;
-   @SerializedName("Env")
+   @Named("Env")
    private final List<String> env;
-   @SerializedName("Cmd")
+   @Named("Cmd")
    private final List<String> cmd;
-   @SerializedName("Dns")
+   @Named("Dns")
    private final List<String> dns;
-   @SerializedName("Image")
+   @Named("Image")
    private final String imageId;
-   @SerializedName("Volumes")
+   @Named("Volumes")
    private final Map<String, ?> volumes;
-   @SerializedName("VolumesFrom")
+   @Named("VolumesFrom")
    private final String volumesFrom;
-   @SerializedName("WorkingDir")
+   @Named("WorkingDir")
    private final String workingDir;
    @SerializedName("Entrypoint")
    private final List<String> entrypoint;
    @SerializedName("NetworkDisabled")
    private final boolean networkDisabled;
-   @SerializedName("OnBuild")
+   @Named("OnBuild")
    private final List<String> onBuild;
+   @Named("RestartPolicy")
+   Map<String, String> restartPolicy;
 
-
-   @ConstructorProperties({ "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",
+   @ConstructorProperties({"Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin",
            "AttachStdout", "AttachStderr", "ExposedPorts", "Tty", "OpenStdin", "StdinOnce", "Env", "Cmd",
-           "Dns", "Image", "Volumes", "VolumesFrom", "WorkingDir", "Entrypoint", "NetworkDisabled", "OnBuild" })
+           "Dns", "Image", "Volumes", "VolumesFrom", "WorkingDir", "Entrypoint", "NetworkDisabled", "OnBuild", "RestartPolicy"})
    protected Config(@Nullable String hostname, @Nullable String domainName, @Nullable String user,
-                             int memory, int memorySwap, int cpuShares, boolean attachStdin, boolean attachStdout,
-                             boolean attachStderr, Map<String, ?> exposedPorts, boolean tty, boolean openStdin,
-                             boolean stdinOnce, @Nullable List<String> env, @Nullable List<String> cmd,
-                             @Nullable List<String> dns, String imageId, @Nullable Map<String, ?> volumes,
-                             @Nullable String volumesFrom, @Nullable String workingDir, @Nullable List<String> entrypoint,
-                             @Nullable boolean networkDisabled, @Nullable List<String> onBuild) {
+                    int memory, int memorySwap, int cpuShares, boolean attachStdin, boolean attachStdout,
+                    boolean attachStderr, Map<String, ?> exposedPorts, boolean tty, boolean openStdin,
+                    boolean stdinOnce, @Nullable List<String> env, @Nullable List<String> cmd,
+                    @Nullable List<String> dns, String imageId, @Nullable Map<String, ?> volumes,
+                    @Nullable String volumesFrom, @Nullable String workingDir, @Nullable List<String> entrypoint,
+                    @Nullable boolean networkDisabled, @Nullable List<String> onBuild, Map<String, String> restartPolicy) {
       this.hostname = hostname;
       this.domainName = domainName;
       this.user = user;
@@ -98,20 +100,21 @@ public class Config {
       this.attachStdin = checkNotNull(attachStdin, "attachStdin");
       this.attachStdout = checkNotNull(attachStdout, "attachStdout");
       this.attachStderr = checkNotNull(attachStderr, "attachStderr");
-      this.exposedPorts = exposedPorts != null ? ImmutableMap.copyOf(exposedPorts) : ImmutableMap.<String, Object> of();
+      this.exposedPorts = exposedPorts != null ? ImmutableMap.copyOf(exposedPorts) : ImmutableMap.<String, Object>of();
       this.tty = checkNotNull(tty, "tty");
       this.openStdin = checkNotNull(openStdin, "openStdin");
       this.stdinOnce = checkNotNull(stdinOnce, "stdinOnce");
-      this.env = env != null ? ImmutableList.copyOf(env) : ImmutableList.<String> of();
-      this.cmd = cmd != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String> of();
-      this.dns = dns != null ? ImmutableList.copyOf(dns) : ImmutableList.<String> of();
+      this.env = env != null ? ImmutableList.copyOf(env) : ImmutableList.<String>of();
+      this.cmd = cmd != null ? ImmutableList.copyOf(cmd) : ImmutableList.<String>of();
+      this.dns = dns != null ? ImmutableList.copyOf(dns) : ImmutableList.<String>of();
       this.imageId = checkNotNull(imageId, "imageId");
-      this.volumes = volumes != null ? ImmutableMap.copyOf(volumes) : ImmutableMap.<String, Object> of();
+      this.volumes = volumes != null ? ImmutableMap.copyOf(volumes) : ImmutableMap.<String, Object>of();
       this.volumesFrom = volumesFrom;
       this.workingDir = workingDir;
       this.entrypoint = entrypoint;
       this.networkDisabled = networkDisabled;
-      this.onBuild = onBuild != null ? ImmutableList.copyOf(onBuild) : ImmutableList.<String> of();
+      this.onBuild = onBuild != null ? ImmutableList.copyOf(onBuild) : ImmutableList.<String>of();
+      this.restartPolicy = restartPolicy != null ? ImmutableMap.copyOf(restartPolicy) : ImmutableMap.<String, String>of();
    }
 
    public String getHostname() {
@@ -206,6 +209,10 @@ public class Config {
       return onBuild;
    }
 
+   public Map<String, String> getRestartPolicy() {
+      return restartPolicy;
+   }
+
    @Override
    public boolean equals(Object o) {
       if (this == o) return true;
@@ -234,14 +241,15 @@ public class Config {
               Objects.equal(this.volumesFrom, that.volumesFrom) &&
               Objects.equal(this.workingDir, that.workingDir) &&
               Objects.equal(this.entrypoint, that.entrypoint) &&
-              Objects.equal(this.onBuild, that.onBuild);
+              Objects.equal(this.onBuild, that.onBuild) &&
+              Objects.equal(this.restartPolicy, that.restartPolicy);
    }
 
    @Override
    public int hashCode() {
       return Objects.hashCode(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
               attachStderr, exposedPorts, tty, openStdin, stdinOnce, env, cmd, dns, imageId, volumes,
-              volumesFrom, workingDir, entrypoint, networkDisabled, onBuild);
+              volumesFrom, workingDir, entrypoint, networkDisabled, onBuild, restartPolicy);
    }
 
    @Override
@@ -270,6 +278,7 @@ public class Config {
               .add("entrypoint", entrypoint)
               .add("networkDisabled", networkDisabled)
               .add("onBuild", onBuild)
+              .add("restartPolicy", restartPolicy)
               .toString();
    }
 
@@ -305,6 +314,7 @@ public class Config {
       private List<String> entrypoint = ImmutableList.of();
       private boolean networkDisabled;
       private List<String> onBuild = ImmutableList.of();
+      private Map<String, String> restartPolicy = ImmutableMap.of();
 
       public Builder hostname(String hostname) {
          this.hostname = hostname;
@@ -421,10 +431,15 @@ public class Config {
          return this;
       }
 
+      public Builder restartPolicy(Map<String, String> restartPolicy) {
+         this.restartPolicy = ImmutableMap.copyOf(restartPolicy);
+         return this;
+      }
+
       public Config build() {
          return new Config(hostname, domainName, user, memory, memorySwap, cpuShares, attachStdin, attachStdout,
                  attachStderr, exposedPorts, tty, openStdin, stdinOnce, env, cmd, dns, imageId, volumes,
-                 volumesFrom, workingDir, entrypoint, networkDisabled, onBuild);
+                 volumesFrom, workingDir, entrypoint, networkDisabled, onBuild, restartPolicy);
       }
 
       public Builder fromConfig(Config in) {
@@ -451,7 +466,8 @@ public class Config {
                  .workingDir(in.getWorkingDir())
                  .entrypoint(in.getEntrypoint())
                  .networkDisabled(in.isNetworkDisabled())
-                 .onBuild(in.getOnBuild());
+                 .onBuild(in.getOnBuild())
+                 .restartPolicy(in.getRestartPolicy());
       }
 
    }

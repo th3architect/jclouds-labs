@@ -36,7 +36,7 @@ public class State {
    @SerializedName("Ghost")
    private final boolean ghost;
 
-   @ConstructorProperties({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Ghost" })
+   @ConstructorProperties({"Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Ghost"})
    protected State(int pid, boolean running, int exitCode, String startedAt, String finishedAt, boolean ghost) {
       this.pid = checkNotNull(pid, "pid");
       this.running = checkNotNull(running, "running");

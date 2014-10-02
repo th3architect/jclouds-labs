@@ -33,10 +33,10 @@ public class ExposedPorts {
    @SerializedName("HostPorts")
    private final Set<String> hostPorts;
 
-   @ConstructorProperties({ "PortAndProtocol", "HostPorts" })
+   @ConstructorProperties({"PortAndProtocol", "HostPorts"})
    protected ExposedPorts(String portAndProtocol, @Nullable Set<String> hostPorts) {
       this.portAndProtocol = checkNotNull(portAndProtocol, "portAndProtocol");
-      this.hostPorts = hostPorts != null ? ImmutableSet.copyOf(hostPorts) : ImmutableSet.<String> of();
+      this.hostPorts = hostPorts != null ? ImmutableSet.copyOf(hostPorts) : ImmutableSet.<String>of();
    }
 
    public String getPortAndProtocol() {
@@ -55,7 +55,7 @@ public class ExposedPorts {
       ExposedPorts that = (ExposedPorts) o;
 
       return Objects.equal(this.portAndProtocol, that.portAndProtocol) &&
-             Objects.equal(this.hostPorts, that.hostPorts);
+              Objects.equal(this.hostPorts, that.hostPorts);
    }
 
    @Override

@@ -1,0 +1,6 @@
+{
+    "ApiVersion":"1.15",
+    "Version":"0.2.2",
+    "GitCommit":"c78088f+CHANGES",
+    "GoVersion":"go1.3.3"
+}

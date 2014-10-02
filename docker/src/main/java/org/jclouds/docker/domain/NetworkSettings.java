@@ -16,16 +16,16 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 public class NetworkSettings {
 
@@ -42,15 +42,15 @@ public class NetworkSettings {
    @SerializedName("Ports")
    private final Map<String, List<Map<String, String>>> ports;
 
-   @ConstructorProperties({ "IPAddress", "IPPrefixLen", "Gateway", "Bridge", "PortMapping", "Ports" })
+   @ConstructorProperties({"IPAddress", "IPPrefixLen", "Gateway", "Bridge", "PortMapping", "Ports"})
    protected NetworkSettings(String ipAddress, int ipPrefixLen, String gateway, String bridge,
-                          @Nullable String portMapping, @Nullable Map<String, List<Map<String, String>>> ports) {
+                             @Nullable String portMapping, @Nullable Map<String, List<Map<String, String>>> ports) {
       this.ipAddress = checkNotNull(ipAddress, "ipAddress");
       this.ipPrefixLen = checkNotNull(ipPrefixLen, "ipPrefixLen");
       this.gateway = checkNotNull(gateway, "gateway");
       this.bridge = checkNotNull(bridge, "bridge");
       this.portMapping = portMapping;
-      this.ports = ports != null ? ImmutableMap.copyOf(ports) : ImmutableMap.<String, List<Map<String, String>>> of();
+      this.ports = ports != null ? ImmutableMap.copyOf(ports) : ImmutableMap.<String, List<Map<String, String>>>of();
    }
 
    public String getIpAddress() {

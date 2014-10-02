@@ -16,15 +16,15 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.gson.annotations.SerializedName;
 
 public class Image {
 
@@ -49,11 +49,11 @@ public class Image {
    @SerializedName("RepoTags")
    private final List<String> repoTags;
 
-   @ConstructorProperties({ "Id", "Parent", "Created", "Container", "DockerVersion", "Architecture", "Os", "Size",
-           "VirtualSize", "RepoTags", "Architecture" })
+   @ConstructorProperties({"Id", "Parent", "Created", "Container", "DockerVersion", "Architecture", "Os", "Size",
+           "VirtualSize", "RepoTags"})
    protected Image(String id, @Nullable String parent, @Nullable String created, @Nullable String container,
-                @Nullable String dockerVersion, @Nullable String architecture, @Nullable String os, long size,
-                @Nullable long virtualSize, @Nullable List<String> repoTags) {
+                   @Nullable String dockerVersion, @Nullable String architecture, @Nullable String os, long size,
+                   @Nullable long virtualSize, @Nullable List<String> repoTags) {
       this.id = checkNotNull(id, "id");
       this.parent = parent;
       this.created = created;
@@ -63,7 +63,7 @@ public class Image {
       this.os = os;
       this.size = size;
       this.virtualSize = virtualSize;
-      this.repoTags = repoTags != null ? ImmutableList.copyOf(repoTags) : ImmutableList.<String> of();
+      this.repoTags = repoTags != null ? ImmutableList.copyOf(repoTags) : ImmutableList.<String>of();
    }
 
    public String getId() {
@@ -233,7 +233,7 @@ public class Image {
                  .os(in.getOs())
                  .size(in.getSize())
                  .virtualSize(in.getVirtualSize());
-                 //DO NOT add .repoTags(in.getRepoTags());
+         //DO NOT add .repoTags(in.getRepoTags());
       }
    }
 }

@@ -16,9 +16,6 @@
  */
 package org.jclouds.docker.features;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.InputStream;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -32,37 +29,20 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks;
-import org.jclouds.docker.binders.BindInputStreamToRequest;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
+import org.jclouds.docker.domain.ContainerSummary;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
-import org.jclouds.docker.domain.Version;
-import org.jclouds.docker.options.BuildOptions;
 import org.jclouds.docker.options.CommitOptions;
-import org.jclouds.docker.options.CreateImageOptions;
-import org.jclouds.docker.options.DeleteImageOptions;
 import org.jclouds.docker.options.ListContainerOptions;
-import org.jclouds.docker.options.ListImageOptions;
 import org.jclouds.docker.options.RemoveContainerOptions;
-import org.jclouds.io.Payload;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
-import org.jclouds.rest.annotations.Headers;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
 @Consumes(MediaType.APPLICATION_JSON)
-public interface RemoteApi extends Closeable {
-
-   /**
-    * Get the information of the current docker version.
-    *
-    * @return The information of the current docker version.
-    */
-   @Named("version")
-   @GET
-   @Path("/version")
-   Version getVersion();
+public interface ContainerApi {
 
    /**
     * List all running containers
@@ -73,7 +53,7 @@ public interface RemoteApi extends Closeable {
    @GET
    @Path("/containers/json")
    @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Container> listContainers();
+   Set<ContainerSummary> listContainers();
 
    /**
     * List all running containers
@@ -85,7 +65,7 @@ public interface RemoteApi extends Closeable {
    @GET
    @Path("/containers/json")
    @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Container> listContainers(ListContainerOptions options);
+   Set<ContainerSummary> listContainers(ListContainerOptions options);
 
    /**
     * Create a container
@@ -173,100 +153,5 @@ public interface RemoteApi extends Closeable {
    @POST
    @Path("/commit")
    Image commit(CommitOptions options);
-
-   /**
-    * List images
-    *
-    * @return the images available.
-    */
-   @Named("images:list")
-   @GET
-   @Path("/images/json")
-   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Image> listImages();
-
-   /**
-    * List images
-    *
-    * @param options the configuration to list images (@see ListImageOptions)
-    * @return the images available.
-    */
-   @Named("images:list")
-   @GET
-   @Path("/images/json")
-   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<Image> listImages(ListImageOptions options);
-
-   /**
-    * Inspect an image
-    *
-    * @param imageName The id of the image to inspect.
-    * @return low-level information on the image name
-    */
-   @Named("image:inspect")
-   @GET
-   @Path("/images/{name}/json")
-   Image inspectImage(@PathParam("name") String imageName);
-
-   /**
-    * Create an image, either by pull it from the registry or by importing it
-    *
-    * @param options the configuration to create an image (@see CreateImageOptions)
-    * @return a stream of the image creation.
-    */
-   @Named("image:create")
-   @POST
-   @Path("/images/create")
-   InputStream createImage(CreateImageOptions options);
-
-   /**
-    * Delete an image.
-    *
-    * @param name the image name to be deleted
-    * @return the stream of the deletion execution.
-    */
-   @Named("image:delete")
-   @DELETE
-   @Path("/images/{name}")
-   InputStream deleteImage(@PathParam("name") String name);
-
-   /**
-    * Remove the image from the filesystem by name
-    *
-    * @param name the name of the image to be removed
-    * @param options the image deletion's options (@see DeleteImageOptions)
-    * @return the stream of the deletion execution.
-    */
-   @Named("image:delete")
-   @DELETE
-   @Path("/images/{name}")
-   InputStream deleteImage(@PathParam("name") String name, DeleteImageOptions options);
-
-   /**
-    * Build an image from Dockerfile via stdin
-    *
-    * @param inputStream The stream must be a tar archive compressed with one of the following algorithms: identity
-    *                    (no compression), gzip, bzip2, xz.
-    * @param options the image build's options (@see BuildOptions)
-    * @return a stream of the build execution
-    */
-   @Named("image:build")
-   @POST
-   @Path("/build")
-   @Headers(keys = "Content-Type", values = "application/tar")
-   InputStream build(Payload inputStream, BuildOptions options);
-
-   /**
-    * Build an image from Dockerfile via stdin
-    *
-    * @param dockerFile The file to be compressed with one of the following algorithms: identity, gzip, bzip2, xz.*
-    * @param options the image build's options (@see BuildOptions)
-    * @return a stream of the build execution
-    */
-   @Named("image:build")
-   @POST
-   @Path("/build")
-   @Headers(keys = "Content-Type", values = "application/tar")
-   InputStream build(@BinderParam(BindInputStreamToRequest.class) File dockerFile, BuildOptions options);
 
 }

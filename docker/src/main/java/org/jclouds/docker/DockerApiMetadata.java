@@ -57,7 +57,7 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
       properties.setProperty("jclouds.ssh.retry-auth", "true");
       properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
       properties.setProperty(ComputeServiceProperties.IMAGE_LOGIN_USER, "root:password");
-      properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true,osVersionMatches=1[012].[01][04]");
+      properties.setProperty(TEMPLATE, "osFamily=UBUNTU,os64Bit=true"); //,osVersionMatches=1[01234].[01][04]");
       return properties;
    }
 
@@ -70,8 +70,8 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
                  .identityName("user")
                  .credentialName("password")
                  .documentation(URI.create("https://docs.docker.com/reference/api/docker_remote_api/"))
-                 .version("1.12")
-                 .defaultEndpoint("http://127.0.0.1:2375")
+                 .version("1.14")
+                 .defaultEndpoint("https://127.0.0.1:2376")
                  .defaultProperties(DockerApiMetadata.defaultProperties())
                  .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(

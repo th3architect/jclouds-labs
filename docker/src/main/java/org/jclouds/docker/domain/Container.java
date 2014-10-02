@@ -16,18 +16,18 @@
  */
 package org.jclouds.docker.domain;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.annotations.SerializedName;
-import org.jclouds.javax.annotation.Nullable;
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.beans.ConstructorProperties;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.annotations.SerializedName;
 
 public class Container {
 
@@ -70,14 +70,16 @@ public class Container {
    @SerializedName("HostnamePath")
    private final String hostnamePath;
 
-   @ConstructorProperties({ "Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
+   @ConstructorProperties({"Id", "Name", "Created", "Path", "Args", "Config", "State", "Image", "NetworkSettings",
            "ResolvConfPath", "Driver", "ExecDriver", "Volumes", "VolumesRW", "Command", "Status", "HostConfig",
-           "Ports", "HostnamePath" })
-   protected Container(String id, @Nullable String name, @Nullable String created, @Nullable String path, @Nullable String[] args,
-                       @Nullable Config containerConfig, @Nullable State state, @Nullable String image, @Nullable NetworkSettings networkSettings,
-                       @Nullable String resolvConfPath, @Nullable String driver, @Nullable String execDriver, @Nullable Map<String, String> volumes,
-                       @Nullable Map<String, Boolean> volumesRW, @Nullable String command, @Nullable String status,
-                       @Nullable HostConfig hostConfig, @Nullable List<Port> ports, @Nullable String hostnamePath) {
+           "Ports", "HostnamePath"})
+   protected Container(String id, @Nullable String name, @Nullable String created, @Nullable String path,
+                       @Nullable String[] args, @Nullable Config containerConfig, @Nullable State state,
+                       @Nullable String image, @Nullable NetworkSettings networkSettings,
+                       @Nullable String resolvConfPath, @Nullable String driver, @Nullable String execDriver,
+                       @Nullable Map<String, String> volumes, @Nullable Map<String, Boolean> volumesRW,
+                       @Nullable String command, @Nullable String status, @Nullable HostConfig hostConfig,
+                       @Nullable List<Port> ports, @Nullable String hostnamePath) {
       this.id = checkNotNull(id, "id");
       this.name = name;
       this.created = created;
@@ -205,8 +207,8 @@ public class Container {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
-              driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
+      return Objects.hashCode(id, name, created, path, args, containerConfig, state, image, networkSettings,
+              resolvConfPath, driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
    }
 
    @Override
@@ -360,8 +362,8 @@ public class Container {
       }
 
       public Container build() {
-         return new Container(id, name, created, path, args, containerConfig, state, image, networkSettings, resolvConfPath,
-                 driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
+         return new Container(id, name, created, path, args, containerConfig, state, image, networkSettings,
+                 resolvConfPath, driver, execDriver, volumes, volumesRW, command, status, hostConfig, ports, hostnamePath);
       }
 
       public Builder fromContainer(Container in) {
