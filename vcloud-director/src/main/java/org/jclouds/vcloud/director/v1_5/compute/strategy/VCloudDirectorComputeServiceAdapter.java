@@ -145,12 +145,21 @@ public class VCloudDirectorComputeServiceAdapter implements
       final Org org = api.getOrgApi().get(find(api.getOrgApi().list(), ReferencePredicates.nameEquals(session.get()))
               .getHref());
       final Network network;
-      Network.FenceMode fenceMode = Network.FenceMode.NAT_ROUTED;
-      Optional<Network> optionalNetwork = tryFindNetworkInOrgWithFenceMode(org, fenceMode);
-      if (!optionalNetwork.isPresent()) {
-         throw new IllegalStateException();
+
+      if (template.getOptions().getNetworks().isEmpty()) {
+         Network.FenceMode fenceMode = Network.FenceMode.NAT_ROUTED;
+         Optional<Network> optionalNetwork = tryFindNetworkInOrgWithFenceMode(org, fenceMode);
+         if (!optionalNetwork.isPresent()) {
+            throw new IllegalStateException();
+         }
+         network = optionalNetwork.get();
+      } else {
+         Optional<Network> optionalNetwork = tryFindNetworkNamed(org, Iterables.getOnlyElement(template.getOptions().getNetworks()));
+         if (!optionalNetwork.isPresent()) {
+            throw new IllegalStateException();
+         }
+         network = optionalNetwork.get();
       }
-      network = optionalNetwork.get();
 
       Vdc vdc = api.getVdcApi()
               .get(find(org.getLinks(), ReferencePredicates.<Link> typeEquals(VDC)).getHref());
@@ -194,7 +203,7 @@ public class VCloudDirectorComputeServiceAdapter implements
       // get the first vm to be added to vApp
       Vm toAddVm = Iterables.get(vms, 0);
 
-      String networkName = "M523007043-2739-default-routed"; //name("vAppNetwork-");
+      String networkName = network.getName(); //"M523007043-2739-default-routed";
       SourcedCompositionItemParam vmItem = createVmItem(toAddVm, networkName);
       Set<String> securityGroups = ImmutableSet.of(DEFAULT_SECURITY_GROUP); // template.getOptions().getGroups()
       ComposeVAppParams compositionParams = ComposeVAppParams.builder()
@@ -593,6 +602,25 @@ public class VCloudDirectorComputeServiceAdapter implements
          public boolean apply(Network input) {
             if (input.getTasks().size() != 0) return false;
             return input.getConfiguration().getFenceMode().equals(fenceMode);
+         }
+      });
+   }
+
+   public Optional<Network> tryFindNetworkNamed(Org org, final String networkName) {
+      FluentIterable<Network> networks = FluentIterable.from(org.getLinks())
+              .filter(ReferencePredicates.typeEquals(ORG_NETWORK))
+              .transform(new Function<Link, Network>() {
+                 @Override
+                 public Network apply(Link in) {
+                    return api.getNetworkApi().get(in.getHref());
+                 }
+              });
+
+      return tryFind(networks, new Predicate<Network>() {
+         @Override
+         public boolean apply(Network input) {
+            if (input.getTasks().size() != 0) return false;
+            return input.getName().equals(networkName);
          }
       });
    }

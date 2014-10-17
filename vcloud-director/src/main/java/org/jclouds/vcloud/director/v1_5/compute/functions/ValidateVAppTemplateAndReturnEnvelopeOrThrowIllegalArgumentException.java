@@ -53,7 +53,7 @@ public class ValidateVAppTemplateAndReturnEnvelopeOrThrowIllegalArgumentExceptio
 
    @Override
    public Envelope apply(VAppTemplate from) {
-      checkArgument(from.getChildren().size() == 1, "multiple vms are not supported: %s", from);
+      //checkArgument(from.getChildren().size() == 1, "multiple vms are not supported: %s", from);
 
       // TODO
       /*

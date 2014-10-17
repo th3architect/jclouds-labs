@@ -55,7 +55,7 @@ public class ImageForVAppTemplate implements Function<VAppTemplate, Image> {
    private static final String UBUNTU = "ubuntu";
    private static final String SUSE = "sles";
    private static final String WINDOWS = "windows";
-
+   private static final String UNRECOGNIZED = "unrecognized";
 
    @Resource
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
@@ -93,9 +93,13 @@ public class ImageForVAppTemplate implements Function<VAppTemplate, Image> {
       }
       builder.description(from.getDescription() != null ? from.getDescription() : from.getName());
       //builder.operatingSystem(CIMOperatingSystem.toComputeOs(ovf));
-      OperatingSystem os = setOsDetails(ovf.getVirtualSystem().getOperatingSystemSection());
+      OperatingSystem os;
+      if (ovf.getVirtualSystem() != null) {
+         os = setOsDetails(ovf.getVirtualSystem().getOperatingSystemSection());
+      } else {
+         os = OperatingSystem.builder().description(UNRECOGNIZED).build();
+      }
       builder.operatingSystem(os);
-
       builder.status(toPortableImageStatus.apply(from.getStatus()));
       return builder.build();
    }

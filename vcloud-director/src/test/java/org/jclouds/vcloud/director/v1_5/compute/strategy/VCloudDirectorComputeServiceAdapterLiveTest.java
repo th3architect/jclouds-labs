@@ -61,8 +61,10 @@ public class VCloudDirectorComputeServiceAdapterLiveTest extends BaseVCloudDirec
 
       Template template = templateBuilder
               .osFamily(OsFamily.CENTOS)
-              .imageNameMatches("cloudsoft-template")
+              .imageNameMatches("centos 6.4 x64")
               .build();
+
+      template.getOptions().networks("Deployment_Network_01");
 
       guest = adapter.createNodeWithGroupEncodedIntoName(group, name, template);
       assertEquals(guest.getNodeId(), guest.getNode().getId() + "");
