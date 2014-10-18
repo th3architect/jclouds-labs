@@ -208,7 +208,7 @@ public class VCloudDirectorComputeServiceAdapter implements
       Set<String> securityGroups = ImmutableSet.of(DEFAULT_SECURITY_GROUP); // template.getOptions().getGroups()
       ComposeVAppParams compositionParams = ComposeVAppParams.builder()
               .name(name("composed-"))
-              .instantiationParams(instantiationParams(org, vdc, networkName, securityGroups))
+              .instantiationParams(instantiationParams(org, vdc, networkName, securityGroups, network))
               .sourcedItems(ImmutableList.of(vmItem))
               .deploy()
               .powerOn()
@@ -393,8 +393,9 @@ public class VCloudDirectorComputeServiceAdapter implements
       return api.getVmApi().getNetworkConnectionSection(vm.getId()).getNetworkConnections();
    }
 
-   protected InstantiationParams instantiationParams(Org org, Vdc vdc, String networkName, Set<String> securityGroups) {
-      NetworkConfiguration networkConfiguration = networkConfiguration(org, vdc, securityGroups);
+   protected InstantiationParams instantiationParams(Org org, Vdc vdc, String networkName,
+                                                     Set<String> securityGroups, Network network) {
+      NetworkConfiguration networkConfiguration = networkConfiguration(org, vdc, securityGroups, network);
 
       InstantiationParams instantiationParams = InstantiationParams.builder()
               .sections(ImmutableSet.of(networkConfigSection(networkName, networkConfiguration)))
@@ -418,8 +419,10 @@ public class VCloudDirectorComputeServiceAdapter implements
       return networkConfigSection;
    }
 
-   private NetworkConfiguration networkConfiguration(Org org, Vdc vdc, Set<String> securityGroups) {
+   private NetworkConfiguration networkConfiguration(Org org, Vdc vdc, Set<String> securityGroups,
+                                                     final Network network) {
       // Create a vAppNetwork with firewall rules
+/*
       Network.FenceMode fenceMode = Network.FenceMode.NAT_ROUTED;
       final Optional<Network> optionalNetwork = tryFindNetworkInOrgWithFenceMode(org, fenceMode);
       if (!optionalNetwork.isPresent()) {
@@ -441,8 +444,17 @@ public class VCloudDirectorComputeServiceAdapter implements
          firewallRules.addAll(securityGroupFirewallRules);
       }
       FirewallService firewallService = addFirewallService(firewallRules);
+*/
+      Set<Reference> networks = vdc.getAvailableNetworks();
+      Optional<Reference> parentNetwork = Iterables.tryFind(networks, new Predicate<Reference>() {
+         @Override
+         public boolean apply(Reference reference) {
+            return reference.getHref().equals(network.getHref());
+         }
+      });
 
       return NetworkConfiguration.builder()
+              //.parentNetwork(parentNetwork.get())
               .parentNetwork(parentNetwork.get())
               //.ipScopes(IpScopes.builder().ipScope(addNewIpScope()).build())
               .fenceMode(Network.FenceMode.BRIDGED)
