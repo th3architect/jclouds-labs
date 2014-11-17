@@ -26,9 +26,10 @@
   </parent>
 
   <!-- TODO: consider merging this with vcloud-director as it is not used anywhere else -->
-  <groupId>org.apache.jclouds.labs</groupId>
+  <groupId>io.cloudsoft.jclouds.labs</groupId>
   <artifactId>dmtf</artifactId>
   <name>jclouds dmtf domain objects</name>
+  <version>1.8.2-alpha-cloudsoft.5</version>
   <description>jclouds implementation of DMTF OVF and CIM domain objects</description>
   <packaging>bundle</packaging>
 
