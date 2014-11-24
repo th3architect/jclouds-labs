@@ -69,9 +69,7 @@ public class DockerErrorHandler implements HttpErrorHandler {
                exception = new IllegalStateException(message, exception);
                break;
             case 404:
-               if (!command.getCurrentRequest().getMethod().equals("DELETE")) {
-                  exception = new ResourceNotFoundException(message, exception);
-               }
+               exception = new ResourceNotFoundException(message, exception);
                break;
             case 405:
                exception = new IllegalArgumentException(message, exception);

@@ -22,6 +22,7 @@ import static org.testng.Assert.assertNotNull;
 import java.util.Properties;
 import java.util.Random;
 
+import org.jclouds.Constants;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceAdapter.NodeAndInitialCredentials;
 import org.jclouds.compute.domain.Hardware;
@@ -119,7 +120,8 @@ public class DockerComputeServiceAdapterLiveTest extends BaseDockerApiLiveTest {
    @Override
    protected Properties setupProperties() {
       Properties properties = super.setupProperties();
-      properties.setProperty("jclouds.ssh.max-retries", "10");
+      properties.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
+      properties.setProperty(Constants.PROPERTY_RELAX_HOSTNAME, "true");
       return properties;
    }
 }

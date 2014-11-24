@@ -33,6 +33,7 @@ import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.DeleteImageOptions;
 import org.jclouds.docker.options.ListImageOptions;
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.rest.annotations.Fallback;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -70,7 +71,8 @@ public interface ImageApi {
    @Named("image:inspect")
    @GET
    @Path("/images/{name}/json")
-   @Fallback(Fallbacks.VoidOnNotFoundOr404.class)
+   @Fallback(Fallbacks.NullOnNotFoundOr404.class)
+   @Nullable
    Image inspectImage(@PathParam("name") String imageName);
 
    /**

@@ -237,12 +237,12 @@ public class DockerComputeServiceAdapter implements
 
    @Override
    public void resumeNode(String id) {
-      throw new UnsupportedOperationException("resume not supported");
+      api.getContainerApi().unpause(id);
    }
 
    @Override
    public void suspendNode(String id) {
-      throw new UnsupportedOperationException("suspend not supported");
+      api.getContainerApi().pause(id);
    }
 
 }

@@ -63,6 +63,7 @@ public class SSLContextWithKeysSupplier implements Supplier<SSLContext> {
          kmf.init(keyStore.get(), keyStorePassword.toCharArray());
          SSLContext sc = SSLContext.getInstance("TLS");
          sc.init(kmf.getKeyManagers(), trustManager, new SecureRandom());
+         System.setProperty("https.protocols", "TLSv1");
          return sc;
       } catch (NoSuchAlgorithmException e) {
          throw propagate(e);

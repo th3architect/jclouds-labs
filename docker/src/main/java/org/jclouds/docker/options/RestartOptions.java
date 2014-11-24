@@ -14,31 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.domain;
+package org.jclouds.docker.options;
 
-import org.jclouds.json.SerializedNames;
+import org.jclouds.http.options.BaseHttpRequestOptions;
 
-import com.google.auto.value.AutoValue;
+public class RestartOptions extends BaseHttpRequestOptions {
 
-@AutoValue
-public abstract class State {
-   public abstract int pid();
+   public static final RestartOptions NONE = new RestartOptions();
 
-   public abstract boolean running();
-
-   public abstract int exitCode();
-
-   public abstract String startedAt();
-
-   public abstract String finishedAt();
-
-   public abstract boolean paused();
-
-   public abstract boolean restarting();
-
-   @SerializedNames({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Paused", "Restarting" })
-   public static State create(int pid, boolean running, int exitCode, String startedAt, String finishedAt,
-         boolean paused, boolean restarting) {
-      return new AutoValue_State(pid, running, exitCode, startedAt, finishedAt, paused, restarting);
+   /**
+    * @param t number of seconds to wait before killing the container
+    * @return RestartOptions
+    */
+   public RestartOptions t(String t) {
+      this.queryParameters.put("t", t.toString());
+      return this;
    }
+
+   public static class Builder {
+
+      /**
+       * @see org.jclouds.docker.options.RestartOptions#t
+       */
+      public static RestartOptions t(String t) {
+         RestartOptions options = new RestartOptions();
+         return options.t(t);
+      }
+
+   }
+
 }

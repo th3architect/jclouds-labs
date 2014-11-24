@@ -26,7 +26,9 @@ import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.ContainerSummary;
+import org.jclouds.docker.domain.Resource;
 import org.jclouds.docker.internal.BaseDockerMockTest;
+import org.jclouds.docker.options.CommitOptions;
 import org.jclouds.docker.options.ListContainerOptions;
 import org.jclouds.rest.ResourceNotFoundException;
 import org.testng.annotations.Test;
@@ -237,6 +239,246 @@ public class ContainerApiMockTest extends BaseDockerMockTest {
       try {
          api.stopContainer("1");
          fail("Stop container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testCommitContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(201));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.commit(CommitOptions.NONE);
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/commit");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testCommitNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.commit(CommitOptions.NONE);
+         fail("Commit container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testPauseContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(204));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.pause("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/pause");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testPauseNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.pause("1");
+         fail("Pause container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testUnpauseContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(204));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.unpause("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/unpause");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testUnpauseNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.unpause("1");
+         fail("Unpause container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testAttachContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(200));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.attach("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/attach");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testAttachNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.attach("1");
+         fail("Attach container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testWaitContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(200));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.wait("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/wait");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testWaitNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.wait("1");
+         fail("Wait container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testRestartContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(204));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.restart("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/restart");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testRestartNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.restart("1");
+         fail("Restart container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testKillContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(204));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.kill("1");
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/kill");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testKillNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.kill("1");
+         fail("Kill container must fail on 404");
+      } catch (ResourceNotFoundException ex) {
+         // Expected exception
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testCopyFileFromContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(204));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.copy("1", Resource.create("test"));
+         assertRequestHasCommonFields(server.takeRequest(), "POST", "/containers/1/copy");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testCopyFileFromNonExistingContainer() throws Exception {
+      MockWebServer server = mockWebServer();
+      server.enqueue(new MockResponse().setResponseCode(404));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ContainerApi api = dockerApi.getContainerApi();
+      try {
+         api.copy("1", Resource.create("test"));
+         fail("Copy file from container must fail on 404");
       } catch (ResourceNotFoundException ex) {
          // Expected exception
       } finally {

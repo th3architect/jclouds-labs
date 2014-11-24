@@ -16,6 +16,7 @@
  */
 package org.jclouds.docker.features;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Named;
@@ -34,9 +35,15 @@ import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.ContainerSummary;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.domain.Resource;
+import org.jclouds.docker.domain.StatusCode;
+import org.jclouds.docker.options.AttachOptions;
 import org.jclouds.docker.options.CommitOptions;
+import org.jclouds.docker.options.KillOptions;
 import org.jclouds.docker.options.ListContainerOptions;
 import org.jclouds.docker.options.RemoveContainerOptions;
+import org.jclouds.docker.options.RestartOptions;
+import org.jclouds.docker.options.StopOptions;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.binders.BindToJsonPayload;
@@ -136,12 +143,22 @@ public interface ContainerApi {
     * Stop a container by id.
     *
     * @param containerId The id of the container to be stopped.
-    * @return the stream of the stop execution.
     */
    @Named("container:stop")
    @POST
    @Path("/containers/{id}/stop")
    void stopContainer(@PathParam("id") String containerId);
+
+   /**
+    * Stop a container by id.
+    *
+    * @param containerId The id of the container to be stopped.
+    * @param options the stop options @see org.jclouds.docker.options.StopOptions
+    */
+   @Named("container:stop")
+   @POST
+   @Path("/containers/{id}/stop")
+   void stopContainer(@PathParam("id") String containerId, StopOptions options);
 
    /**
     * Create a new image from a container’s changes
@@ -154,4 +171,108 @@ public interface ContainerApi {
    @Path("/commit")
    Image commit(CommitOptions options);
 
+   /**
+    * Pause the container id
+    *
+    * @param containerId The id of the container to be paused.
+    */
+   @Named("container:pause")
+   @POST
+   @Path("/containers/{id}/pause")
+   void pause(@PathParam("id") String containerId);
+
+   /**
+    * Unpause the container id
+    *
+    * @param containerId The id of the container to be unpaused.
+    */
+   @Named("container:unpause")
+   @POST
+   @Path("/containers/{id}/unpause")
+   void unpause(@PathParam("id") String containerId);
+
+   /**
+    * Attach to a container
+    *
+    * @param containerId The id of the container to be attached.
+    */
+   @Named("container:attach")
+   @POST
+   @Path("/containers/{id}/attach")
+   InputStream attach(@PathParam("id") String containerId);
+
+   /**
+    * Attach to a container
+    *
+    * @param containerId The id of the container to be attached.
+    * @param options the attach options @see org.jclouds.docker.options.AttachOptions
+    *
+    */
+   @Named("container:attach")
+   @POST
+   @Path("/containers/{id}/attach")
+   InputStream attach(@PathParam("id") String containerId, AttachOptions options);
+
+   /**
+    * Wait a container
+    *
+    * Block until container @param containerId stops, then returns the exit code
+    */
+   @Named("container:wait")
+   @POST
+   @Path("/containers/{id}/wait")
+   StatusCode wait(@PathParam("id") String containerId);
+
+   /**
+    * Restart a container
+    *
+    * @param containerId restarts
+    */
+   @Named("container:restart")
+   @POST
+   @Path("/containers/{id}/restart")
+   void restart(@PathParam("id") String containerId);
+
+   /**
+    * Restart a container
+    *
+    * @param containerId restarts
+    * @param options the restart options @see org.jclouds.docker.options.RestartOptions
+    */
+   @Named("container:restart")
+   @POST
+   @Path("/containers/{id}/restart")
+   void restart(@PathParam("id") String containerId, RestartOptions options);
+
+
+   /**
+    * Kill a container
+    *
+    * @param containerId to be killed
+    */
+   @Named("container:kill")
+   @POST
+   @Path("/containers/{id}/kill")
+   void kill(@PathParam("id") String containerId);
+
+   /**
+    * Kill a container
+    *
+    * @param containerId to be killed
+    * @param options the kill options @see org.jclouds.docker.options.KillOptions
+    */
+   @Named("container:kill")
+   @POST
+   @Path("/containers/{id}/kill")
+   void kill(@PathParam("id") String containerId, KillOptions options);
+
+   /**
+    * Copy files or folders from a container
+    *
+    * Copy files or folders of container @param containerId
+    */
+   @Named("container:copy")
+   @POST
+   @Path("/containers/{id}/copy")
+   InputStream copy(@PathParam("id") String containerId, @BinderParam(BindToJsonPayload.class) Resource resource);
 }
