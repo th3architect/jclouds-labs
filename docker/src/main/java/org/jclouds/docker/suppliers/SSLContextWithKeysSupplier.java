@@ -61,10 +61,9 @@ public class SSLContextWithKeysSupplier implements Supplier<SSLContext> {
       try {
          kmf = KeyManagerFactory.getInstance("SunX509");
          kmf.init(keyStore.get(), keyStorePassword.toCharArray());
-         SSLContext sc = SSLContext.getInstance("TLS");
-         sc.init(kmf.getKeyManagers(), trustManager, new SecureRandom());
-         System.setProperty("https.protocols", "TLSv1");
-         return sc;
+         SSLContext sslContext = SSLContext.getInstance("TLS");
+         sslContext.init(kmf.getKeyManagers(), trustManager, new SecureRandom());
+         return sslContext;
       } catch (NoSuchAlgorithmException e) {
          throw propagate(e);
       } catch (UnrecoverableKeyException e) {

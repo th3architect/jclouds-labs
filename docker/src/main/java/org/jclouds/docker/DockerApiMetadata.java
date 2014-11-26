@@ -25,6 +25,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.docker.compute.config.DockerComputeServiceContextModule;
 import org.jclouds.docker.config.DockerHttpApiModule;
+import org.jclouds.docker.config.DockerHttpApiModule.DockerHttpCommandExecutorServiceModule;
 import org.jclouds.docker.config.DockerParserModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
@@ -76,6 +77,7 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(
                          DockerParserModule.class,
                          DockerHttpApiModule.class,
+                         DockerHttpCommandExecutorServiceModule.class,
                          DockerComputeServiceContextModule.class));
       }
 

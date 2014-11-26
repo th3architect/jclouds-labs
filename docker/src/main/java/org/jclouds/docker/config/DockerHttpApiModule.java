@@ -22,16 +22,22 @@ import javax.net.ssl.SSLContext;
 
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.handlers.DockerErrorHandler;
+import org.jclouds.docker.http.DockerHttpCommandExecutorService;
 import org.jclouds.docker.suppliers.KeyStoreSupplier;
 import org.jclouds.docker.suppliers.SSLContextWithKeysSupplier;
+import org.jclouds.http.HttpCommandExecutorService;
 import org.jclouds.http.HttpErrorHandler;
 import org.jclouds.http.annotation.ClientError;
 import org.jclouds.http.annotation.Redirection;
 import org.jclouds.http.annotation.ServerError;
+import org.jclouds.http.config.ConfiguresHttpCommandExecutorService;
+import org.jclouds.http.config.SSLModule;
 import org.jclouds.rest.ConfiguresHttpApi;
 import org.jclouds.rest.config.HttpApiModule;
 
 import com.google.common.base.Supplier;
+import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 
 /**
@@ -59,5 +65,15 @@ public class DockerHttpApiModule extends HttpApiModule<DockerApi> {
       bind(new TypeLiteral<Supplier<KeyStore>>() {
       }).to(new TypeLiteral<KeyStoreSupplier>() {
       });
+   }
+
+   @ConfiguresHttpCommandExecutorService
+   public static class DockerHttpCommandExecutorServiceModule extends AbstractModule {
+      @Override
+      protected void configure() {
+         install(new SSLModule());
+         bind(HttpCommandExecutorService.class).to(DockerHttpCommandExecutorService.class).in(
+                 Scopes.SINGLETON);
+      }
    }
 }
