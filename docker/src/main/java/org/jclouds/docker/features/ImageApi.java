@@ -28,8 +28,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jclouds.Fallbacks;
+import org.jclouds.Fallbacks.EmptyListOnNotFoundOr404;
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.domain.ImageSummary;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.DeleteImageOptions;
 import org.jclouds.docker.options.ListImageOptions;
@@ -40,38 +42,32 @@ import org.jclouds.rest.annotations.Fallback;
 public interface ImageApi {
 
    /**
-    * List images
-    *
     * @return the images available.
     */
    @Named("images:list")
    @GET
    @Path("/images/json")
-   @Fallback(Fallbacks.EmptyListOnNotFoundOr404.class)
-   List<Image> listImages();
+   @Fallback(EmptyListOnNotFoundOr404.class)
+   List<ImageSummary> listImages();
 
    /**
-    * List images
-    *
     * @param options the configuration to list images (@see ListImageOptions)
     * @return the images available.
     */
    @Named("images:list")
    @GET
    @Path("/images/json")
-   @Fallback(Fallbacks.EmptyListOnNotFoundOr404.class)
-   List<Image> listImages(ListImageOptions options);
+   @Fallback(EmptyListOnNotFoundOr404.class)
+   List<ImageSummary> listImages(ListImageOptions options);
 
    /**
-    * Inspect an image
-    *
     * @param imageName The id of the image to inspect.
     * @return low-level information on the image name
     */
    @Named("image:inspect")
    @GET
    @Path("/images/{name}/json")
-   @Fallback(Fallbacks.NullOnNotFoundOr404.class)
+   @Fallback(NullOnNotFoundOr404.class)
    @Nullable
    Image inspectImage(@PathParam("name") String imageName);
 
@@ -87,8 +83,6 @@ public interface ImageApi {
    InputStream createImage(CreateImageOptions options);
 
    /**
-    * Delete an image.
-    *
     * @param name the image name to be deleted
     * @return the stream of the deletion execution.
     */
@@ -98,8 +92,6 @@ public interface ImageApi {
    InputStream deleteImage(@PathParam("name") String name);
 
    /**
-    * Remove the image from the filesystem by name
-    *
     * @param name the name of the image to be removed
     * @param options the image deletion's options (@see DeleteImageOptions)
     * @return the stream of the deletion execution.

@@ -19,6 +19,7 @@ package org.jclouds.docker.features;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -34,7 +35,6 @@ import org.jclouds.docker.domain.Resource;
 import org.jclouds.docker.options.AttachOptions;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.ListContainerOptions;
-import org.jclouds.docker.options.RestartOptions;
 import org.jclouds.docker.options.StopOptions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -115,7 +115,7 @@ public class ContainerApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testStopContainer")
    public void testRestartContainer() {
-      api().restart(container.id(), RestartOptions.NONE);
+      api().restart(container.id());
       assertTrue(api().inspectContainer(container.id()).state().running());
    }
 
@@ -125,10 +125,10 @@ public class ContainerApiLiveTest extends BaseDockerApiLiveTest {
       assertEquals(api().wait(container.id()).statusCode(), -1);
    }
 
-   @Test(dependsOnMethods = "testWaitContainer", expectedExceptions = NullPointerException.class)
+   @Test(dependsOnMethods = "testWaitContainer")
    public void testRemoveContainer() {
       api().removeContainer(container.id());
-      assertFalse(api().inspectContainer(container.id()).state().running());
+      assertNull(api().inspectContainer(container.id()));
    }
 
    @Test

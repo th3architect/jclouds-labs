@@ -20,10 +20,8 @@ import org.jclouds.http.options.BaseHttpRequestOptions;
 
 public class StopOptions extends BaseHttpRequestOptions {
 
-   public static final StopOptions NONE = new StopOptions();
-
    /**
-    * @param t  number of seconds to wait before killing the container
+    * @param t number of seconds to wait before killing the container
     * @return RestartOptions
     */
    public StopOptions t(String t) {

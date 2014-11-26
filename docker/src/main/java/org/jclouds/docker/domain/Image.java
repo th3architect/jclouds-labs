@@ -27,32 +27,40 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class Image {
+
    public abstract String id();
 
-   @Nullable public abstract String parent();
+   @Nullable public abstract String author();
 
-   @Nullable public abstract String created();
+   @Nullable public abstract String comment();
 
-   @Nullable public abstract String container();
+   @Nullable public abstract Config config();
 
-   @Nullable public abstract String dockerVersion();
+   @Nullable public abstract Config containerConfig();
 
-   @Nullable public abstract String architecture();
+   public abstract String parent();
 
-   @Nullable public abstract String os();
+   public abstract String created();
+
+   public abstract String container();
+
+   public abstract String dockerVersion();
+
+   public abstract String architecture();
+
+   public abstract String os();
 
    public abstract long size();
 
-   @Nullable public abstract long virtualSize();
+   public abstract long virtualSize();
 
-   public abstract List<String> repoTags();
+   @Nullable public abstract List<String> repoTags();
 
-   @SerializedNames({ "Id", "Parent", "Created", "Container", "DockerVersion", "Architecture", "Os", "Size",
-         "VirtualSize", "RepoTags" })
-   public static Image create(String id, String parent, String created, String container, String dockerVersion,
-         String architecture, String os, long size, long virtualSize, List<String> repoTags) {
-      return new AutoValue_Image(id, parent, created, container, dockerVersion, architecture, os, size, virtualSize,
-            copyOf(repoTags));
+   @SerializedNames({ "Id", "Author", "Comment", "Config", "ContainerConfig", "Parent", "Created",
+           "Container", "DockerVersion", "Architecture", "Os", "Size", "VirtualSize", "RepoTags" })
+   public static Image create(String id, String author, String comment, Config config, Config containerConfig, String parent, String created, String container, String dockerVersion, String architecture, String os, long size, long virtualSize, List<String> repoTags) {
+      return new AutoValue_Image(id, author, comment, config, containerConfig, parent, created, container,
+              dockerVersion, architecture, os, size, virtualSize, copyOf(repoTags));
    }
 
 }

@@ -40,6 +40,7 @@ import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.ContainerSummary;
 import org.jclouds.docker.domain.HostConfig;
 import org.jclouds.docker.domain.Image;
+import org.jclouds.docker.domain.ImageSummary;
 import org.jclouds.docker.options.ListContainerOptions;
 import org.jclouds.docker.options.RemoveContainerOptions;
 import org.jclouds.domain.Location;
@@ -170,14 +171,13 @@ public class DockerComputeServiceAdapter implements
    @Override
    public Set<Image> listImages() {
       Set<Image> images = Sets.newHashSet();
-      for (Image image : api.getImageApi().listImages()) {
+      for (ImageSummary imageSummary : api.getImageApi().listImages()) {
          // less efficient than just listImages but returns richer json that needs repoTags coming from listImages
-         Image inspected = api.getImageApi().inspectImage(image.id());
-         if (inspected.repoTags().isEmpty()) {
-            inspected = Image.create(inspected.id(), inspected.parent(), inspected.container(), inspected.created(),
+         Image inspected = api.getImageApi().inspectImage(imageSummary.id());
+         inspected = Image.create(inspected.id(), inspected.author(), inspected.comment(), inspected.config(),
+                    inspected.containerConfig(), inspected.parent(), inspected.container(), inspected.created(),
                     inspected.dockerVersion(), inspected.architecture(), inspected.os(), inspected.size(),
-                    inspected.virtualSize(), image.repoTags());
-         }
+                    inspected.virtualSize(), imageSummary.repoTags());
          images.add(inspected);
       }
       return images;

@@ -30,4 +30,5 @@ public abstract class Resource {
       return new AutoValue_Resource(resource);
    }
 
+   Resource() {}
 }

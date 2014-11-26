@@ -18,6 +18,7 @@ package org.jclouds.docker.domain;
 
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import com.google.common.collect.ImmutableMap;
 public abstract class Container {
    public abstract String id();
 
-   @Nullable public abstract String created();
+   @Nullable public abstract Date created();
 
    @Nullable public abstract String path();
 
@@ -82,7 +83,7 @@ public abstract class Container {
                  "ResolvConfPath", "Volumes", "HostConfig", "Driver", "ExecDriver", "VolumesRW", "Command", "Status",
                  "Ports", "HostnamePath", "HostsPath", "MountLabel", "ProcessLabel"
          })
-   public static Container create(String id, String created, String path, String name, List<String> args, Config config,
+   public static Container create(String id, Date created, String path, String name, List<String> args, Config config,
                                   State state, String image, NetworkSettings networkSettings, String sysInitPath,
                                   String resolvConfPath, Map<String, String> volumes, HostConfig hostConfig,
                                   String driver, String execDriver, Map<String, Boolean> volumesRW, String command,
@@ -104,7 +105,7 @@ public abstract class Container {
    public static final class Builder {
 
       private String id;
-      private String created;
+      private Date created;
       private String path;
       private String name;
       private List<String> args;
@@ -132,7 +133,7 @@ public abstract class Container {
          return this;
       }
 
-      public Builder created(String created) {
+      public Builder created(Date created) {
          this.created = created;
          return this;
       }

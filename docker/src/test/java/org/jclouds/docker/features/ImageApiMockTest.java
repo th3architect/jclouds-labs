@@ -16,15 +16,15 @@
  */
 package org.jclouds.docker.features;
 
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertEquals;
 
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.internal.BaseDockerMockTest;
 import org.jclouds.docker.options.CreateImageOptions;
-import org.jclouds.rest.ResourceNotFoundException;
+import org.jclouds.docker.parse.ImageParseTest;
+import org.jclouds.docker.parse.ImagesParseTest;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.ImmutableMultimap;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
@@ -35,29 +35,42 @@ import com.squareup.okhttp.mockwebserver.MockWebServer;
 public class ImageApiMockTest extends BaseDockerMockTest {
 
    public void testCreateImage() throws Exception {
-      MockWebServer server = mockWebServer();
+      MockWebServer server = mockDockerWebServer();
       server.enqueue(new MockResponse().setResponseCode(200));
       DockerApi dockerApi = api(server.getUrl("/"));
       ImageApi api = dockerApi.getImageApi();
       try {
          api.createImage(CreateImageOptions.Builder.fromImage("base"));
-         assertRequestHasParameters(server.takeRequest(), "POST", "/images/create", ImmutableMultimap.of("fromImage", "base"));
+         assertSent(server, "POST", "/images/create?fromImage=base");
       } finally {
          dockerApi.close();
          server.shutdown();
       }
    }
 
-   public void testCreateImageFailure() throws Exception {
-      MockWebServer server = mockWebServer();
-      server.enqueue(new MockResponse().setResponseCode(404));
+   public void testGetImage() throws Exception {
+      MockWebServer server = mockDockerWebServer();
+      server.enqueue(new MockResponse().setBody(payloadFromResource("/image.json")));
       DockerApi dockerApi = api(server.getUrl("/"));
       ImageApi api = dockerApi.getImageApi();
       try {
-         api.createImage(CreateImageOptions.Builder.fromImage("base"));
-         fail("Create image must fail on 404");
-      } catch (ResourceNotFoundException ex) {
-         // Expected exception
+         String imageId = "cbba6639a342646deed70d7ea6162fa2a0acea9300f911f4e014555fe37d3456";
+         assertEquals(api.inspectImage(imageId), new ImageParseTest().expected());
+         assertSent(server, "GET", "/images/" + imageId + "/json");
+      } finally {
+         dockerApi.close();
+         server.shutdown();
+      }
+   }
+
+   public void testListImages() throws Exception {
+      MockWebServer server = mockDockerWebServer();
+      server.enqueue(new MockResponse().setBody(payloadFromResource("/images.json")));
+      DockerApi dockerApi = api(server.getUrl("/"));
+      ImageApi api = dockerApi.getImageApi();
+      try {
+         assertEquals(api.listImages(), new ImagesParseTest().expected());
+         assertSent(server, "GET", "/images/json");
       } finally {
          dockerApi.close();
          server.shutdown();
@@ -65,29 +78,14 @@ public class ImageApiMockTest extends BaseDockerMockTest {
    }
 
    public void testDeleteImage() throws Exception {
-      MockWebServer server = mockWebServer();
+      MockWebServer server = mockDockerWebServer();
       server.enqueue(new MockResponse().setResponseCode(204));
       DockerApi dockerApi = api(server.getUrl("/"));
       ImageApi api = dockerApi.getImageApi();
       try {
          api.deleteImage("1");
-         assertRequestHasCommonFields(server.takeRequest(), "DELETE", "/images/1");
-      } finally {
-         dockerApi.close();
-         server.shutdown();
-      }
-   }
+         assertSent(server, "DELETE", "/images/1");
 
-   public void testDeleteNotExistingImage() throws Exception {
-      MockWebServer server = mockWebServer();
-      server.enqueue(new MockResponse().setResponseCode(404));
-      DockerApi dockerApi = api(server.getUrl("/"));
-      ImageApi api = dockerApi.getImageApi();
-      try {
-         api.deleteImage("1");
-         fail("Delete image must fail on 404");
-      } catch (ResourceNotFoundException ex) {
-         // Expected exception
       } finally {
          dockerApi.close();
          server.shutdown();

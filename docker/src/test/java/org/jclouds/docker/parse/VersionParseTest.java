@@ -14,13 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.config;
+package org.jclouds.docker.parse;
 
-public class DockerProperties {
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
 
-   /**
-    * default Docker host password
-    */
-   public static final String HOST_PASSWORD = "jclouds.docker.host.password";
+import org.jclouds.docker.domain.Version;
+import org.jclouds.docker.internal.BaseDockerParseTest;
+import org.testng.annotations.Test;
 
+@Test(groups = "unit")
+public class VersionParseTest extends BaseDockerParseTest<Version> {
+
+   @Override
+   public String resource() {
+      return "/version.json";
+   }
+
+   @Override
+   @Consumes(MediaType.APPLICATION_JSON)
+   public Version expected() {
+      return Version.create(
+              "1.15",
+              "amd64",
+              "c78088f",
+              "go1.3.3",
+              "3.16.4-tinycore64",
+              "linux",
+              "1.3.0");
+   }
 }

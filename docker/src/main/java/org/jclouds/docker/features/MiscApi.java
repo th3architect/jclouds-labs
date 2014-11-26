@@ -60,6 +60,19 @@ public interface MiscApi {
     *
     * @param inputStream The stream must be a tar archive compressed with one of the following algorithms: identity
     *                    (no compression), gzip, bzip2, xz.
+    * @return a stream of the build execution
+    */
+   @Named("image:build")
+   @POST
+   @Path("/build")
+   @Headers(keys = "Content-Type", values = "application/tar")
+   InputStream build(Payload inputStream);
+
+   /**
+    * Build an image from Dockerfile via stdin
+    *
+    * @param inputStream The stream must be a tar archive compressed with one of the following algorithms: identity
+    *                    (no compression), gzip, bzip2, xz.
     * @param options the image build's options (@see BuildOptions)
     * @return a stream of the build execution
     */

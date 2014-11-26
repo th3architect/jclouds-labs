@@ -17,9 +17,8 @@
 package org.jclouds.docker.internal;
 
 import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
-import static org.jclouds.http.utils.Queries.encodeQueryLine;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.jclouds.util.Strings2.toStringAndClose;
-import static org.testng.Assert.assertEquals;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
@@ -34,9 +33,7 @@ import org.jclouds.docker.DockerApi;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import com.google.inject.Module;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
@@ -67,7 +64,7 @@ public class BaseDockerMockTest {
       return new Properties();
    }
 
-   public static MockWebServer mockWebServer() throws IOException {
+   public static MockWebServer mockDockerWebServer() throws IOException {
       MockWebServer server = new MockWebServer();
       server.play();
       return server;
@@ -81,38 +78,12 @@ public class BaseDockerMockTest {
       }
    }
 
-   protected static void assertRequestHasCommonFields(final RecordedRequest request, final String path)
-           throws InterruptedException {
-      assertRequestHasParameters(request, "GET", path, ImmutableMultimap.<String, String> of());
-   }
-
-   protected static void assertRequestHasCommonFields(final RecordedRequest request,
-                                                      final String verb, final String path)
-         throws InterruptedException {
-      assertRequestHasParameters(request, verb, path, ImmutableMultimap.<String, String> of());
-   }
-
-   protected static void assertRequestHasParameters(final RecordedRequest request, final String path,
-                                                    Multimap<String, String> parameters) throws InterruptedException {
-      assertRequestHasParameters(request, "GET", path, parameters);
-   }
-
-   protected static void assertRequestHasParameters(final RecordedRequest request, String verb, final String path,
-                                                    Multimap<String, String> parameters) throws InterruptedException {
-      String queryParameters = "";
-      if (!parameters.isEmpty()) {
-         Multimap<String, String> allparams = ImmutableMultimap.<String, String>builder()
-                 .putAll(parameters)
-                 .build();
-
-         assertRequestHasAcceptHeader(request);
-         queryParameters = "?" + encodeQueryLine(allparams);
-      }
-      assertEquals(request.getRequestLine(), verb + " " + path + queryParameters + " HTTP/1.1");
-   }
-
-   protected static void assertRequestHasAcceptHeader(final RecordedRequest request) throws InterruptedException {
-      assertEquals(request.getHeader(HttpHeaders.ACCEPT), MediaType.APPLICATION_JSON);
+   protected RecordedRequest assertSent(MockWebServer server, String method, String path) throws InterruptedException {
+      RecordedRequest request = server.takeRequest();
+      assertThat(request.getMethod()).isEqualTo(method);
+      assertThat(request.getPath()).isEqualTo(path);
+      assertThat(request.getHeader(HttpHeaders.ACCEPT)).isEqualTo(MediaType.APPLICATION_JSON);
+      return request;
    }
 
 }

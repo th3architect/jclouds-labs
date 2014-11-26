@@ -14,31 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.docker.options;
+package org.jclouds.docker.internal;
 
-import org.jclouds.http.options.BaseHttpRequestOptions;
+import org.jclouds.docker.config.DockerParserModule;
+import org.jclouds.json.BaseItemParserTest;
+import org.jclouds.json.config.GsonModule;
 
-public class RestartOptions extends BaseHttpRequestOptions {
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-   /**
-    * @param t number of seconds to wait before killing the container
-    * @return RestartOptions
-    */
-   public RestartOptions t(String t) {
-      this.queryParameters.put("t", t.toString());
-      return this;
-   }
+public abstract class BaseDockerParseTest<T>  extends BaseItemParserTest<T> {
 
-   public static class Builder {
-
-      /**
-       * @see org.jclouds.docker.options.RestartOptions#t
-       */
-      public static RestartOptions t(String t) {
-         RestartOptions options = new RestartOptions();
-         return options.t(t);
-      }
-
+   @Override
+   protected Injector injector() {
+      return Guice.createInjector(new GsonModule(), new DockerParserModule());
    }
 
 }

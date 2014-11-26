@@ -18,12 +18,7 @@ package org.jclouds.docker.options;
 
 import org.jclouds.http.options.BaseHttpRequestOptions;
 
-/**
- * Options to kill container builder.
- */
 public class KillOptions extends BaseHttpRequestOptions {
-
-   public static final KillOptions NONE = new KillOptions();
 
    /**
     *

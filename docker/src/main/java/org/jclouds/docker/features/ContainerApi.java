@@ -29,7 +29,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jclouds.Fallbacks;
+import org.jclouds.Fallbacks.EmptyListOnNotFoundOr404;
+import org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Container;
 import org.jclouds.docker.domain.ContainerSummary;
@@ -52,31 +53,25 @@ import org.jclouds.rest.binders.BindToJsonPayload;
 public interface ContainerApi {
 
    /**
-    * List all running containers
-    *
     * @return a set of containers
     */
    @Named("containers:list")
    @GET
    @Path("/containers/json")
-   @Fallback(Fallbacks.EmptyListOnNotFoundOr404.class)
+   @Fallback(EmptyListOnNotFoundOr404.class)
    List<ContainerSummary> listContainers();
 
    /**
-    * List all running containers
-    *
     * @param options the options to list the containers (@see ListContainerOptions)
     * @return a set of containers
     */
    @Named("containers:list")
    @GET
    @Path("/containers/json")
-   @Fallback(Fallbacks.EmptyListOnNotFoundOr404.class)
+   @Fallback(EmptyListOnNotFoundOr404.class)
    List<ContainerSummary> listContainers(ListContainerOptions options);
 
    /**
-    * Create a container
-    *
     * @param name the name for the new container. Must match /?[a-zA-Z0-9_-]+.
     * @param config the container’s configuration (@see BindToJsonPayload)
     * @return a new container
@@ -94,12 +89,10 @@ public interface ContainerApi {
    @Named("container:inspect")
    @GET
    @Path("/containers/{id}/json")
-   @Fallback(Fallbacks.NullOnNotFoundOr404.class)
+   @Fallback(NullOnNotFoundOr404.class)
    Container inspectContainer(@PathParam("id") String containerId);
 
    /**
-    * Remove the container by id from the filesystem
-    *
     * @param containerId The id of the container to be removed.
     */
    @Named("container:delete")
@@ -108,8 +101,6 @@ public interface ContainerApi {
    void removeContainer(@PathParam("id") String containerId);
 
    /**
-    * Remove the container by id from the filesystem
-    *
     * @param containerId The id of the container to be removed.
     * @param options the operation’s configuration (@see RemoveContainerOptions)
     */
@@ -119,8 +110,6 @@ public interface ContainerApi {
    void removeContainer(@PathParam("id") String containerId, RemoveContainerOptions options);
 
    /**
-    * Start a container by id.
-    *
     * @param containerId The id of the container to be started.
     */
    @Named("container:start")
@@ -129,8 +118,6 @@ public interface ContainerApi {
    void startContainer(@PathParam("id") String containerId);
 
    /**
-    * Start a container.
-    *
     * @param containerId The id of the container to be started.
     * @param hostConfig the container’s host configuration
     */
@@ -140,8 +127,6 @@ public interface ContainerApi {
    void startContainer(@PathParam("id") String containerId, @BinderParam(BindToJsonPayload.class) HostConfig hostConfig);
 
    /**
-    * Stop a container by id.
-    *
     * @param containerId The id of the container to be stopped.
     */
    @Named("container:stop")
@@ -150,8 +135,6 @@ public interface ContainerApi {
    void stopContainer(@PathParam("id") String containerId);
 
    /**
-    * Stop a container by id.
-    *
     * @param containerId The id of the container to be stopped.
     * @param options the stop options @see org.jclouds.docker.options.StopOptions
     */
@@ -159,6 +142,16 @@ public interface ContainerApi {
    @POST
    @Path("/containers/{id}/stop")
    void stopContainer(@PathParam("id") String containerId, StopOptions options);
+
+   /**
+    * Create a new image from a container’s changes
+    *
+    * @return a new image created from the current container's status.
+    */
+   @Named("container:commit")
+   @POST
+   @Path("/commit")
+   Image commit();
 
    /**
     * Create a new image from a container’s changes
@@ -172,8 +165,6 @@ public interface ContainerApi {
    Image commit(CommitOptions options);
 
    /**
-    * Pause the container id
-    *
     * @param containerId The id of the container to be paused.
     */
    @Named("container:pause")
@@ -182,8 +173,6 @@ public interface ContainerApi {
    void pause(@PathParam("id") String containerId);
 
    /**
-    * Unpause the container id
-    *
     * @param containerId The id of the container to be unpaused.
     */
    @Named("container:unpause")
@@ -192,8 +181,6 @@ public interface ContainerApi {
    void unpause(@PathParam("id") String containerId);
 
    /**
-    * Attach to a container
-    *
     * @param containerId The id of the container to be attached.
     */
    @Named("container:attach")
@@ -202,8 +189,6 @@ public interface ContainerApi {
    InputStream attach(@PathParam("id") String containerId);
 
    /**
-    * Attach to a container
-    *
     * @param containerId The id of the container to be attached.
     * @param options the attach options @see org.jclouds.docker.options.AttachOptions
     *
@@ -214,8 +199,6 @@ public interface ContainerApi {
    InputStream attach(@PathParam("id") String containerId, AttachOptions options);
 
    /**
-    * Wait a container
-    *
     * Block until container @param containerId stops, then returns the exit code
     */
    @Named("container:wait")
@@ -224,8 +207,6 @@ public interface ContainerApi {
    StatusCode wait(@PathParam("id") String containerId);
 
    /**
-    * Restart a container
-    *
     * @param containerId restarts
     */
    @Named("container:restart")
@@ -234,8 +215,6 @@ public interface ContainerApi {
    void restart(@PathParam("id") String containerId);
 
    /**
-    * Restart a container
-    *
     * @param containerId restarts
     * @param options the restart options @see org.jclouds.docker.options.RestartOptions
     */
@@ -246,8 +225,6 @@ public interface ContainerApi {
 
 
    /**
-    * Kill a container
-    *
     * @param containerId to be killed
     */
    @Named("container:kill")
@@ -256,8 +233,6 @@ public interface ContainerApi {
    void kill(@PathParam("id") String containerId);
 
    /**
-    * Kill a container
-    *
     * @param containerId to be killed
     * @param options the kill options @see org.jclouds.docker.options.KillOptions
     */
@@ -267,9 +242,7 @@ public interface ContainerApi {
    void kill(@PathParam("id") String containerId, KillOptions options);
 
    /**
-    * Copy files or folders from a container
-    *
-    * Copy files or folders of container @param containerId
+    * @param containerId id of the container to copy files from
     */
    @Named("container:copy")
    @POST

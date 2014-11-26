@@ -16,7 +16,6 @@
  */
 package org.jclouds.docker.domain;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
 
 import java.util.List;
@@ -26,8 +25,6 @@ import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @AutoValue
 public abstract class Config {
@@ -135,7 +132,7 @@ public abstract class Config {
       return builder().fromConfig(this);
    }
 
-   public static class Builder {
+   public static final class Builder {
       private String hostname;
       private String domainname;
       private String user;
@@ -239,7 +236,7 @@ public abstract class Config {
       }
 
       public Builder cmd(List<String> cmd) {
-         this.cmd = ImmutableList.copyOf(checkNotNull(cmd, "cmd"));
+         this.cmd = cmd;
          return this;
       }
 
@@ -254,7 +251,7 @@ public abstract class Config {
       }
 
       public Builder volumes(Map<String, ?> volumes) {
-         this.volumes = ImmutableMap.copyOf(checkNotNull(volumes, "volumes"));
+         this.volumes = volumes;
          return this;
       }
 
@@ -269,13 +266,13 @@ public abstract class Config {
       }
 
       public Builder exposedPorts(Map<String, ?> exposedPorts) {
-         this.exposedPorts = ImmutableMap.copyOf(checkNotNull(exposedPorts, "exposedPorts"));
+         this.exposedPorts = exposedPorts;
          return this;
       }
 
       public Builder securityOpts(List<String> securityOpts) {
-      this.securityOpts = ImmutableList.copyOf(checkNotNull(securityOpts, "securityOpts"));
-      return this;
+         this.securityOpts = securityOpts;
+         return this;
       }
 
       public Builder hostConfig(HostConfig hostConfig) {
@@ -284,22 +281,22 @@ public abstract class Config {
       }
 
       public Builder binds(List<String> binds) {
-         this.binds = ImmutableList.copyOf(checkNotNull(binds, "binds"));
+         this.binds = binds;
          return this;
       }
 
       public Builder links(List<String> links) {
-         this.links = ImmutableList.copyOf(checkNotNull(links, "links"));
+         this.links = links;
          return this;
       }
 
       public Builder lxcConf(List<Map<String, String>> lxcConf) {
-         this.lxcConf = ImmutableList.copyOf(checkNotNull(lxcConf, "lxcConf"));
+         this.lxcConf = lxcConf;
          return this;
       }
 
       public Builder portBindings(Map<String, List<Map<String, String>>> portBindings) {
-         this.portBindings = ImmutableMap.copyOf(portBindings);
+         this.portBindings = portBindings;
          return this;
       }
 
@@ -314,7 +311,7 @@ public abstract class Config {
       }
 
       public Builder dns(List<String>  dns) {
-         this.dns = ImmutableList.copyOf(checkNotNull(dns, "dns"));
+         this.dns = dns;
          return this;
       }
 
@@ -329,17 +326,17 @@ public abstract class Config {
       }
 
       public Builder capAdd(List<String> capAdd) {
-         this.capAdd = ImmutableList.copyOf(checkNotNull(capAdd, "capAdd"));
+         this.capAdd = capAdd;
          return this;
       }
 
       public Builder capDrop(List<String> capDrop) {
-         this.capDrop = ImmutableList.copyOf(checkNotNull(capDrop, "capDrop"));
+         this.capDrop = capDrop;
          return this;
       }
 
       public Builder restartPolicy(Map<String, String> restartPolicy) {
-         this.restartPolicy = ImmutableMap.copyOf(restartPolicy);
+         this.restartPolicy = restartPolicy;
          return this;
       }
 
@@ -349,7 +346,7 @@ public abstract class Config {
       }
 
       public Builder devices(Map<String, String> devices) {
-         this.devices = ImmutableMap.copyOf(devices);
+         this.devices = devices;
          return this;
       }
 
