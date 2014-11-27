@@ -360,8 +360,8 @@ public abstract class Config {
 
       public Builder fromConfig(Config in) {
          return hostname(in.hostname()).domainname(in.domainname()).user(in.user()).memory(in.memory())
-               .memorySwap(in.memorySwap()).cpuShares(in.cpuShares()).attachStdin(in.attachStdin())
-               .attachStdout(in.attachStdout()).attachStderr(in.attachStderr()).tty(in.tty())
+                 .memorySwap(in.memorySwap()).cpuShares(in.cpuShares()).attachStdin(in.attachStdin())
+                 .attachStdout(in.attachStdout()).attachStderr(in.attachStderr()).tty(in.tty())
                  .image(in.image()).volumes(in.volumes()).workingDir(in.workingDir())
                  .networkDisabled(in.networkDisabled()).exposedPorts(in.exposedPorts()).securityOpts(in.securityOpts())
                  .hostConfig(in.hostConfig()).binds(in.binds()).links(in.links()).lxcConf(in.lxcConf())

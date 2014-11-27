@@ -7,10 +7,14 @@ providers, it supports the same portable abstractions offered by jclouds.
 Please follow these steps to configure your workstation for jclouds-docker:
 
 - install the latest Docker release (please visit https://docs.docker.com/installation/)
-If you are using boot2docker, notice that from version v1.3.0 the Docker daemon is set to use an encrypted TCP socket (--tls, or --tlsverify), 
+
+If you are using `boot2docker`, notice that from version v1.3.0 the Docker daemon is set to use an encrypted TCP
+socket (--tls, or --tlsverify),
 then you need to create a p12 certificate using the following command:
       
       `openssl pkcs12 -export -out $HOME/.jclouds/docker.p12 -inkey $HOME/.boot2docker/certs/boot2docker-vm/key.pem -in $HOME/.boot2docker/certs/boot2docker-vm/cert.pem -certfile $HOME/.boot2docker/certs/boot2docker-vm/ca.pem`
+
+N.B.: From `Docker 1.3.2+` the server doesn't accept sslv3 protocol (https://github.com/docker/docker/pull/8588/files)
 
 #How it works
 
