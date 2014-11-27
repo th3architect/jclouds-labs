@@ -29,7 +29,7 @@ public abstract class ImageSummary {
 
    public abstract String id();
 
-   public abstract String created();
+   public abstract long created();
 
    public abstract String parentId();
 
@@ -40,7 +40,7 @@ public abstract class ImageSummary {
    public abstract List<String> repoTags();
 
    @SerializedNames({"Id", "Created", "ParentId", "Size", "VirtualSize", "RepoTags"})
-   public static ImageSummary create(String id, String created, String parentId, int size, int virtualSize,
+   public static ImageSummary create(String id, long created, String parentId, int size, int virtualSize,
                                      List<String> repoTags) {
       return new AutoValue_ImageSummary(id, created, parentId, size, virtualSize, copyOf(repoTags));
    }

@@ -18,6 +18,7 @@ package org.jclouds.docker.domain;
 
 import static org.jclouds.docker.internal.NullSafeCopies.copyOf;
 
+import java.util.Date;
 import java.util.List;
 
 import org.jclouds.javax.annotation.Nullable;
@@ -40,7 +41,7 @@ public abstract class Image {
 
    public abstract String parent();
 
-   public abstract String created();
+   public abstract Date created();
 
    public abstract String container();
 
@@ -58,7 +59,7 @@ public abstract class Image {
 
    @SerializedNames({ "Id", "Author", "Comment", "Config", "ContainerConfig", "Parent", "Created",
            "Container", "DockerVersion", "Architecture", "Os", "Size", "VirtualSize", "RepoTags" })
-   public static Image create(String id, String author, String comment, Config config, Config containerConfig, String parent, String created, String container, String dockerVersion, String architecture, String os, long size, long virtualSize, List<String> repoTags) {
+   public static Image create(String id, String author, String comment, Config config, Config containerConfig, String parent, Date created, String container, String dockerVersion, String architecture, String os, long size, long virtualSize, List<String> repoTags) {
       return new AutoValue_Image(id, author, comment, config, containerConfig, parent, created, container,
               dockerVersion, architecture, os, size, virtualSize, copyOf(repoTags));
    }

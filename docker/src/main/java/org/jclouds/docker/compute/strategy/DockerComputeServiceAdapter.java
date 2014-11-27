@@ -175,8 +175,8 @@ public class DockerComputeServiceAdapter implements
          // less efficient than just listImages but returns richer json that needs repoTags coming from listImages
          Image inspected = api.getImageApi().inspectImage(imageSummary.id());
          inspected = Image.create(inspected.id(), inspected.author(), inspected.comment(), inspected.config(),
-                    inspected.containerConfig(), inspected.parent(), inspected.container(), inspected.created(),
-                    inspected.dockerVersion(), inspected.architecture(), inspected.os(), inspected.size(),
+                    inspected.containerConfig(), inspected.parent(), inspected.created(), inspected.container(),
+                 inspected.dockerVersion(), inspected.architecture(), inspected.os(), inspected.size(),
                     inspected.virtualSize(), imageSummary.repoTags());
          images.add(inspected);
       }

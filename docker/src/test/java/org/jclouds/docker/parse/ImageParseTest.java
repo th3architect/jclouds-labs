@@ -19,6 +19,7 @@ package org.jclouds.docker.parse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 
+import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.docker.domain.Config;
 import org.jclouds.docker.domain.Image;
 import org.jclouds.docker.internal.BaseDockerParseTest;
@@ -44,9 +45,9 @@ public class ImageParseTest extends BaseDockerParseTest<Image> {
               "comment",
               Config.builder().cmd(ImmutableList.of("/bin/sh", "-c", "echo hello world"))
                       .env(ImmutableList.of(
-                              "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                              "HOME=/root",
-                              "JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64"
+                                      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                      "HOME=/root",
+                                      "JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64"
                               )
                       )
                       .exposedPorts(ImmutableMap.of("8081/tcp", Maps.newHashMap()))
@@ -70,7 +71,7 @@ public class ImageParseTest extends BaseDockerParseTest<Image> {
                       .workingDir("/home/user")
                       .build(),
               "05794515afd5724df1cdf0e674ae932455fce7dea3c70a94d77119ad1fa954ba",
-              "2014-11-24T11:09:20.310023104Z",
+              new SimpleDateFormatDateService().iso8601DateParse("2014-11-24T11:09:20.310023104Z"),
               "0d14967353dbbd2ee78abe209f026f71654da49692fa2b044296ec3c810027b3",
               "1.3.1",
               "amd64",
