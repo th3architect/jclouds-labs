@@ -25,10 +25,11 @@ public abstract class StatusCode {
 
    public abstract int statusCode();
 
+   StatusCode() {
+   }
+
    @SerializedNames({ "StatusCode" })
    public static StatusCode create(int statusCode) {
       return new AutoValue_StatusCode(statusCode);
    }
-
-   StatusCode() {}
 }

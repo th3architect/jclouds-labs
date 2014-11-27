@@ -36,6 +36,9 @@ public abstract class State {
 
    public abstract boolean restarting();
 
+   State() {
+   }
+
    @SerializedNames({ "Pid", "Running", "ExitCode", "StartedAt", "FinishedAt", "Paused", "Restarting" })
    public static State create(int pid, boolean running, int exitCode, String startedAt, String finishedAt,
          boolean paused, boolean restarting) {

@@ -57,6 +57,9 @@ public abstract class Image {
 
    @Nullable public abstract List<String> repoTags();
 
+   Image() {
+   }
+
    @SerializedNames({ "Id", "Author", "Comment", "Config", "ContainerConfig", "Parent", "Created",
            "Container", "DockerVersion", "Architecture", "Os", "Size", "VirtualSize", "RepoTags" })
    public static Image create(String id, String author, String comment, Config config, Config containerConfig, String parent, Date created, String container, String dockerVersion, String architecture, String os, long size, long virtualSize, List<String> repoTags) {

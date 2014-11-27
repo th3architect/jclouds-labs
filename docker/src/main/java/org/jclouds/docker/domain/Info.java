@@ -59,6 +59,9 @@ public abstract class Info {
 
    public abstract int swapLimit();
 
+   Info() {
+   }
+
    @SerializedNames({
                    "Containers", "Debug", "Driver", "DriverStatus", "ExecutionDriver", "IPv4Forwarding", "Images",
                    "IndexServerAddress", "InitPath", "InitSha1", "KernelVersion", "MemoryLimit", "NEventsListener",

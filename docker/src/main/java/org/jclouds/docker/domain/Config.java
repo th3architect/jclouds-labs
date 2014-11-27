@@ -100,6 +100,9 @@ public abstract class Config {
 
    public abstract Map<String, String> devices();
 
+   Config() {
+   }
+
    @SerializedNames(
          {
                  "Hostname", "Domainname", "User", "Memory", "MemorySwap", "CpuShares", "AttachStdin", "AttachStdout",

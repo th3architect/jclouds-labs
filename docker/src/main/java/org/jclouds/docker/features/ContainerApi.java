@@ -40,11 +40,8 @@ import org.jclouds.docker.domain.Resource;
 import org.jclouds.docker.domain.StatusCode;
 import org.jclouds.docker.options.AttachOptions;
 import org.jclouds.docker.options.CommitOptions;
-import org.jclouds.docker.options.KillOptions;
 import org.jclouds.docker.options.ListContainerOptions;
 import org.jclouds.docker.options.RemoveContainerOptions;
-import org.jclouds.docker.options.RestartOptions;
-import org.jclouds.docker.options.StopOptions;
 import org.jclouds.rest.annotations.BinderParam;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.binders.BindToJsonPayload;
@@ -134,14 +131,10 @@ public interface ContainerApi {
    @Path("/containers/{id}/stop")
    void stopContainer(@PathParam("id") String containerId);
 
-   /**
-    * @param containerId The id of the container to be stopped.
-    * @param options the stop options @see org.jclouds.docker.options.StopOptions
-    */
    @Named("container:stop")
    @POST
    @Path("/containers/{id}/stop")
-   void stopContainer(@PathParam("id") String containerId, StopOptions options);
+   void stopContainer(@PathParam("id") String containerId, @QueryParam("t") int secondsToWait);
 
    /**
     * Create a new image from a container’s changes
@@ -214,14 +207,10 @@ public interface ContainerApi {
    @Path("/containers/{id}/restart")
    void restart(@PathParam("id") String containerId);
 
-   /**
-    * @param containerId restarts
-    * @param options the restart options @see org.jclouds.docker.options.RestartOptions
-    */
    @Named("container:restart")
    @POST
    @Path("/containers/{id}/restart")
-   void restart(@PathParam("id") String containerId, RestartOptions options);
+   void restart(@PathParam("id") String containerId, @QueryParam("t") int secondsToWait);
 
 
    /**
@@ -234,12 +223,23 @@ public interface ContainerApi {
 
    /**
     * @param containerId to be killed
-    * @param options the kill options @see org.jclouds.docker.options.KillOptions
+    * @param signal Signal to send to the container. When not set, SIGKILL is assumed and the call will waits for the
+    *               container to exit.
     */
    @Named("container:kill")
    @POST
    @Path("/containers/{id}/kill")
-   void kill(@PathParam("id") String containerId, KillOptions options);
+   void kill(@PathParam("id") String containerId, @QueryParam("signal") int signal);
+
+   /**
+    * @param containerId to be killed
+    * @param signal Signal string like "SIGINT" to send to the container. When not set, SIGKILL is assumed and the call will waits for
+    *               the container to exit.
+    */
+   @Named("container:kill")
+   @POST
+   @Path("/containers/{id}/kill")
+   void kill(@PathParam("id") String containerId, @QueryParam("signal") String signal);
 
    /**
     * @param containerId id of the container to copy files from

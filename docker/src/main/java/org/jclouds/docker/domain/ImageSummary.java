@@ -39,6 +39,9 @@ public abstract class ImageSummary {
 
    public abstract List<String> repoTags();
 
+   ImageSummary() {
+   }
+
    @SerializedNames({"Id", "Created", "ParentId", "Size", "VirtualSize", "RepoTags"})
    public static ImageSummary create(String id, long created, String parentId, int size, int virtualSize,
                                      List<String> repoTags) {

@@ -35,7 +35,6 @@ import org.jclouds.docker.domain.Resource;
 import org.jclouds.docker.options.AttachOptions;
 import org.jclouds.docker.options.CreateImageOptions;
 import org.jclouds.docker.options.ListContainerOptions;
-import org.jclouds.docker.options.StopOptions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -121,7 +120,7 @@ public class ContainerApiLiveTest extends BaseDockerApiLiveTest {
 
    @Test(dependsOnMethods = "testRestartContainer")
    public void testWaitContainer() {
-      api().stopContainer(container.id(), StopOptions.Builder.t("1"));
+      api().stopContainer(container.id(), 1);
       assertEquals(api().wait(container.id()).statusCode(), -1);
    }
 

@@ -77,6 +77,9 @@ public abstract class Container {
 
    @Nullable public abstract String processLabel();
 
+   Container() {
+   }
+
    @SerializedNames(
          {
                  "Id", "Created", "Path", "Name", "Args", "Config", "State", "Image", "NetworkSettings", "SysInitPath",

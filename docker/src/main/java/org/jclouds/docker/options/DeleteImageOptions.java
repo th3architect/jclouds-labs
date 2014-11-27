@@ -25,6 +25,11 @@ public class DeleteImageOptions extends BaseHttpRequestOptions {
       return this;
    }
 
+   public DeleteImageOptions noPrune(Boolean noPrune) {
+      this.queryParameters.put("noPrune", noPrune.toString());
+      return this;
+   }
+
    public static class Builder {
 
       /**
@@ -33,6 +38,14 @@ public class DeleteImageOptions extends BaseHttpRequestOptions {
       public static DeleteImageOptions force(Boolean force) {
          DeleteImageOptions options = new DeleteImageOptions();
          return options.force(force);
+      }
+
+      /**
+       * @see DeleteImageOptions#noPrune
+       */
+      public static DeleteImageOptions noPrune(Boolean noPrune) {
+         DeleteImageOptions options = new DeleteImageOptions();
+         return options.noPrune(noPrune);
       }
    }
 

@@ -25,10 +25,11 @@ public abstract class Resource {
 
    public abstract String resource();
 
+   Resource() {
+   }
+
    @SerializedNames({ "Resource" })
    public static Resource create(String resource) {
       return new AutoValue_Resource(resource);
    }
-
-   Resource() {}
 }
