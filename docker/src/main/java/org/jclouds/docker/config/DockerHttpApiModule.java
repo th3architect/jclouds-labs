@@ -16,13 +16,10 @@
  */
 package org.jclouds.docker.config;
 
-import java.security.KeyStore;
-
 import javax.net.ssl.SSLContext;
 
 import org.jclouds.docker.DockerApi;
 import org.jclouds.docker.handlers.DockerErrorHandler;
-import org.jclouds.docker.suppliers.KeyStoreSupplier;
 import org.jclouds.docker.suppliers.SSLContextWithKeysSupplier;
 import org.jclouds.http.HttpErrorHandler;
 import org.jclouds.http.annotation.ClientError;
@@ -55,9 +52,6 @@ public class DockerHttpApiModule extends HttpApiModule<DockerApi> {
       super.configure();
       bind(new TypeLiteral<Supplier<SSLContext>>() {
       }).to(new TypeLiteral<SSLContextWithKeysSupplier>() {
-      });
-      bind(new TypeLiteral<Supplier<KeyStore>>() {
-      }).to(new TypeLiteral<KeyStoreSupplier>() {
       });
    }
 }
