@@ -63,9 +63,6 @@ public class SSLContextWithKeysSupplier implements Supplier<SSLContext> {
          kmf.init(keyStore.get(), keyStorePassword.toCharArray());
          SSLContext sc = SSLContext.getInstance("TLS");
          sc.init(kmf.getKeyManagers(), trustManager, new SecureRandom());
-         // TODO this is a temporary solution to disable SSL v3.0 in JDK and JRE b/c of https://github.com/docker/docker/pull/8588/files.
-         // This system property will be removed once we can use an http driver with strict control on TLS protocols
-         System.setProperty("https.protocols", "TLSv1");
          return sc;
       } catch (NoSuchAlgorithmException e) {
          throw propagate(e);

@@ -26,6 +26,7 @@ import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.docker.compute.config.DockerComputeServiceContextModule;
 import org.jclouds.docker.config.DockerHttpApiModule;
 import org.jclouds.docker.config.DockerParserModule;
+import org.jclouds.http.okhttp.config.OkHttpCommandExecutorServiceModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
 import java.net.URI;
@@ -52,6 +53,7 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
 
    public static Properties defaultProperties() {
       Properties properties = BaseHttpApiMetadata.defaultProperties();
+      properties.setProperty("jclouds.okhttp.tls-versions", " TLS_1_2,TLS_1_1,TLS_1_0");
       properties.setProperty(Constants.PROPERTY_MAX_RETRIES, "15");
       properties.setProperty("jclouds.ssh.retry-auth", "true");
       properties.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "1200000"); // 15 minutes
@@ -76,6 +78,7 @@ public class DockerApiMetadata extends BaseHttpApiMetadata<DockerApi> {
                  .defaultModules(ImmutableSet.<Class<? extends Module>>of(
                          DockerParserModule.class,
                          DockerHttpApiModule.class,
+                         OkHttpCommandExecutorServiceModule.class,
                          DockerComputeServiceContextModule.class));
       }
 

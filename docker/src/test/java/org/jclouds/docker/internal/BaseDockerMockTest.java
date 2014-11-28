@@ -46,14 +46,21 @@ public class BaseDockerMockTest {
          sameThreadExecutor()));
 
    protected String provider;
+   private final String identity;
+   private final String credential;
 
    public BaseDockerMockTest() {
       provider = "docker";
+      // self-signed dummy cert:
+      // keytool -genkey -alias test -keyalg RSA -keysize 1024 -validity 5475 -dname "CN=localhost" -keystore
+      // docker-test.p12 -storepass dockerpass -storetype pkcs12
+      identity = this.getClass().getResource("/docker-test.p12").getFile();
+      credential = "dockerpass";
    }
 
    public DockerApi api(URL url) {
       return ContextBuilder.newBuilder(provider)
-            .credentials("clientid", "apikey")
+            .credentials(identity, credential)
             .endpoint(url.toString())
             .modules(modules)
             .overrides(setupProperties())
