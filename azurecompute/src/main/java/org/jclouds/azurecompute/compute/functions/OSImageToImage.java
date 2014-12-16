@@ -16,15 +16,40 @@
  */
 package org.jclouds.azurecompute.compute.functions;
 
+import org.jclouds.azurecompute.compute.functions.internal.OperatingSystems;
 import org.jclouds.azurecompute.domain.OSImage;
 import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.ImageBuilder;
+import org.jclouds.compute.domain.OsFamily;
 
 import com.google.common.base.Function;
 
 public class OSImageToImage implements Function<OSImage, Image> {
 
+   private static final String UNRECOGNIZED = "UNRECOGNIZED";
+
    @Override
-   public Image apply(OSImage input) {
-      return null;
+   public Image apply(OSImage osImage) {
+
+      OsFamily osFamily = OperatingSystems.osFamily().apply(osImage.label());
+      String osVersion = OperatingSystems.version().apply(osImage);
+
+      org.jclouds.compute.domain.OperatingSystem os = org.jclouds.compute.domain.OperatingSystem.builder()
+              .description(osImage.description() == null ? UNRECOGNIZED : osImage.description())
+              .family(osFamily)
+              .version(osVersion)
+              .is64Bit(is64bit(osImage.label()))
+              .build();
+
+      return new ImageBuilder()
+              .ids(osImage.name())
+              .description(osImage.description())
+              .operatingSystem(os)
+              .status(Image.Status.AVAILABLE)
+              .build();
+   }
+
+   private boolean is64bit(String label) {
+      return label.matches("-x64-");
    }
 }

@@ -18,26 +18,32 @@ package org.jclouds.azurecompute.compute.config;
 
 import org.jclouds.azurecompute.compute.AzureComputeServiceAdapter;
 import org.jclouds.azurecompute.compute.functions.DeploymentToNodeMetadata;
+import org.jclouds.azurecompute.compute.functions.LocationToLocation;
 import org.jclouds.azurecompute.compute.functions.OSImageToImage;
 import org.jclouds.azurecompute.compute.functions.RoleSizeToHardware;
+import org.jclouds.azurecompute.compute.strategy.UseNodeCredentialsButOverrideFromTemplate;
 import org.jclouds.azurecompute.domain.Deployment;
+import org.jclouds.azurecompute.domain.Location;
 import org.jclouds.azurecompute.domain.OSImage;
 import org.jclouds.azurecompute.domain.RoleSize;
+import org.jclouds.azurecompute.options.AzureComputeTemplateOptions;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.options.TemplateOptions;
+import org.jclouds.compute.strategy.PrioritizeCredentialsFromTemplate;
 
 import com.google.common.base.Function;
 import com.google.inject.TypeLiteral;
 
 public class AzureComputeServiceContextModule
-      extends ComputeServiceAdapterContextModule<Deployment, RoleSize, OSImage, String> {
+      extends ComputeServiceAdapterContextModule<Deployment, RoleSize, OSImage, Location> {
 
    @Override
    protected void configure() {
       super.configure();
-      bind(new TypeLiteral<ComputeServiceAdapter<Deployment, RoleSize, OSImage, String>>() {
+      bind(new TypeLiteral<ComputeServiceAdapter<Deployment, RoleSize, OSImage, Location>>() {
       }).to(AzureComputeServiceAdapter.class);
       bind(new TypeLiteral<Function<OSImage, org.jclouds.compute.domain.Image>>() {
       }).to(OSImageToImage.class);
@@ -45,5 +51,13 @@ public class AzureComputeServiceContextModule
       }).to(RoleSizeToHardware.class);
       bind(new TypeLiteral<Function<Deployment, NodeMetadata>>() {
       }).to(DeploymentToNodeMetadata.class);
+
+      bind(PrioritizeCredentialsFromTemplate.class).to(UseNodeCredentialsButOverrideFromTemplate.class);
+      bind(new TypeLiteral<Function<Location, org.jclouds.domain.Location>>() {
+      }).to(LocationToLocation.class);
+      // to have the compute service adapter override default locations
+      install(new LocationsFromComputeServiceAdapterModule<Deployment, RoleSize, OSImage, Location>(){});
+
+      bind(TemplateOptions.class).to(AzureComputeTemplateOptions.class);
    }
 }

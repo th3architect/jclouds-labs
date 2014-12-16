@@ -17,6 +17,7 @@
 package org.jclouds.azurecompute.domain;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import org.jclouds.javax.annotation.Nullable;
@@ -30,9 +31,12 @@ import com.google.auto.value.AutoValue;
  */
 @AutoValue
 public abstract class OSImage {
+
    public enum Type {
       LINUX, WINDOWS;
    }
+
+   OSImage() {} // For AutoValue only!
 
    public abstract String name();
 
@@ -76,9 +80,31 @@ public abstract class OSImage {
    // Not URI as some providers put non-uri data in, such as riverbed.
    public abstract List<String> eula();
 
+   @Nullable public abstract String imageFamily();
+
+   @Nullable public abstract Date publishedDate();
+
+   @Nullable public abstract String iconUri();
+
+   @Nullable public abstract String smallIconUri();
+
+   @Nullable public abstract URI privacyUri();
+
+   @Nullable public abstract URI pricingDetailLink();
+
+   @Nullable public abstract String recommendedVMSize();
+
+   @Nullable public abstract Boolean isPremium();
+
+   @Nullable public abstract Boolean showInGui();
+
+   @Nullable public abstract String publisherName();
+
    public static OSImage create(String name, List<String> locations, String affinityGroup, String label,
-         String description, String category, Type os, URI mediaLink, int logicalSizeInGB, List<String> eula) {
+         String description, String category, Type os, URI mediaLink, int logicalSizeInGB, List<String> eula,
+         String imageFamily, Date publishedDate, String iconUri, String smallIconUri, URI privacyUri, URI
+                 pricingDetailLink, String recommendedVMSize, Boolean isPremium, Boolean showInGui, String publisherName) {
       return new AutoValue_OSImage(name, locations, affinityGroup, label, description, category, os, mediaLink,
-            logicalSizeInGB, eula);
+            logicalSizeInGB, eula, imageFamily, publishedDate, iconUri, smallIconUri, privacyUri, pricingDetailLink, recommendedVMSize, isPremium, showInGui, publisherName);
    }
 }

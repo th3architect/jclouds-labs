@@ -16,6 +16,107 @@
  */
 package org.jclouds.azurecompute.domain;
 
-public enum RoleSize {
-   EXTRA_SMALL, SMALL, MEDIUM, LARGE, EXTRA_LARGE, UNRECOGNIZED;
+import org.jclouds.javax.annotation.Nullable;
+
+import com.google.auto.value.AutoValue;
+
+/**
+ * A Role Size that is available in a given subscription.
+ *
+ * @see <a href="http://msdn.microsoft.com/en-us/library/jj157176" >api</a>
+ */
+@AutoValue
+public abstract class RoleSize {
+
+   public enum Type {
+      BASIC_A0 ("Basic_A0"), BASIC_A1 ("Basic_A1"), BASIC_A2 ("Basic_A2"), BASIC_A3 ("Basic_A3"), BASIC_A4 ("Basic_A4"),
+      A0 ("A0"), A1 ("A1"), A2 ("A2"), A3 ("A3"), A4 ("A4"), A5 ("A5"), A6 ("A6"), A7 ("A7"), A8 ("A8"), A9 ("A9"),
+      STANDARD_A0 ("Standartd_A0"), STANDARD_A1 ("Standartd_A1"), STANDARD_A2 ("Standartd_A2"), STANDARD_A3
+              ("Standartd_A3"),
+      STANDARD_A4 ("Standartd_A4"), STANDARD_A5 ("Standartd_A5"), STANDARD_A6 ("Standartd_A6"),
+      STANDARD_A7 ("Standartd_A7"),
+      STANDARD_A8 ("Standartd_A8"), STANDARD_A9 ("Standartd_A9"),
+      STANDARD_D1 ("Standartd_D1"), STANDARD_D2 ("Standartd_D2"), STANDARD_D3 ("Standartd_D3"), STANDARD_D4
+              ("Standartd_D4"),
+      STANDARD_D11 ("Standartd_D11"),
+      STANDARD_D12 ("Standartd_D12"), STANDARD_D13 ("Standartd_D13"),
+      STANDARD_D14 ("Standartd_D14"),
+      EXTRASMALL ("ExtraSmall"), SMALL ("Small"), MEDIUM ("Medium"), LARGE ("Large"), EXTRALARGE ("ExtraLarge"),
+      UNRECOGNIZED ("UNRECOGNIZED");
+
+      private String text;
+
+      Type(String text) {
+         this.text = text;
+      }
+
+      public String getText() {
+         return this.text;
+      }
+
+      public static Type fromString(String text) {
+         if (text != null) {
+            for (Type b : Type.values()) {
+               if (text.equalsIgnoreCase(b.text)) {
+                  return b;
+               }
+            }
+         }
+         throw new IllegalArgumentException("No constant with text " + text + " found");
+      }
+   }
+
+   RoleSize() {} // For AutoValue only!
+
+   /**
+    * The name of the role size.
+    */
+   public abstract Type name();
+
+   /**
+    * The description of the role size.
+    */
+   @Nullable
+   public abstract String label();
+
+   /**
+    * The number of cores that are available in the role size.
+    */
+   public abstract Integer cores();
+
+   /**
+    * The amount of memory that is available in the role size.
+    */
+   public abstract Integer memoryInMb();
+
+   /**
+    * Indicates whether the role size supports web roles or worker roles.
+    */
+   public abstract Boolean supportedByWebWorkerRoles();
+
+   /**
+    * Indicates whether the role size supports Virtual Machines.
+    */
+   public abstract Boolean supportedByVirtualMachines();
+
+   /**
+    * The maximum number of data disks that can be attached to the role.
+    */
+   public abstract Integer maxDataDiskCount();
+
+   /**
+    * The size of the resource disk for a web role or worker role.
+    */
+   public abstract Integer webWorkerResourceDiskSizeInMb();
+
+   /**
+    * The size of the resource disk for a Virtual Machine.
+    */
+   public abstract Integer virtualMachineResourceDiskSizeInMb();
+
+   public static RoleSize create(Type name, String label, Integer cores, Integer memoryInMb, Boolean
+           supportedByWebWorkerRoles, Boolean supportedByVirtualMachines, Integer maxDataDiskCount, Integer webWorkerResourceDiskSizeInMb, Integer virtualMachineResourceDiskSizeInMb) {
+      return new AutoValue_RoleSize(name, label, cores, memoryInMb, supportedByWebWorkerRoles, supportedByVirtualMachines, maxDataDiskCount, webWorkerResourceDiskSizeInMb, virtualMachineResourceDiskSizeInMb);
+   }
+
 }

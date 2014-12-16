@@ -24,6 +24,8 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class Location {
 
+   Location() {} // For AutoValue only!
+
    /** The name of the data center location. Ex. {@code West Europe}. */
    public abstract String name();
 

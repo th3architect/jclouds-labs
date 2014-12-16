@@ -45,12 +45,12 @@ public abstract class DeploymentParams {
       public abstract int localPort();
 
       public static ExternalEndpoint inboundTcpToLocalPort(int port, int localPort) {
-         return new AutoValue_DeploymentParams_ExternalEndpoint(String.format("tcp %s:%s", port, localPort), "tcp",
+         return new AutoValue_DeploymentParams_ExternalEndpoint(String.format("tcp_%s-%s", port, localPort), "tcp",
                port, localPort);
       }
 
       public static ExternalEndpoint inboundUdpToLocalPort(int port, int localPort) {
-         return new AutoValue_DeploymentParams_ExternalEndpoint(String.format("udp %s:%s", port, localPort), "udp",
+         return new AutoValue_DeploymentParams_ExternalEndpoint(String.format("udp_%s-%s", port, localPort), "udp",
                port, localPort);
       }
 
@@ -58,11 +58,13 @@ public abstract class DeploymentParams {
       }
    }
 
+   DeploymentParams() {} // For AutoValue only!
+
    /** The user-supplied name for this deployment. */
    public abstract String name();
 
    /** The size of the virtual machine to allocate. The default value is Small. */
-   public abstract RoleSize size();
+   public abstract RoleSize.Type size();
 
    /**
     * Specifies the name of a user to be created in the sudoers group of the
@@ -89,6 +91,9 @@ public abstract class DeploymentParams {
 
    public abstract List<ExternalEndpoint> externalEndpoints();
 
+   /** {@link org.jclouds.azurecompute.domain.NetworkConfiguration.VirtualNetworkSite#name} */
+   public abstract String virtualNetworkName();
+
    public Builder toBuilder() {
       return builder().fromDeploymentParams(this);
    }
@@ -99,20 +104,21 @@ public abstract class DeploymentParams {
 
    public static final class Builder {
       private String name;
-      private RoleSize size = RoleSize.SMALL;
+      private RoleSize.Type size;
       private String username;
       private String password;
       private String sourceImageName;
       private URI mediaLink;
       private OSImage.Type os;
       private List<ExternalEndpoint> externalEndpoints = Lists.newArrayList();
+      private String virtualNetworkName;
 
       public Builder name(String name) {
          this.name = name;
          return this;
       }
 
-      public Builder size(RoleSize size) {
+      public Builder size(RoleSize.Type size) {
          this.size = size;
          return this;
       }
@@ -148,13 +154,18 @@ public abstract class DeploymentParams {
       }
 
       public Builder externalEndpoints(Collection<ExternalEndpoint> externalEndpoints) {
-         externalEndpoints.addAll(externalEndpoints);
+         this.externalEndpoints.addAll(externalEndpoints);
+         return this;
+      }
+
+      public Builder virtualNetworkName(String virtualNetworkName) {
+         this.virtualNetworkName = virtualNetworkName;
          return this;
       }
 
       public DeploymentParams build() {
          return DeploymentParams.create(name, size, username, password, sourceImageName, mediaLink, os,
-               ImmutableList.copyOf(externalEndpoints));
+               ImmutableList.copyOf(externalEndpoints), virtualNetworkName);
       }
 
       public Builder fromDeploymentParams(DeploymentParams in) {
@@ -169,8 +180,9 @@ public abstract class DeploymentParams {
       }
    }
 
-   private static DeploymentParams create(String name, RoleSize size, String username, String password, String sourceImageName,
-         URI mediaLink, OSImage.Type os, List<ExternalEndpoint> externalEndpoints) {
-      return new AutoValue_DeploymentParams(name, size, username, password, sourceImageName, mediaLink, os, externalEndpoints);
+   private static DeploymentParams create(String name, RoleSize.Type size, String username, String password, String
+           sourceImageName, URI mediaLink, OSImage.Type os, List<ExternalEndpoint> externalEndpoints, String virtualNetworkName) {
+      return new AutoValue_DeploymentParams(name, size, username, password, sourceImageName, mediaLink, os,
+              externalEndpoints, virtualNetworkName);
    }
 }

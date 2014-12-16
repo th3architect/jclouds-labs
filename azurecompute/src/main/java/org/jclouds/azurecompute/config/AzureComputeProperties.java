@@ -33,4 +33,7 @@ public class AzureComputeProperties {
 	 * @see <a href="http://msdn.microsoft.com/en-us/library/ee460786">docs</a>
 	 */
 	public static final String SUBSCRIPTION_ID = "jclouds.azurecompute.subscription-id";
+
+	public static final String OPERATION_TIMEOUT = "jclouds.azurecompute.timeout";
+
 }
