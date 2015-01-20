@@ -70,7 +70,7 @@ public class AzureComputeServiceContextLiveTest extends BaseComputeServiceContex
       final String group = "node" + new Random().nextLong();
 
       TemplateBuilder templateBuilder = view.getComputeService().templateBuilder();
-      templateBuilder.imageId("b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu_DAILY_BUILD-trusty-14_04_1-LTS-amd64-server-20141212-en-us-30GB");
+      templateBuilder.imageId("b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu_DAILY_BUILD-trusty-14_04_1-LTS-amd64-server-20150115-en-us-30GB");
       templateBuilder.hardwareId("BASIC_A2");
       Template template = templateBuilder.build();
 
